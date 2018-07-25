@@ -24,7 +24,8 @@ class Model:
         return self.id + " " + self.type
         
         
-class Dataset:
+class Data:
+
     
     def load_types(self):
         model_types = {}
@@ -36,14 +37,21 @@ class Dataset:
     
     
     def __init__(self, root_folder):
+        self.unique_room_types = set()
+        self.unique_model_types = set()
+        
         self.root_folder = root_folder
         self.model_types = self.load_types()
         self.rooms = []
         houses = os.listdir(os.path.join(root_folder,"house")) 
+        
+        i=0
         for house_id in houses:
             print(house_id)
             self.rooms = self.rooms + self._load_house(house_id)
-            #break
+            if i>10:
+                break
+            i+=1
     
     def _load_house(self, house_id):
         with open(os.path.join(self.root_folder,'house',house_id,"house.json"),'r') as f:
@@ -60,6 +68,7 @@ class Dataset:
                     model.id = entry['modelId']
                     model.bbox = entry['bbox']
                     model.type = self.model_types[model.id]
+                    self.unique_model_types.add(self.model_types[model.id])                    
                     models.append(model)
                 
                 elif entry['type'] == 'Room':
@@ -68,6 +77,8 @@ class Dataset:
                         room.id = entry['modelId']
                         room.indexes = entry['nodeIndices']
                         room.types = entry['roomTypes']
+                        for t in entry['roomTypes']:
+                            self.unique_room_types.add(t)
                         rooms.append(room)
                     models.append(None)
                 else:
@@ -81,7 +92,7 @@ class Dataset:
 
     def write_to_file(self, filename):
         with open(filename, 'wb') as f:
-            pickle.dump(self.rooms,f)
+            pickle.dump(self,f)
         
         
 if __name__ == "__main__":
@@ -94,6 +105,6 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    dataset = Dataset(args.folder)
+    dataset = Data(args.folder)
     dataset.write_to_file(args.output)
     
