@@ -3,15 +3,14 @@ Created on 25. 7. 2018
 
 @author: Mirek
 '''
-from .parse_dataset import Model, Room, Data
+from dataset.parse_dataset import Model,Data,Room
 import pickle
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
 
 
 class Dataset:
     def __init__(self, data, maxsize, shuffle_batches=True):
-        
         room_cats = self._make_index_mapping(data.unique_room_types)
         model_cats = self._make_index_mapping(data.unique_model_types)
         
@@ -19,15 +18,18 @@ class Dataset:
         self._labels = np.zeros([len(data.rooms), 3], np.float32)
 
         for room in range(len(data.rooms)):
-            random_index = np.random.randint(len(room.models))
+            random_index = np.random.randint(len(data.rooms[room].models))
             for model in range(maxsize):
                 if model != random_index:
-                    if len(data.rooms[room].models) > model:
+                    if len(data.rooms[room].models) > model and data.rooms[room].models[model]!= None:
                         self._sequences[room, model, 0] = model_cats[data.rooms[room].models[model].type]
-                        self._sequences[room, model, 1:] = data.rooms[room].models[model].bbox['min'] + data.rooms[room].models[model].bbox['min']
+                        self._sequences[room, model, 1:7] = data.rooms[room].models[model].bbox['min'] + data.rooms[room].models[model].bbox['min']
                 else:
-                    self._labels[room,:] = data.rooms[room].models[model].bbox['min']
-
+                    if data.rooms[room].models[model]!=None:
+                        self._labels[room,:] = data.rooms[room].models[model].bbox['min']
+        print(self._sequences[0])
+        print(self._labels)
+        
         self._shuffle_batches = shuffle_batches
         self._permutation = np.random.permutation(len(self._sequences)) if self._shuffle_batches else np.arange(len(self._sequences))
 
