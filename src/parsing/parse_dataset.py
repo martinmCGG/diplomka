@@ -3,18 +3,16 @@ Created on 25. 7. 2018
 
 @author: Mirek
 '''
-import numpy as np
 import json
 import os
-from IPython.utils.tokenize2 import Number
+import pickle
 
 class Room:
-
     def __init__(self):   
         self.types = []
         self.models = []
         self.indexes = []
-        self.id = "" 
+        self.id = ""
         
 class Model:
 
@@ -43,9 +41,9 @@ class Dataset:
         self.rooms = []
         houses = os.listdir(os.path.join(root_folder,"house")) 
         for house_id in houses:
+            print(house_id)
             self.rooms = self.rooms + self._load_house(house_id)
             #break
-        pass
     
     def _load_house(self, house_id):
         with open(os.path.join(self.root_folder,'house',house_id,"house.json"),'r') as f:
@@ -54,10 +52,8 @@ class Dataset:
         
         rooms = []
         models = []
-        
-        
+            
         for level in parsed['levels']:
-            print(level)
             for entry in level['nodes']:
                 if entry['type'] == 'Object':
                     model = Model()
@@ -68,24 +64,24 @@ class Dataset:
                 
                 elif entry['type'] == 'Room':
                     if 'nodeIndices' in entry: #skip empty rooms
-                        print(entry)
                         room = Room()
                         room.id = entry['modelId']
                         room.indexes = entry['nodeIndices']
                         room.types = entry['roomTypes']
                         rooms.append(room)
-                        models.append(None)
+                    models.append(None)
                 else:
-                    models.append[None]
-        print(models)
+                    models.append(None)
         for room in rooms:
             for node in room.indexes:
-                print(len(models), node)
                 room.models.append(models[node])
-            print(room.models)
-        
+
+
         return rooms
 
+    def write_to_file(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self.rooms,f)
         
         
 if __name__ == "__main__":
@@ -94,7 +90,10 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to data")
+    parser.add_argument("--output", default="data.txt", type=str, help="Path to output file")
+    
     args = parser.parse_args()
     
     dataset = Dataset(args.folder)
+    dataset.write_to_file(args.output)
     
