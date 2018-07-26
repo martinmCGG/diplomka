@@ -26,7 +26,6 @@ class Model:
         
 class Data:
 
-    
     def load_types(self):
         model_types = {}
         with open(os.path.join(self.root_folder,"ModelCategoryMapping.csv"),'r') as f:
@@ -39,19 +38,20 @@ class Data:
     def __init__(self, root_folder):
         self.unique_room_types = set()
         self.unique_model_types = set()
-        
         self.root_folder = root_folder
-        self.model_types = self.load_types()
+
         self.rooms = []
-        houses = os.listdir(os.path.join(root_folder,"house")) 
-        
-        i=0
-        for house_id in houses:
-            print(house_id)
-            self.rooms = self.rooms + self._load_house(house_id)
-            if i>10:
-                break
-            i+=1
+        if root_folder != None:
+            self.model_types = self.load_types()
+            houses = os.listdir(os.path.join(root_folder,"house")) 
+            
+            i=0
+            for house_id in houses:
+                print(house_id)
+                self.rooms = self.rooms + self._load_house(house_id)
+                if i>10:
+                    break
+                i+=1
     
     def _load_house(self, house_id):
         with open(os.path.join(self.root_folder,'house',house_id,"house.json"),'r') as f:
@@ -90,8 +90,18 @@ class Data:
 
         return rooms
 
-    def write_to_file(self, filename):
-        with open(filename, 'wb') as f:
+    def write_to_file(self, filename, val):
+        valset = Data(None)
+        valset.unique_model_types = self.unique_model_types
+        valset.unique_room_types = self.unique_room_types
+        border = int(len(self.rooms) * val)
+        
+        valset.rooms = self.rooms[:border]
+        self.rooms = self.rooms[border:]
+        
+        with open(os.path.join(filename,"val.pickle"), 'wb') as f:
+            pickle.dump(valset,f)
+        with open(os.path.join(filename,"train.pickle"), 'wb') as f:
             pickle.dump(self,f)
         
         
@@ -101,10 +111,10 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to data")
-    parser.add_argument("--output", default="data.txt", type=str, help="Path to output file")
+    parser.add_argument("--val", default=0.2, type=float, help="Size of validation set")
     
     args = parser.parse_args()
     
     dataset = Data(args.folder)
-    dataset.write_to_file(args.output)
+    dataset.write_to_file(args.folder, args.val)
     

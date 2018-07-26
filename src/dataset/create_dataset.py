@@ -3,8 +3,9 @@ Created on 25. 7. 2018
 
 @author: Mirek
 '''
-from dataset.parse_dataset import Model,Data,Room
+from dataset.parse_dataset import Model, Data, Room
 import pickle
+import os
 import numpy as np
 #import tensorflow as tf
 
@@ -27,7 +28,8 @@ class Dataset:
                 else:
                     if data.rooms[room].models[model]!=None:
                         self._labels[room,:] = data.rooms[room].models[model].bbox['min']
-        print(self._sequences[0])
+        
+        print(self._sequences)
         print(self._labels)
         
         self._shuffle_batches = shuffle_batches
@@ -66,17 +68,20 @@ class Dataset:
         return False
 
 
+
 if __name__ == '__main__':
     import argparse
-
     np.random.seed(42)
     # Parse arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", default=".", type=str, help="Path to pickled data")
-    parser.add_argument("--val",default=0.2, type=float, help="size of te validation set")
+    parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
     args = parser.parse_args()
-    with open(args.input, 'rb') as f:
-        data = pickle.load(f)
     
-    dataset = Dataset(data, 10, args.val)
+    with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
+        train_data = pickle.load(f)
+    with open(os.path.join(args.folder,"val.pickle"), 'rb') as f:
+        val_data = pickle.load(f)
+    train = Dataset(train_data, 10)
+    val = Dataset(val_data, 10)
+    
     
