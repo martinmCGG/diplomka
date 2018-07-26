@@ -29,8 +29,8 @@ class Dataset:
                     if data.rooms[room].models[model]!=None:
                         self._labels[room,:] = data.rooms[room].models[model].bbox['min']
         
-        print(self._sequences)
-        print(self._labels)
+        #print(self._sequences)
+        #print(self._labels)
         
         self._shuffle_batches = shuffle_batches
         self._permutation = np.random.permutation(len(self._sequences)) if self._shuffle_batches else np.arange(len(self._sequences))
