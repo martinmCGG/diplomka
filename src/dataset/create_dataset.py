@@ -3,32 +3,47 @@ Created on 25. 7. 2018
 
 @author: Mirek
 '''
-from dataset.parse_dataset import Model, Data, Room
+from parse_dataset import Model, Data, Room
 import pickle
 import os
 import numpy as np
-#import tensorflow as tf
-
 
 class Dataset:
     def __init__(self, data, maxsize, shuffle_batches=True):
+        
+        self.data = data
+        
         room_cats = self._make_index_mapping(data.unique_room_types)
         model_cats = self._make_index_mapping(data.unique_model_types)
         
-        self._sequences = np.zeros([len(data.rooms), maxsize, 7], np.float32)
+        self._categories = np.zeros([len(data.rooms), maxsize],np.int32)
+        self._sequences = np.zeros([len(data.rooms), maxsize, 6], np.float32)
+        self._labels_categories = np.zeros([len(data.rooms)], np.int32)
         self._labels = np.zeros([len(data.rooms), 3], np.float32)
+        
+        self._sequence_lengths = np.zeros([len(data.rooms)], np.int32)
 
+
+        offset = 0
         for room in range(len(data.rooms)):
+            size_of_room = len(data.rooms[room].models)
             random_index = np.random.randint(len(data.rooms[room].models))
             for model in range(maxsize):
-                if model != random_index:
-                    if len(data.rooms[room].models) > model and data.rooms[room].models[model]!= None:
-                        self._sequences[room, model, 0] = model_cats[data.rooms[room].models[model].type]
-                        self._sequences[room, model, 1:7] = data.rooms[room].models[model].bbox['min'] + data.rooms[room].models[model].bbox['min']
+                if size_of_room > model:
+                    modell = data.rooms[room].models[model]
+                    if model != random_index:
+                        if modell != None:
+                            self.categories[room, model+offset] = model_cats[modell.type]
+                            self._sequences[room, model+offset,:] = modell.bbox['min'] + modell.bbox['max']
+                    else:
+                        if modell !=None:
+                            offset = -1
+                            self._labels_categories[room] = model_cats[modell.type]
+                            self._labels[room,:] = modell.bbox['min']
                 else:
-                    if data.rooms[room].models[model]!=None:
-                        self._labels[room,:] = data.rooms[room].models[model].bbox['min']
-        
+                    break
+            self._sequence_lengths[room] = size_of_room - 1 
+            
         #print(self._sequences)
         #print(self._labels)
         
@@ -48,18 +63,27 @@ class Dataset:
     @property
     def sequences(self):
         return self._sequences
-
+    @property
+    def categories(self):
+        return self._categories
     @property
     def labels(self):
         return self._labels
+    @property
+    def labels_categories(self):
+        return self._labels_categories
+   
+    @property
+    def sequence_lengths(self):
+        return self._sequence_lengths
 
     def all_data(self):
-        return self._sequences, self._labels
+        return self._sequences, self._labels, self._categories, self._labels_categories, self._sequence_lengths
 
     def next_batch(self, batch_size):
         batch_size = min(batch_size, len(self._permutation))
         batch_perm, self._permutation = self._permutation[:batch_size], self._permutation[batch_size:]
-        return self._sequences[batch_perm], self._labels[batch_perm]
+        return self._sequences[batch_perm], self._labels[batch_perm], self._categories[batch_perm],self._labels_categories[batch_perm], self._sequence_lengths[batch_perm]
 
     def epoch_finished(self):
         if len(self._permutation) == 0:
@@ -67,8 +91,9 @@ class Dataset:
             return True
         return False
 
-
-
+    def get_number_of_categories(self):
+        return len(self.data.unique_model_types)
+    
 if __name__ == '__main__':
     import argparse
     np.random.seed(42)

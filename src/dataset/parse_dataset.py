@@ -7,6 +7,7 @@ import json
 import os
 import pickle
 
+
 class Room:
     def __init__(self):   
         self.types = []
@@ -25,6 +26,8 @@ class Model:
         
         
 class Data:
+
+    ignored_categories = ["otherprop"]
 
     def load_types(self):
         model_types = {}
@@ -49,9 +52,9 @@ class Data:
             for house_id in houses:
                 print(house_id)
                 self.rooms = self.rooms + self._load_house(house_id)
-                if i>10:
-                    break
-                i+=1
+                #if i>10:
+                #    break
+                #i+=1
     
     def _load_house(self, house_id):
         with open(os.path.join(self.root_folder,'house',house_id,"house.json"),'r') as f:
@@ -68,7 +71,8 @@ class Data:
                     model.id = entry['modelId']
                     model.bbox = entry['bbox']
                     model.type = self.model_types[model.id]
-                    self.unique_model_types.add(self.model_types[model.id])                    
+                    if model.type not in self.ignored_categories:
+                        self.unique_model_types.add(self.model_types[model.id])                    
                     models.append(model)
                 
                 elif entry['type'] == 'Room':
@@ -83,12 +87,14 @@ class Data:
                     models.append(None)
                 else:
                     models.append(None)
+
         for room in rooms:
             for node in room.indexes:
-                room.models.append(models[node])
-
-
-        return rooms
+                if models[node]!= None and models[node].type not in self.ignored_categories:
+                    room.models.append(models[node])
+        
+        #Filter out empty rooms
+        return [x for x in rooms if x.models]
 
     def write_to_file(self, filename, val):
         valset = Data(None)

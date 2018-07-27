@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import numpy as np
 import tensorflow as tf
-from dataset.create_dataset import Dataset
-from dataset.parse_dataset import Data, Room, Model
+from create_dataset import Dataset
+from parse_dataset import Data, Room, Model
 import pickle
-
+import math
 
 class Network:
     def __init__(self, threads, seed=42):
@@ -31,11 +31,11 @@ class Network:
             # Training
             self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
             global_step = tf.train.create_global_step()
-            optimizer = tf.train.AdamOptimizer()
+            optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
             self.training = tf.train.AdamOptimizer().minimize(self.loss, global_step=global_step, name="training")
 
             # Summaries
-            self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.labels, self.predictions), tf.float32))
+            self.accuracy = tf.reduce_mean(tf.abs(self.labels - self.predictions))
             summary_writer = tf.contrib.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
             self.summaries = {}
             with summary_writer.as_default(), tf.contrib.summary.record_summaries_every_n_global_steps(10):
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
     parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
     parser.add_argument("--room_size", default=20, type=int, help="Number of items in room")
-    parser.add_argument("--hidden_count", default=2, type=int, help="Number of hidden layers")
-    parser.add_argument("--hidden_size", default=1024, type=int, help="Size of hidden layers")
-    parser.add_argument("--epochs", default=20, type=int, help="Number of epochs.")
+    parser.add_argument("--hidden_count", default=1, type=int, help="Number of hidden layers")
+    parser.add_argument("--hidden_size", default=2048, type=int, help="Size of hidden layers")
+    parser.add_argument("--epochs", default=1, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     
     args = parser.parse_args()
@@ -106,10 +106,17 @@ if __name__ == "__main__":
         while not train.epoch_finished():
             sequences, labels = train.next_batch(args.batch_size)
             acc,loss = network.train(sequences, labels)
+            if math.isnan(acc):
+                print (sequences)
+                print (labels)
+                i=5000
+                break
             print("train loss: ", loss)
+            print("train acc: ", acc)
 
         dev_sequences, dev_labels = val.all_data()
         acc,loss = network.evaluate("dev", dev_sequences, dev_labels)
         print("dev loss: ", loss)
+        print("dev acc: ", acc)
     
     
