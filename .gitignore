@@ -1,2 +1,4 @@
 *.DESKTOP-FN5ET9C
 *.pyc
+src/dataset/rnet.py-2018-07-27_112037/events.out.tfevents.1532683274.mayrau.v2
+src/dataset/test.py
