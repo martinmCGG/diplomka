@@ -14,11 +14,12 @@ class Room:
         self.models = []
         self.indexes = []
         self.id = ""
+        self.bbox = {}
         
 class Model:
 
     def __init__(self):
-        self.bbox = {min:0,max:0}
+        self.bbox = {"min":0,"max":0}
         self.type = ""
         self.id = "" 
     def __repr__(self):
@@ -81,6 +82,7 @@ class Data:
                         room.id = entry['modelId']
                         room.indexes = entry['nodeIndices']
                         room.types = entry['roomTypes']
+                        room.bbox = entry["bbox"]
                         for t in entry['roomTypes']:
                             self.unique_room_types.add(t)
                         rooms.append(room)
@@ -90,9 +92,11 @@ class Data:
 
         for room in rooms:
             for node in room.indexes:
-                if models[node]!= None and models[node].type not in self.ignored_categories:
+                model = models[node]
+                if model!= None and model.type not in self.ignored_categories:
+                    model.bbox = self._subtract_bbox(model.bbox, room.bbox["min"])
                     room.models.append(models[node])
-        
+            room.bbox = self._subtract_bbox(room.bbox, room.bbox["min"])
         #Filter out empty rooms
         return [x for x in rooms if x.models]
 
@@ -109,7 +113,13 @@ class Data:
             pickle.dump(valset,f)
         with open(os.path.join(filename,"train.pickle"), 'wb') as f:
             pickle.dump(self,f)
-        
+            
+    def _subtract_bbox(self, bbox, sub):
+        rt = {}
+        for m in ["min","max"]:
+            rt[m] = [bbox[m][i] - sub[i] for i in range(3)]
+        return rt
+           
         
 if __name__ == "__main__":
     import argparse

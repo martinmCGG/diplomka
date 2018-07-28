@@ -40,7 +40,7 @@ class Network:
             proccesed_input = tf.concat((embeded_label,state[1]), axis = 1)
             print(state[1])
             print(proccesed_input)
-            dense_layer = tf.layers.dense(proccesed_input, 2048, activation=tf.nn.relu)
+            dense_layer = tf.layers.dense(proccesed_input, 512, activation=tf.nn.relu)
             
             output_layer = tf.layers.dense(dense_layer, 3, activation=None)
             self.predictions = output_layer
@@ -50,7 +50,7 @@ class Network:
             # Training
             self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
             global_step = tf.train.create_global_step()
-            optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+            optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
             self.training = optimizer.minimize(self.loss, global_step=global_step, name="training")
 
             # Summaries
@@ -100,7 +100,7 @@ if __name__ == "__main__":
     parser.add_argument("--room_size", default=30, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
     parser.add_argument("--dims", default=50, type=int, help="Number of hidden layers")
-    parser.add_argument("--epochs", default=100, type=int, help="Number of epochs.")
+    parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     
     args = parser.parse_args()
