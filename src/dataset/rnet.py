@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-from create_dataset import Dataset
+from create_dataset import Dataset, RnnDataset
 from parse_dataset import Data, Room, Model
 import pickle
 import math
@@ -28,7 +28,7 @@ class Network:
             embeded = embedding_layer(tf.one_hot(self.categories,args.number_of_categories))
             
             inputs = tf.concat((tf.squeeze(embeded), self.sequences), axis=2, name="input")
-            print(inputs)
+
             inputs = tf.reshape(inputs, [-1,inputs.shape[1],args.embedding_size + 6])
             #create rnn cell and run recurent network
             cell = tf.nn.rnn_cell.LSTMCell(args.dims)
@@ -38,14 +38,11 @@ class Network:
             embeded_label = embedding_layer(tf.one_hot(self.labels_categories,args.number_of_categories))
             
             proccesed_input = tf.concat((embeded_label,state[1]), axis = 1)
-            print(state[1])
-            print(proccesed_input)
+
             dense_layer = tf.layers.dense(proccesed_input, 512, activation=tf.nn.relu)
             
             output_layer = tf.layers.dense(dense_layer, 3, activation=None)
             self.predictions = output_layer
-            print(self.predictions)
-            print(self.labels)
             
             # Training
             self.loss = tf.losses.mean_squared_error(self.labels, self.predictions)
@@ -96,10 +93,10 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
-    parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
-    parser.add_argument("--room_size", default=30, type=int, help="Number of items in room")
+    parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
+    parser.add_argument("--room_size", default=50, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
-    parser.add_argument("--dims", default=50, type=int, help="Number of hidden layers")
+    parser.add_argument("--dims", default=128, type=int, help="Size of the rnn cells")
     parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     
@@ -117,10 +114,9 @@ if __name__ == "__main__":
         train_data = pickle.load(f)
     with open(os.path.join(args.folder,"val.pickle"), 'rb') as f:
         val_data = pickle.load(f)
-    train = Dataset(train_data, args.room_size)
-    val = Dataset(val_data, args.room_size)
+    train = RnnDataset(train_data, args.room_size)
+    val = RnnDataset(val_data, args.room_size)
     args.number_of_categories = train.get_number_of_categories()
-    print(args.number_of_categories)
     
     # Construct the network
     network = Network(threads=args.threads)

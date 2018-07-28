@@ -8,48 +8,35 @@ import pickle
 import os
 import numpy as np
 
+
 class Dataset:
-    def __init__(self, data, maxsize, shuffle_batches=True):
-        
+    def __init__(self, data, data_created, shuffle_batches=True):
         self.data = data
+        self.room_cats = self._make_index_mapping(data.unique_room_types)
+        self.model_cats = self._make_index_mapping(data.unique_model_types)
         
-        room_cats = self._make_index_mapping(data.unique_room_types)
-        model_cats = self._make_index_mapping(data.unique_model_types)
+        self.shuffle_batches = shuffle_batches
+        self.permutation = np.random.permutation(len(self.sequences)) if self.shuffle_batches else np.arange(len(self.sequences))
+    
+        self.data_created = data_created
         
-        self._categories = np.zeros([len(data.rooms), maxsize],np.int32)
-        self._sequences = np.zeros([len(data.rooms), maxsize, 6], np.float32)
-        self._labels_categories = np.zeros([len(data.rooms)], np.int32)
-        self._labels = np.zeros([len(data.rooms), 3], np.float32)
-        
-        self._sequence_lengths = np.zeros([len(data.rooms)], np.int32)
+    def all_data(self):
+        return self.data_created
 
-
-        offset = 0
-        for room in range(len(data.rooms)):
-            size_of_room = len(data.rooms[room].models)
-            random_index = np.random.randint(len(data.rooms[room].models))
-            for model in range(maxsize):
-                if size_of_room > model:
-                    modell = data.rooms[room].models[model]
-                    if model != random_index:
-                        if modell != None:
-                            self.categories[room, model+offset] = model_cats[modell.type]
-                            self._sequences[room, model+offset,:] = modell.bbox['min'] + modell.bbox['max']
-                    else:
-                        if modell !=None:
-                            offset = -1
-                            self._labels_categories[room] = model_cats[modell.type]
-                            self._labels[room,:] = modell.bbox['min']
-                else:
-                    break
-            self._sequence_lengths[room] = size_of_room - 1 
-            
-        #print(self._sequences)
-        #print(self._labels)
-        
-        self._shuffle_batches = shuffle_batches
-        self._permutation = np.random.permutation(len(self._sequences)) if self._shuffle_batches else np.arange(len(self._sequences))
-
+    def next_batch(self, batch_size):
+        batch_size = min(batch_size, len(self.permutation))
+        batch_perm, self.permutation = self.permutation[:batch_size], self.permutation[batch_size:]
+        return [x[batch_perm] for x in self.data_created]
+    
+    def epoch_finished(self):
+        if len(self.permutation) == 0:
+            self.permutation = np.random.permutation(len(self.sequences)) if self.shuffle_batches else np.arange(len(self.sequences))
+            return True
+        return False
+    
+    def get_number_of_categories(self):
+        return len(self.data.unique_model_types)
+    
     def _make_index_mapping(self, sett):
         sett = list(sett)
         mapping = {}
@@ -60,39 +47,34 @@ class Dataset:
         return mapping
 
 
-    @property
-    def sequences(self):
-        return self._sequences
-    @property
-    def categories(self):
-        return self._categories
-    @property
-    def labels(self):
-        return self._labels
-    @property
-    def labels_categories(self):
-        return self._labels_categories
-   
-    @property
-    def sequence_lengths(self):
-        return self._sequence_lengths
+class RnnDataset(Dataset):
+    
+    
+    
+    def __init__(self, data, maxsize, shuffle_batches=True):
+        self.maxsize = maxsize
+        
+        self.categories = np.zeros([len(data.rooms), maxsize],np.int32)
+        self.sequences = np.zeros([len(data.rooms), maxsize, 6], np.float32)
+        self.labels_categories = np.zeros([len(data.rooms)], np.int32)
+        self.labels = np.zeros([len(data.rooms), 3], np.float32)
+        self.sequence_lengths = np.zeros([len(data.rooms)], np.int32)
+        
+        
+        data_created = [self.sequences,self.labels, self.categories, self.labels_categories,  self.sequence_lengths]
+        
+        Dataset.__init__(self, data, data_created, shuffle_batches)
+        self._create_data()
+        
+    
 
-    def all_data(self):
-        return self._sequences, self._labels, self._categories, self._labels_categories, self._sequence_lengths
-
-    def next_batch(self, batch_size):
-        batch_size = min(batch_size, len(self._permutation))
-        batch_perm, self._permutation = self._permutation[:batch_size], self._permutation[batch_size:]
-        return self._sequences[batch_perm], self._labels[batch_perm], self._categories[batch_perm],self._labels_categories[batch_perm], self._sequence_lengths[batch_perm]
-
-    def epoch_finished(self):
-        if len(self._permutation) == 0:
-            self._permutation = np.random.permutation(len(self._sequences)) if self._shuffle_batches else np.arange(len(self._sequences))
-            return True
-        return False
-
-    def get_number_of_categories(self):
-        return len(self.data.unique_model_types)
+    
+class ConvDataset(Dataset):
+    def __init__(self, data, size_of_pixel, shuffle_batches=True):
+        self.size_of_pixel = size_of_pixel
+        
+        
+        
     
 if __name__ == '__main__':
     import argparse
