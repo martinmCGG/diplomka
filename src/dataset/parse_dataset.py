@@ -28,6 +28,8 @@ class Model:
         
 class Data:
 
+    zaporne = 0
+    kladne = 0
     ignored_categories = ["otherprop"]
 
     def load_types(self):
@@ -56,6 +58,7 @@ class Data:
                 #if i>10:
                 #    break
                 #i+=1
+        print(-1*self.zaporne,  self.kladne)
     
     def _load_house(self, house_id):
         with open(os.path.join(self.root_folder,'house',house_id,"house.json"),'r') as f:
@@ -79,7 +82,7 @@ class Data:
                 elif entry['type'] == 'Room':
                     if 'nodeIndices' in entry: #skip empty rooms
                         room = Room()
-                        room.id = entry['modelId']
+                        room.id = house_id
                         room.indexes = entry['nodeIndices']
                         room.types = entry['roomTypes']
                         room.bbox = entry["bbox"]
@@ -89,17 +92,33 @@ class Data:
                     models.append(None)
                 else:
                     models.append(None)
+                    
 
         for room in rooms:
             for node in room.indexes:
                 model = models[node]
                 if model!= None and model.type not in self.ignored_categories:
-                    model.bbox = self._subtract_bbox(model.bbox, room.bbox["min"])
-                    room.models.append(models[node])
+                    #Filter the models which are not inside the room
+                    if self._is_inside(room.bbox, model.bbox):
+                        self.kladne+=1
+                        room.models.append(models[node])
+                        model.bbox = self._subtract_bbox(model.bbox, room.bbox["min"])
+                    else:
+                        self.zaporne +=1
             room.bbox = self._subtract_bbox(room.bbox, room.bbox["min"])
+        
         #Filter out empty rooms
         return [x for x in rooms if x.models]
 
+    def _is_inside(self, big, small):
+        istrue = True
+        for i in [0,2]:
+            istrue = istrue and big["min"][i] <= small["min"][i]
+        for i in [0,2]:
+            istrue = istrue and big["max"][i] >= small["max"][i]
+        return istrue
+    
+    
     def write_to_file(self, filename, val):
         valset = Data(None)
         valset.unique_model_types = self.unique_model_types
