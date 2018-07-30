@@ -95,7 +95,10 @@ class ConvDataset(Dataset):
         self.image_size = image_size
         
         self.images = np.zeros([len(data.rooms), image_size, image_size], np.int32)
-        data_created = [self.images]
+        self.labels = np.zeros([len(data.rooms), 2], np.int32)
+        self.label_cats = np.zeros([len(data.rooms)], np.int32)
+        
+        data_created = [self.images, self.labels, self.label_cats]
         Dataset.__init__(self, data, data_created, shuffle_batches)
         
         print(self.model_cats)
@@ -103,7 +106,11 @@ class ConvDataset(Dataset):
         for r in range(100):
         #for r in range(len(data.rooms)):
             room = data.rooms[r]
-            self.images[r,:,:] = self._proccess_room(room)
+            proom = self._proccess_room(room)
+            self.images[r,:,:] = proom[0]
+            self.labels[r,0] = proom[1][0]
+            self.labels[r,1] = proom[1][1]
+            self.label_cats[r] = proom[1][2]
         print(np.shape(self.images))
             
         
@@ -118,17 +125,25 @@ class ConvDataset(Dataset):
         x = x * pixel_size
         z = z * pixel_size
         
+        random_index = np.random.randint(len(room.models))
+        label_model = room.models[random_index]
+        
+       
+
         for model in room.models:
             category = self.model_cats[model.type]
             minx = int(model.bbox["min"][0] * pixel_size)
             maxx = int(model.bbox["max"][0] * pixel_size)
             minz = int(model.bbox["min"][2] * pixel_size)
             maxz = int(model.bbox["max"][2] * pixel_size)
-            for i in range(minx, maxx):
-                for j in range(minz, maxz):
-                    image[i,j] = category
+            if model != label_model:
+                for i in range(minx, maxx):
+                    for j in range(minz, maxz):
+                        image[i,j] = category
+            else:
+                label = [minx + (maxx - minx)/2, minz + (maxz - minz)/2, category]
         
-        return image
+        return image, label
     
 if __name__ == '__main__':
     import argparse
