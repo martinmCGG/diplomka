@@ -7,7 +7,7 @@ from parse_dataset import Model, Data, Room
 import pickle
 import os
 import numpy as np
-
+np.set_printoptions(suppress=True,linewidth=np.nan,threshold=np.nan)
 
 class Dataset:
     def __init__(self, data, data_created, shuffle_batches=True):
@@ -40,7 +40,6 @@ class Dataset:
         return len(self.data.unique_model_types)
     
     def _make_index_mapping(self, sett):
-        sett = list(sett)
         mapping = {}
         i = 1
         for category in sett:
@@ -99,13 +98,14 @@ class ConvDataset(Dataset):
         data_created = [self.images]
         Dataset.__init__(self, data, data_created, shuffle_batches)
         
-        for r in range(len(data.rooms)):
+        print(self.model_cats)
+        
+        for r in range(100):
+        #for r in range(len(data.rooms)):
             room = data.rooms[r]
             self.images[r,:,:] = self._proccess_room(room)
         print(np.shape(self.images))
             
-        
-        
         
     def _proccess_room(self, room):
         image = np.zeros((self.image_size,self.image_size), np.int32)
@@ -128,7 +128,6 @@ class ConvDataset(Dataset):
                 for j in range(minz, maxz):
                     image[i,j] = category
         
-        np.savetxt('/home/krabec/'+room.id+'.txt', image)
         return image
     
 if __name__ == '__main__':

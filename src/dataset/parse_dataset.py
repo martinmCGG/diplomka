@@ -14,6 +14,7 @@ class Room:
         self.models = []
         self.indexes = []
         self.id = ""
+        self.house_id = ""
         self.bbox = {}
         
 class Model:
@@ -42,8 +43,8 @@ class Data:
     
     
     def __init__(self, root_folder):
-        self.unique_room_types = set()
-        self.unique_model_types = set()
+        self.unique_room_types = []
+        self.unique_model_types = []
         self.root_folder = root_folder
 
         self.rooms = []
@@ -75,19 +76,21 @@ class Data:
                     model.id = entry['modelId']
                     model.bbox = entry['bbox']
                     model.type = self.model_types[model.id]
-                    if model.type not in self.ignored_categories:
-                        self.unique_model_types.add(self.model_types[model.id])                    
+                    if model.type not in self.ignored_categories and model.type not in self.unique_model_types:
+                        self.unique_model_types.append(self.model_types[model.id])                    
                     models.append(model)
                 
                 elif entry['type'] == 'Room':
                     if 'nodeIndices' in entry: #skip empty rooms
                         room = Room()
-                        room.id = house_id
+                        room.id = entry['id']
+                        room.house_id = house_id
                         room.indexes = entry['nodeIndices']
                         room.types = entry['roomTypes']
                         room.bbox = entry["bbox"]
                         for t in entry['roomTypes']:
-                            self.unique_room_types.add(t)
+                            if t not in self.unique_room_types:
+                                self.unique_room_types.append(t)
                         rooms.append(room)
                     models.append(None)
                 else:
