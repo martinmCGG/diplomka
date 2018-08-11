@@ -13,12 +13,11 @@ class Network:
         self.session = tf.Session(graph = graph, config=tf.ConfigProto(inter_op_parallelism_threads=threads,
                                                                        intra_op_parallelism_threads=threads))
         
-        
     def construct(self, args):
         with self.session.graph.as_default():        
             
             self.images = tf.placeholder(tf.int32, [None, args.room_size,args.room_size], name="images")
-            self.labels = tf.placeholder(tf.int32, [None, 2], name="labesl")
+            self.labels = tf.placeholder(tf.int32, [None], name="labels")
             self.labels_categories = tf.placeholder(tf.int32, [None], name="labels_categories")
             
             embedding_layer = tf.layers.Dense(args.embedding_size, activation=None, name="categories_embedding")
@@ -26,7 +25,7 @@ class Network:
             
             next_layer = embeded
             print(next_layer)
-            cnn = "CB-64-3-2-same,CB-64-3-2-same,M-3-2,F".split(sep=',')
+            cnn = "CB-64-3-2-same,CB-64-3-2-same,M-3-2,CB-128-3-2-same,CB-128-3-2-same,M-3-2,F".split(sep=',')
             for layer in cnn:
                 layer = layer.split('-')
                 print(layer)
@@ -39,19 +38,19 @@ class Network:
                 elif layer[0] == 'R':
                     next_layer = tf.layers.dense(next_layer,int(layer[1]),activation=tf.nn.relu)
                 elif layer[0] == 'CB':
-                    nextlayer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=(int(layer[3])), padding=layer[4])
-                    nextlayer = tf.contrib.layers.batch_norm(next_layer,)
-                    nextlayer = tf.nn.relu(nextlayer)
+                    next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=(int(layer[3])), padding=layer[4])
+                    next_layer = tf.contrib.layers.batch_norm(next_layer,)
+                    next_layer = tf.nn.relu(next_layer)
                 print(next_layer)
             
             #embed labeled item category
             embeded_label = embedding_layer(tf.one_hot(self.labels_categories,args.number_of_categories))
             
-            proccesed_input = tf.concat((embeded_label, next_layer), axis = 1)
+            next_layer = tf.concat((embeded_label, next_layer), axis = 1)
 
-            dense_layer = tf.layers.dense(proccesed_input, 1024, activation=tf.nn.relu)
+            next_layer = tf.layers.dense(next_layer, 1024, activation=tf.nn.relu)
             
-            output_layer = tf.layers.dense(dense_layer, 2, activation=None)
+            output_layer = tf.layers.dense(next_layer, 2, activation=None)
             self.predictions = output_layer
             
             # Training
@@ -105,7 +104,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
     parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
-    parser.add_argument("--room_size", default=64, type=int, help="Number of items in room")
+    parser.add_argument("--room_size", default=256, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=16, type=int, help="Size of embedding of the categories")
     parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")

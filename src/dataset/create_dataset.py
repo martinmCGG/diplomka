@@ -86,9 +86,7 @@ class RnnDataset(Dataset):
         Dataset.__init__(self, data, data_created, shuffle_batches)
         self._create_data()
         
-    
-
-    
+  
 class ConvDataset(Dataset):
 
     def __init__(self, data, image_size, shuffle_batches=True):
@@ -156,9 +154,7 @@ class RoomClassDataset(Dataset):
             proom = self._proccess_room(room)
             self.images[r,:,:] = proom
             for t in room.types:
-                self.labels[r,self.room_cats[t]-1] = 1
-
-        
+                self.labels[r,self.room_cats[t]-1] = 1    
         
     def _proccess_room(self, room):
         image = np.zeros((self.image_size,self.image_size), np.int32)
