@@ -19,19 +19,19 @@ class Dataset:
         
         self.shuffle_batches = shuffle_batches
         self.permutation = np.random.permutation(len(self.data_created[0])) if self.shuffle_batches else np.arange(len(self.data_created[0]))
-    
-        
-        
+          
     def all_data(self):
         return self.data_created
 
     def next_batch(self, batch_size):
         batch_size = min(batch_size, len(self.permutation))
         batch_perm, self.permutation = self.permutation[:batch_size], self.permutation[batch_size:]
-        return [x[batch_perm] for x in self.data_created]
+        batch = [x[batch_perm] for x in self.data_created]
+        #print(batch[0])
+        return batch
     
-    def epoch_finished(self):
-        if len(self.permutation) == 0:
+    def epoch_finished(self, batch_size):
+        if len(self.permutation) < batch_size:
             self.permutation = np.random.permutation(len(self.data_created[0])) if self.shuffle_batches else np.arange(len(self.data_created[0]))
             return True
         return False
@@ -141,20 +141,23 @@ class ConvDataset(Dataset):
 class RoomClassDataset(Dataset):
     def __init__(self, data, image_size, shuffle_batches=True):
         self.image_size = image_size
+        
+        data.rooms = [x for x in data.rooms if len(x.types)>0]
+        
         self.images = np.zeros([len(data.rooms), image_size, image_size], np.int32)
         self.labels = np.zeros([len(data.rooms),len(data.unique_room_types)], np.int32)
         
         data_created = [self.images, self.labels]
         Dataset.__init__(self, data, data_created, shuffle_batches)
-        print(self.room_cats)
         
-        for r in range(100):
-        #for r in range(len(data.rooms)):
+        for r in range(len(data.rooms)):
             room = data.rooms[r]
             proom = self._proccess_room(room)
             self.images[r,:,:] = proom
             for t in room.types:
                 self.labels[r,self.room_cats[t]-1] = 1    
+        self.data_created = [self.images, self.labels]
+        #print(self.data_created)
         
     def _proccess_room(self, room):
         image = np.zeros((self.image_size,self.image_size), np.int32)
@@ -176,7 +179,6 @@ class RoomClassDataset(Dataset):
             for i in range(minx, maxx):
                 for j in range(minz, maxz):
                     image[i,j] = category
-        
         return image
         
     

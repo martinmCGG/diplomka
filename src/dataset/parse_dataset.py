@@ -29,8 +29,6 @@ class Model:
         
 class Data:
 
-    zaporne = 0
-    kladne = 0
     ignored_categories = ["otherprop"]
 
     def load_types(self):
@@ -42,7 +40,7 @@ class Data:
         return model_types
     
     
-    def __init__(self, root_folder):
+    def __init__(self, root_folder, limit):
         self.unique_room_types = []
         self.unique_model_types = []
         self.root_folder = root_folder
@@ -56,10 +54,9 @@ class Data:
             for house_id in houses:
                 print(house_id)
                 self.rooms = self.rooms + self._load_house(house_id)
-                #if i>10:
-                #    break
-                #i+=1
-        print(-1*self.zaporne,  self.kladne)
+                if limit != -1 and i>limit:
+                    break
+                i+=1
     
     def _load_house(self, house_id):
         with open(os.path.join(self.root_folder,'house',house_id,"house.json"),'r') as f:
@@ -103,11 +100,8 @@ class Data:
                 if model!= None and model.type not in self.ignored_categories:
                     #Filter the models which are not inside the room
                     if self._is_inside(room.bbox, model.bbox):
-                        self.kladne+=1
                         room.models.append(models[node])
                         model.bbox = self._subtract_bbox(model.bbox, room.bbox["min"])
-                    else:
-                        self.zaporne +=1
             room.bbox = self._subtract_bbox(room.bbox, room.bbox["min"])
         
         #Filter out empty rooms
@@ -123,7 +117,7 @@ class Data:
     
     
     def write_to_file(self, filename, val):
-        valset = Data(None)
+        valset = Data(None,None)
         valset.unique_model_types = self.unique_model_types
         valset.unique_room_types = self.unique_room_types
         border = int(len(self.rooms) * val)
@@ -150,9 +144,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to data")
     parser.add_argument("--val", default=0.2, type=float, help="Size of validation set")
+    parser.add_argument("--limit", default=-1, type=int, help="Limit the size of data")
     
     args = parser.parse_args()
     
-    dataset = Data(args.folder)
+    dataset = Data(args.folder,args.limit)
     dataset.write_to_file(args.folder, args.val)
     

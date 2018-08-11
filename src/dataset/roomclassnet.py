@@ -6,7 +6,7 @@ import pickle
 import math
 
 class Network:
-    def __init__(self, threads, seed=42):
+    def __init__(self, threads, seed=0):
         # Create an empty graph and a session
         graph = tf.Graph()
         graph.seed = seed
@@ -25,7 +25,8 @@ class Network:
             #next_layer = embeded
             next_layer = tf.one_hot(self.images,args.number_of_categories)
             print(next_layer)
-            cnn = "CB-64-3-1-same,CB-64-3-1-same,M-2-2,F".split(sep=',')
+            cnn = "CB-64-3-1-same,M-2-2,CB-64-3-1-same,M-2-2,F".split(sep=',')
+            #cnn = "F"
             for layer in cnn:
                 layer = layer.split('-')
                 print(layer)
@@ -45,22 +46,23 @@ class Network:
 
             dense_layer = tf.layers.dense(next_layer, 1024, activation=tf.nn.relu)
             
-            output_layer = tf.layers.dense(dense_layer, args.labels_size, activation=None)
-            
+            output_layer = tf.layers.dense(dense_layer, args.labels_size, activation=tf.nn.sigmoid)
+            self.output = output_layer
             ones = tf.ones((args.batch_size, args.labels_size), tf.float32)
             zeros = tf.zeros((args.batch_size, args.labels_size), tf.float32)
-            halfs = tf.ones((args.batch_size, args.labels_size), tf.float32) * 0.5
             
-            self.predictions = tf.where(tf.greater(tf.sigmoid(output_layer),halfs),ones,zeros)
-            
+            self.predictions = tf.where(tf.greater(output_layer,0.5),ones,zeros)
+            print(self.predictions)
             # Training
             self.loss = tf.nn.sigmoid_cross_entropy_with_logits (labels=self.labels, logits=output_layer)          
             global_step = tf.train.create_global_step()
-            optimizer = tf.train.AdamOptimizer(learning_rate=0.001)
+            optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
             self.training = optimizer.minimize(self.loss, global_step=global_step, name="training")
 
             # Summaries
             self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.labels, self.predictions), tf.float32), axis=(0,1))
+            print(self.accuracy)
+            
             summary_writer = tf.contrib.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
             self.summaries = {}
             with summary_writer.as_default(), tf.contrib.summary.record_summaries_every_n_global_steps(10):
@@ -78,12 +80,12 @@ class Network:
     
     def train(self, train, args):
         images, labels= train.next_batch(args.batch_size)
-        loss, acc,_,_ = self.session.run([self.loss,self.accuracy, self.training, self.summaries["train"]],
+        loss, acc, pred ,_,_ = self.session.run([self.loss, self.accuracy,self.output, self.training, self.summaries["train"]],
                         {self.images: images, self.labels: labels})
-        return loss, acc
+        return loss, acc, pred
 
     
-    def evaluate(self,name,dataset):
+    def evaluate(self,name,dataset,args):
         images, labels = dataset.next_batch(args.batch_size)
         loss, acc,_= self.session.run([self.loss,self.accuracy, self.summaries[name]],
                         {self.images: images, self.labels: labels})
@@ -98,13 +100,13 @@ if __name__ == "__main__":
     import os
 
     # Fix random seed
-    np.random.seed(42)
+    np.random.seed(0)
 
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
-    parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
-    parser.add_argument("--room_size", default=128, type=int, help="Size of the image representing room")
+    parser.add_argument("--batch_size", default=8, type=int, help="Batch size.")
+    parser.add_argument("--room_size", default=64, type=int, help="Size of the image representing room")
     parser.add_argument("--embedding_size", default=16, type=int, help="Size of embedding of the categories")
     parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
@@ -134,11 +136,11 @@ if __name__ == "__main__":
 
     # Train
     for i in range(args.epochs):
-        while not train.epoch_finished():
-            acc,loss = network.train(train,args)
-            print("train loss: ", loss)
+        while not train.epoch_finished(args.batch_size):
+            acc,loss,pred = network.train(train,args)
+        print("train loss: ", loss)
+            #print("train preds: ", pred)
             #print("train acc: ", acc)
-
-        acc,loss = network.evaluate("dev", val)
+        acc,loss = network.evaluate("dev", val,args)
         print("dev loss: ", loss)
         print("dev acc: ", acc)
