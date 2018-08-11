@@ -18,7 +18,7 @@ class Network:
         with self.session.graph.as_default():        
             
             self.images = tf.placeholder(tf.int32, [None, args.room_size,args.room_size], name="images")
-            self.labels = tf.placeholder(tf.float32, [None, args.labels_size], name="labels")
+            self.labels = tf.placeholder(tf.int64, [None], name="labels")
             
             #embedding_layer = tf.layers.Dense(args.embedding_size, activation=None, name="categories_embedding")
             #embeded = embedding_layer(tf.one_hot(self.images,args.number_of_categories))
@@ -46,21 +46,18 @@ class Network:
 
             dense_layer = tf.layers.dense(next_layer, 1024, activation=tf.nn.relu)
             
-            output_layer = tf.layers.dense(dense_layer, args.labels_size, activation=tf.nn.sigmoid)
-            self.output = output_layer
-            ones = tf.ones((args.batch_size, args.labels_size), tf.float32)
-            zeros = tf.zeros((args.batch_size, args.labels_size), tf.float32)
+            output_layer = tf.layers.dense(dense_layer, args.labels_size, activation=None)
+            self.predictions = tf.argmax(output_layer, axis=1)
             
-            self.predictions = tf.where(tf.greater(output_layer,0.5),ones,zeros)
             print(self.predictions)
             # Training
-            self.loss = tf.nn.sigmoid_cross_entropy_with_logits (labels=self.labels, logits=output_layer)          
+            self.loss = tf.losses.softmax_cross_entropy(tf.one_hot(self.labels, args.labels_size), output_layer)         
             global_step = tf.train.create_global_step()
             optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
             self.training = optimizer.minimize(self.loss, global_step=global_step, name="training")
 
             # Summaries
-            self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.labels, self.predictions), tf.float32), axis=(0,1))
+            self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.labels, self.predictions), tf.float32))
             print(self.accuracy)
             
             summary_writer = tf.contrib.summary.create_file_writer(args.logdir, flush_millis=10 * 1000)
@@ -80,7 +77,7 @@ class Network:
     
     def train(self, train, args):
         images, labels= train.next_batch(args.batch_size)
-        loss, acc, pred ,_,_ = self.session.run([self.loss, self.accuracy,self.output, self.training, self.summaries["train"]],
+        loss, acc, pred ,_,_ = self.session.run([self.loss, self.accuracy,self.predictions, self.training, self.summaries["train"]],
                         {self.images: images, self.labels: labels})
         return loss, acc, pred
 
@@ -139,7 +136,7 @@ if __name__ == "__main__":
         while not train.epoch_finished(args.batch_size):
             acc,loss,pred = network.train(train,args)
         print("train loss: ", loss)
-            #print("train preds: ", pred)
+        print("train preds: ", pred)
             #print("train acc: ", acc)
         acc,loss = network.evaluate("dev", val,args)
         print("dev loss: ", loss)

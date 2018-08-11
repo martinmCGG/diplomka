@@ -145,7 +145,7 @@ class RoomClassDataset(Dataset):
         data.rooms = [x for x in data.rooms if len(x.types)>0]
         
         self.images = np.zeros([len(data.rooms), image_size, image_size], np.int32)
-        self.labels = np.zeros([len(data.rooms),len(data.unique_room_types)], np.int32)
+        self.labels = np.zeros([len(data.rooms)], np.int32)
         
         data_created = [self.images, self.labels]
         Dataset.__init__(self, data, data_created, shuffle_batches)
@@ -154,8 +154,7 @@ class RoomClassDataset(Dataset):
             room = data.rooms[r]
             proom = self._proccess_room(room)
             self.images[r,:,:] = proom
-            for t in room.types:
-                self.labels[r,self.room_cats[t]-1] = 1    
+            self.labels[r] = self.room_cats[room.types[0]]
         self.data_created = [self.images, self.labels]
         #print(self.data_created)
         
