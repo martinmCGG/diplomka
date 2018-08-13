@@ -27,13 +27,13 @@ class Dataset:
         batch_size = min(batch_size, len(self.permutation))
         batch_perm, self.permutation = self.permutation[:batch_size], self.permutation[batch_size:]
         batch = [x[batch_perm] for x in self.data_created]
-        #print(batch[0])
         return batch
     
     def epoch_finished(self, batch_size):
         if len(self.permutation) < batch_size:
             self.permutation = np.random.permutation(len(self.data_created[0])) if self.shuffle_batches else np.arange(len(self.data_created[0]))
             return True
+        
         return False
     
     def get_number_of_categories(self):
@@ -99,8 +99,8 @@ class ConvDataset(Dataset):
         data_created = [self.images, self.labels, self.label_cats]
         Dataset.__init__(self, data, data_created, shuffle_batches)
         
-        for r in range(100):
-        #for r in range(len(data.rooms)):
+        
+        for r in range(len(data.rooms)):
             room = data.rooms[r]
             proom = self._proccess_room(room)
             self.images[r,:,:] = proom[0]
@@ -142,7 +142,7 @@ class RoomClassDataset(Dataset):
     def __init__(self, data, image_size, shuffle_batches=True):
         self.image_size = image_size
         
-        data.rooms = [x for x in data.rooms if len(x.types)>0]
+        data.rooms = [x for x in data.rooms if len(x.types)==1]
         
         self.images = np.zeros([len(data.rooms), image_size, image_size], np.int32)
         self.labels = np.zeros([len(data.rooms)], np.int32)
@@ -180,19 +180,4 @@ class RoomClassDataset(Dataset):
                     image[i,j] = category
         return image
         
-    
-if __name__ == '__main__':
-    import argparse
-    np.random.seed(42)
-    # Parse arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
-    args = parser.parse_args()
-    
-    with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
-        train_data = pickle.load(f)
-    with open(os.path.join(args.folder,"val.pickle"), 'rb') as f:
-        val_data = pickle.load(f)
-    train = ConvDataset(train_data, 32)
-    val = ConvDataset(val_data, 32)
     

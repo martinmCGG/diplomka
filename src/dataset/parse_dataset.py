@@ -125,9 +125,9 @@ class Data:
         valset.rooms = self.rooms[:border]
         self.rooms = self.rooms[border:]
         
-        with open(os.path.join(filename,"val.pickle"), 'wb') as f:
+        with open(os.path.join(filename,"sval.pickle"), 'wb') as f:
             pickle.dump(valset,f)
-        with open(os.path.join(filename,"train.pickle"), 'wb') as f:
+        with open(os.path.join(filename,"strain.pickle"), 'wb') as f:
             pickle.dump(self,f)
             
     def _subtract_bbox(self, bbox, sub):

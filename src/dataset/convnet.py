@@ -134,10 +134,10 @@ if __name__ == "__main__":
     # Train
     for i in range(args.epochs):
         while not train.epoch_finished():
-            acc,loss = network.train(train,args)
+            loss,acc = network.train(train,args)
             print("train loss: ", loss)
             print("train acc: ", acc)
 
-        acc,loss = network.evaluate("dev", val)
+        loss,acc = network.evaluate("dev", val)
         print("dev loss: ", loss)
         print("dev acc: ", acc)

@@ -20,12 +20,13 @@ class Network:
             
             self.images = tf.placeholder(tf.int32, [None, args.room_size, args.room_size], name="images")
             self.labels = tf.placeholder(tf.int64, [None], name="labels")
+            self.isTraining = tf.placeholder(tf.bool, name = "isTraining")
             
             embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
-            network_string = "F,R-256"
+            #network_string = "CB-32-3-1-same,M-2-2,CB-32-3-1-same,M-2-2,F,R-512,D"
             #cnn = "CB-64-3-1-same,M-2-2,CB-64-3-1-same,M-2-2,F,R-1024"
             #cnn = "F,R-256" 0.78
-            #cnn = "F,R-512,D" 0.78
+            network_string= "F,R-512,D"
             #cnn = "CB-32-3-2-same,M-2-2,CB-32-3-2-same,M-2-2,F,R-128"
             
             output_layer = self._construct_network(network_string, embedded_ids)
@@ -33,10 +34,11 @@ class Network:
             
             # Training
             self.loss = tf.losses.softmax_cross_entropy(tf.one_hot(self.labels, args.labels_size), output_layer)         
-            global_step = tf.train.create_global_step()
+            self.global_step = tf.train.create_global_step()
             optimizer = tf.train.AdamOptimizer(learning_rate=0.0001)
             
-            self.training = optimizer.minimize(self.loss, global_step=global_step, name="training")
+            
+            self.training = optimizer.minimize(self.loss, global_step=self.global_step, name="training")
             self.accuracy = tf.reduce_mean(tf.cast(tf.equal(self.labels, self.predictions), tf.float32))
             
             
@@ -68,7 +70,7 @@ class Network:
             elif layer[0] == 'R':
                 next_layer = tf.layers.dense(next_layer,int(layer[1]),activation=tf.nn.relu)
             elif layer[0] == 'D':
-                next_layer = tf.layers.dropout(next_layer)
+                next_layer = tf.layers.dropout(next_layer, training=self.isTraining)
             elif layer[0] == 'CB':
                 next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=(int(layer[3])), padding=layer[4])
                 next_layer = tf.contrib.layers.batch_norm(next_layer,)
@@ -94,7 +96,10 @@ class Network:
             tf.contrib.summary.initialize(session=self.session, graph=self.session.graph)
           
     
-    def _write_summaries2(self, logdir,metadata_path):
+    def _write_summaries2(self, logdir, metadata_path):
+        
+        self.accuracy_value = tf.placeholder(tf.float32, shape=())
+        self.loss_value = tf.placeholder(tf.float32, shape=())
         
         self.summary_writer_train = tf.summary.FileWriter(os.path.join(logdir,"train"), graph=tf.get_default_graph())
         self.summary_writer_dev = tf.summary.FileWriter(os.path.join(logdir,"dev"))
@@ -106,45 +111,49 @@ class Network:
 
         projector.visualize_embeddings(self.summary_writer_train, config)
         
-        tf.summary.scalar("loss", self.loss)
-        tf.summary.scalar("accuracy", self.accuracy)
-        self.merged_summary_op = tf.summary.merge_all()
+        loss_summary = tf.summary.scalar("loss", self.loss_value)
+        accuracy_summary = tf.summary.scalar("accuracy", self.accuracy_value)
+        self.merged_summary_op = tf.summary.merge([loss_summary,accuracy_summary])
     
-    def train(self, train, args,step):
+    def train(self, train, args):
         images, labels= train.next_batch(args.batch_size)
-        loss, acc, pred ,_, summary = self.session.run([self.loss, self.accuracy,self.predictions, self.training, self.merged_summary_op],
-                        {self.images: images, self.labels: labels})
-        self.summary_writer_train.add_summary(summary, step)
-        
-        if step % 10000 == 0:
-            saver = tf.train.Saver([self.embedding_var])
-            saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
-
+        loss, acc, pred ,_ = self.session.run([self.loss, self.accuracy, self.predictions, self.training],
+                        {self.images: images, self.labels: labels, self.isTraining : True})
         return loss, acc, pred
 
     
-    def evaluate(self,name,dataset,args, step):
-        images, labels = dataset.next_batch(args.batch_size)
-        loss, acc, summary = self.session.run([self.loss, self.accuracy, self.merged_summary_op],
-                        {self.images: images, self.labels: labels})
-        self.summary_writer_dev.add_summary(summary, step)
+    def evaluate(self,name,dataset,args):
+        images, labels = dataset.all_data()
+        loss, acc= self.session.run([self.loss, self.accuracy],
+                        {self.images: images, self.labels: labels, self.isTraining : False})
+        
+        #self.summary_writer_dev.add_summary(summary, self.global_step)
         return loss, acc
     
-    
-    
-    
+    def summarize(self, accuracy, loss, train, step):
+        
+        summary = self.session.run([self.merged_summary_op],{self.accuracy_value:accuracy, self.loss_value:loss})
+        if train:
+            self.summary_writer_train.add_summary(summary[0], step)
+        else:
+            self.summary_writer_dev.add_summary(summary[0], step)
+            
+        saver = tf.train.Saver([self.embedding_var])
+        saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
+            
+            
 if __name__ == "__main__":
     import argparse
     import datetime
     import os
 
     # Fix random seed
-    np.random.seed(0)
+    np.random.seed(1)
 
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
-    parser.add_argument("--batch_size", default=512, type=int, help="Batch size.")
+    parser.add_argument("--batch_size", default=64, type=int, help="Batch size.")
     parser.add_argument("--room_size", default=64, type=int, help="Size of the image representing room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
     parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
@@ -179,12 +188,21 @@ if __name__ == "__main__":
     step = 0
     # Train
     for i in range(args.epochs):
+        epoch_accuracy = 0
+        epoch_loss = 0
         while not train.epoch_finished(args.batch_size):
-            loss,acc,pred = network.train(train, args, step)
+            loss,acc,pred = network.train(train, args)
+            epoch_accuracy += acc
+            epoch_loss += loss
             step +=1
-        print("train loss: ", loss)
-            #print("train preds: ", pred)
-        print("train acc: ", acc)
-        loss, acc = network.evaluate("dev", val,args, step)
+        epoch_accuracy /= step/(i+1)
+        epoch_loss /= step/(i+1)
+        
+        network.summarize(epoch_accuracy, epoch_loss, True, step)
+            
+        print("train loss: ", epoch_loss)
+        print("train acc: ", epoch_accuracy)
+        loss, acc = network.evaluate("dev", val, args)
+        network.summarize(acc, loss, False, step)
         print("dev loss: ", loss)
         print("dev acc: ", acc)
