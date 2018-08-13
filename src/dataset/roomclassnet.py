@@ -123,7 +123,7 @@ class Network:
 
     
     def evaluate(self,name,dataset,args):
-        images, labels = dataset.all_data()
+        images, labels = dataset.next_batch(args.batch_size)
         loss, acc= self.session.run([self.loss, self.accuracy],
                         {self.images: images, self.labels: labels, self.isTraining : False})
         
@@ -202,7 +202,16 @@ if __name__ == "__main__":
             
         print("train loss: ", epoch_loss)
         print("train acc: ", epoch_accuracy)
-        loss, acc = network.evaluate("dev", val, args)
-        network.summarize(acc, loss, False, step)
-        print("dev loss: ", loss)
-        print("dev acc: ", acc)
+        
+        val_step = 0
+        val_loss = 0
+        val_accuracy = 0
+        while not val.epoch_finished(args.batch_size):
+            loss, acc = network.evaluate("dev", val, args)
+            val_loss += loss
+            val_accuracy += acc
+            val_step+=1
+        
+        network.summarize(val_accuracy/val_step, val_loss/val_step, False, step)
+        print("dev loss: ", val_loss/val_step)
+        print("dev acc: ", val_accuracy/val_step)
