@@ -14,7 +14,6 @@ class Network:
         self.session = tf.Session(graph = graph, config=tf.ConfigProto(inter_op_parallelism_threads=threads,
                                                                        intra_op_parallelism_threads=threads))
         
-        
     def construct(self, args):
         FURNITURE_CATS = args.number_of_categories
         with self.session.graph.as_default():        
@@ -22,7 +21,7 @@ class Network:
             self.images = tf.placeholder(tf.int32, [None, args.room_size, args.room_size], name="images")
             self.labels = tf.placeholder(tf.int64, [None], name="labels")
             
-            embedding_var, embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
+            embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
             network_string = "F,R-256"
             #cnn = "CB-64-3-1-same,M-2-2,CB-64-3-1-same,M-2-2,F,R-1024"
             #cnn = "F,R-256" 0.78
@@ -43,15 +42,16 @@ class Network:
             
             # Initialize variables
             self.session.run(tf.global_variables_initializer())
-            self._write_summaries(args.logdir)
+            #self._write_summaries(args.logdir)
+            self._write_summaries2(args.logdir, args.metadata_path)
 
 
     
     
     def _construct_embeddings(self, number_of_categories, embedding_size, data):
-        embedding_var = tf.get_variable('embeddings', [number_of_categories, embedding_size])
-        embedded_ids = tf.gather(embedding_var, data)    
-        return embedding_var, embedded_ids
+        self.embedding_var = tf.get_variable('embeddings', [number_of_categories, embedding_size])
+        embedded_ids = tf.gather(self.embedding_var, data)    
+        return embedded_ids
     
     def _construct_network(self, network_string, input):
         next_layer = input
@@ -93,17 +93,41 @@ class Network:
         with summary_writer.as_default():
             tf.contrib.summary.initialize(session=self.session, graph=self.session.graph)
           
-    def train(self, train, args):
+    
+    def _write_summaries2(self, logdir,metadata_path):
+        
+        self.summary_writer_train = tf.summary.FileWriter(os.path.join(logdir,"train"), graph=tf.get_default_graph())
+        self.summary_writer_dev = tf.summary.FileWriter(os.path.join(logdir,"dev"))
+        
+        config = projector.ProjectorConfig()
+        embedding = config.embeddings.add()
+        embedding.tensor_name = self.embedding_var.name
+        embedding.metadata_path = metadata_path
+
+        projector.visualize_embeddings(self.summary_writer_train, config)
+        
+        tf.summary.scalar("loss", self.loss)
+        tf.summary.scalar("accuracy", self.accuracy)
+        self.merged_summary_op = tf.summary.merge_all()
+    
+    def train(self, train, args,step):
         images, labels= train.next_batch(args.batch_size)
-        loss, acc, pred ,_,_ = self.session.run([self.loss, self.accuracy,self.predictions, self.training, self.summaries["train"]],
+        loss, acc, pred ,_, summary = self.session.run([self.loss, self.accuracy,self.predictions, self.training, self.merged_summary_op],
                         {self.images: images, self.labels: labels})
+        self.summary_writer_train.add_summary(summary, step)
+        
+        if step % 10000 == 0:
+            saver = tf.train.Saver([self.embedding_var])
+            saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
+
         return loss, acc, pred
 
     
-    def evaluate(self,name,dataset,args):
+    def evaluate(self,name,dataset,args, step):
         images, labels = dataset.next_batch(args.batch_size)
-        loss, acc,_= self.session.run([self.loss, self.accuracy, self.summaries[name]],
+        loss, acc, summary = self.session.run([self.loss, self.accuracy, self.merged_summary_op],
                         {self.images: images, self.labels: labels})
+        self.summary_writer_dev.add_summary(summary, step)
         return loss, acc
     
     
@@ -134,6 +158,8 @@ if __name__ == "__main__":
         datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")
     )
     if not os.path.exists("logs"): os.mkdir("logs") # TF 1.6 will do this by itself
+    args.metadata_path = 'D:\\workspace\\diplomka\\METADATA.tsv'
+    print(args.metadata_path)
     
     
     with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
@@ -150,13 +176,15 @@ if __name__ == "__main__":
     network = Network(threads=args.threads)
     network.construct(args)
 
+    step = 0
     # Train
     for i in range(args.epochs):
         while not train.epoch_finished(args.batch_size):
-            loss,acc,pred = network.train(train,args)
+            loss,acc,pred = network.train(train, args, step)
+            step +=1
         print("train loss: ", loss)
             #print("train preds: ", pred)
         print("train acc: ", acc)
-        loss, acc = network.evaluate("dev", val,args)
+        loss, acc = network.evaluate("dev", val,args, step)
         print("dev loss: ", loss)
         print("dev acc: ", acc)
