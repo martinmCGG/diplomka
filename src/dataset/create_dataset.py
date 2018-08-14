@@ -46,9 +46,6 @@ class Dataset:
             mapping[category] = i
             i=i+1
         return mapping
-    
-    
-
 
 class RnnDataset(Dataset):
     
@@ -91,12 +88,17 @@ class RnnDataset(Dataset):
   
 class ConvDataset(Dataset):
 
-    def __init__(self, data, image_size, shuffle_batches=True):
+    def __init__(self, data, image_size, type_of_prediction, shuffle_batches=True):
         self.image_size = image_size 
         self.size = data.count_models()
         print("Creating {} examples...".format(self.size))
         self.images = np.zeros([self.size, image_size, image_size], np.int32)
-        self.labels = np.zeros([self.size,2], np.int32)
+        
+        if type_of_prediction == 'coordinates':
+            self.labels = np.zeros([self.size,2], np.int32)
+        elif type_of_prediction == 'map':
+            self.labels = np.zeros([self.size, image_size, image_size], np.int32)
+        
         self.label_cats = np.zeros([self.size], np.int32)
         
         data_created = [self.images, self.labels, self.label_cats]
@@ -105,14 +107,18 @@ class ConvDataset(Dataset):
         index = 0
         for room in data.rooms:
             for model in room.models:
-                proom = self._proccess_room_model(room,model)
+                proom = self._proccess_room_model(room,model,type_of_prediction)
                 self.images[index,:,:] = proom[0]
-                self.labels[index,0] = proom[1][0]
-                self.labels[index,1] = proom[1][1]
-                self.label_cats[index] = proom[1][2]
+                self.label_cats[index] = proom[2]
+                if type_of_prediction == 'coordinates':
+                    self.labels[index,0] = proom[1][0]
+                    self.labels[index,1] = proom[1][1]
+                elif type_of_prediction == 'map':
+                    self.labels[index,:,:] = proom[1]
+                
                 index+=1
         
-    def _proccess_room_model(self, room, missing_model):
+    def _proccess_room_model(self, room, missing_model, type_of_prediction):
         image = np.zeros((self.image_size,self.image_size), np.int32)
         bbmax = room.bbox["max"]
         x = bbmax[0]
@@ -134,8 +140,14 @@ class ConvDataset(Dataset):
                     for j in range(minz, maxz):
                         image[i,j] = category
             else:
-                label = [minx + (maxx - minx)/2, minz + (maxz - minz)/2, category]
-        return image, label
+                if type_of_prediction == 'coordinates':
+                    label = [minx + (maxx - minx)/2, minz + (maxz - minz)/2]
+                elif type_of_prediction == 'map':
+                    label = np.zeros((self.image_size,self.image_size), np.int32)
+                    for i in range(minx, maxx):
+                        for j in range(minz, maxz):
+                            label[i,j] = 1
+        return image, label, category
 
 class RoomClassDataset(Dataset):
     def __init__(self, data, image_size, shuffle_batches=True):

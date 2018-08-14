@@ -19,28 +19,20 @@ class Network:
         FURNITURE_CATS = args.number_of_categories
         with self.session.graph.as_default():        
             
-            self.images = tf.placeholder(tf.int32, [None, args.room_size,args.room_size], name="images")
-            self.labels = tf.placeholder(tf.int32, [None,2], name="labels")
-            self.labels_categories = tf.placeholder(tf.int32, [None], name="labels_categories")
-            self.isTraining = tf.placeholder(tf.bool, name = "isTraining")
+            self._define_placeholders(args)
             
             embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
-            network_string = "CB-64-3-1-same,CB-64-2-1-same,M-2-2,F"
-            
+            #network_string = "CB-64-3-1-same,CB-64-2-1-same,M-2-2,F,R-1024"
+            network_string = "CB-64-3-1-same,F,R-1024"
             next_layer = self._construct_network(network_string, embedded_ids)
             
             embeded_label = tf.gather(self.embedding_var, self.labels_categories)
             
-            next_layer = tf.concat((embeded_label, next_layer), axis = 1)
-
-            next_layer = tf.layers.dense(next_layer, 1024, activation=tf.nn.relu)
+            #next_layer = tf.concat((embeded_label, next_layer), axis = 1)
             
+            self._construct_ouput(args, next_layer)
             
-            output_layer = tf.layers.dense(next_layer, 2, activation=None)
-            self.predictions = output_layer
-            
-            # Training
-            self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.predictions, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+            self._define_loss(args, self.output)
             
             #self.accuracy = 0
             global_step = tf.train.create_global_step()
@@ -49,7 +41,7 @@ class Network:
 
             # Initialize variables
             self.session.run(tf.global_variables_initializer())
-            self._write_summaries2(args.logdir, args.metadata_path)
+            self._write_summaries(args)
             
     
     def _construct_embeddings(self, number_of_categories, embedding_size, data):
@@ -57,6 +49,35 @@ class Network:
         embedded_ids = tf.gather(self.embedding_var, data)    
         return embedded_ids
     
+    def _define_placeholders(self, args):
+        self.images = tf.placeholder(tf.int32, [None, args.room_size,args.room_size], name="images")
+        self.labels_categories = tf.placeholder(tf.int32, [None], name="labels_categories")
+        self.isTraining = tf.placeholder(tf.bool, name = "isTraining")
+        
+        if args.type_of_prediction == 'coordinates':
+            self.labels = tf.placeholder(tf.int32, [None,2], name="labels")
+        elif args.type_of_prediction == 'map':
+            self.labels = tf.placeholder(tf.int32, [None, args.room_size, args.room_size], name="labels")
+            
+    def _construct_ouput(self, args, input):
+        if args.type_of_prediction == 'coordinates':   
+            output_layer = tf.layers.dense(input, 2, activation=None)
+            self.output = output_layer
+            self.predictions = output_layer
+        elif args.type_of_prediction == 'map':
+            self.output = tf.layers.dense(input,args.room_size*args.room_size, activation=None)
+            self.output = tf.reshape(self.output,(-1,args.room_size,args.room_size))
+            print(self.output)
+            self.predictions = tf.expand_dims(self.output,-1)
+            
+    
+    def _define_loss(self,args, input):
+        if args.type_of_prediction == 'coordinates':
+            self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+        elif args.type_of_prediction == 'map':
+            self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+        
+        
     def _construct_network(self, network_string, input):
         next_layer = input
         print(next_layer)
@@ -74,16 +95,22 @@ class Network:
             elif layer[0] == 'D':
                 next_layer = tf.layers.dropout(next_layer, training=self.isTraining)
             elif layer[0] == 'CB':
-                next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=(int(layer[3])), padding=layer[4])
+                next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding=layer[4])
                 next_layer = tf.contrib.layers.batch_norm(next_layer,)
                 next_layer = tf.nn.relu(next_layer)
+            elif layer[0] == 'CT':
+                next_layer = tf.layers.conv2d_transpose(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding=layer[4], activation=tf.nn.relu)
             print(next_layer)
         return next_layer 
     
-    def _write_summaries2(self, logdir, metadata_path):
+    def _write_summaries(self, args):
+        
+        logdir = args.logdir
+        metadata_path = args.metadata_path
         
         self.accuracy_value = tf.placeholder(tf.float32, shape=())
         self.loss_value = tf.placeholder(tf.float32, shape=())
+        self.image_value = tf.placeholder(tf.float32)
         
         self.summary_writer_train = tf.summary.FileWriter(os.path.join(logdir,"train"), graph=tf.get_default_graph())
         self.summary_writer_dev = tf.summary.FileWriter(os.path.join(logdir,"dev"))
@@ -94,11 +121,13 @@ class Network:
         embedding.metadata_path = metadata_path
 
         projector.visualize_embeddings(self.summary_writer_train, config)
-        
-        loss_summary = tf.summary.scalar("loss", self.loss_value)
+        if args.type_of_prediction == 'map':
+            self.image_summary = tf.summary.image("Image", self.image_value, max_outputs = 3)
+            
+        loss_summary = tf.summary.scalar("Loss", self.loss_value)
         #accuracy_summary = tf.summary.scalar("accuracy", self.accuracy_value)
-        self.merged_summary_op = tf.summary.merge([loss_summary])
-        
+
+        self.merged_summary_op = tf.summary.merge([loss_summary])        
         self.saver = tf.train.Saver([self.embedding_var], max_to_keep=5, keep_checkpoint_every_n_hours = 2) 
     
     def train(self, train, args):
@@ -109,11 +138,18 @@ class Network:
 
     
     def evaluate(self,name,dataset,args):
-        images, labels,labels_categories = dataset.next_batch(args.batch_size)
+        images, labels, labels_categories = dataset.next_batch(args.batch_size)
         loss = self.session.run([self.loss],
                         {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False})
         return loss[0]
     
+    def make_example(self, dato, step):
+        images, labels, labels_categories = dato
+        loss, prediction = self.session.run([self.loss, self.predictions], {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False})
+        summary = self.session.run([self.image_summary],{self.image_value:prediction})
+        self.summary_writer_train.add_summary(summary[0], step)
+        return loss, prediction, labels
+        
     def summarize(self, loss, train, step):
         summary = self.session.run([self.merged_summary_op],{self.loss_value:loss})
         if train:
@@ -122,7 +158,7 @@ class Network:
             self.summary_writer_dev.add_summary(summary[0], step)
             
         self.saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
-    
+        
 if __name__ == "__main__":
     import argparse
     import datetime
@@ -135,11 +171,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
     parser.add_argument("--batch_size", default=8, type=int, help="Batch size.")
-    parser.add_argument("--room_size", default=64, type=int, help="Number of items in room")
+    parser.add_argument("--room_size", default=32, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
     parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--log_frequency", default=100, type=int, help="Frequency of training logging")
+    "coordinates, map"
+    parser.add_argument("--type_of_prediction", default="map", type=str, help="Type of predicted")
     
     args = parser.parse_args()
     
@@ -155,8 +193,9 @@ if __name__ == "__main__":
         train_data = pickle.load(f)
     with open(os.path.join(args.folder,"sval.pickle"), 'rb') as f:
         val_data = pickle.load(f)
-    train = ConvDataset(train_data, args.room_size)
-    val = ConvDataset(val_data, args.room_size)
+        
+    train = ConvDataset(train_data, args.room_size, args.type_of_prediction)
+    val = ConvDataset(val_data, args.room_size, args.type_of_prediction)
     args.number_of_categories = train.get_number_of_categories()
     
     # Construct the network
@@ -178,6 +217,7 @@ if __name__ == "__main__":
                 epoch_loss /= args.log_frequency
                 print("train loss: ", epoch_loss)
                 network.summarize(epoch_loss, True, step)
+                loss, prediction, labels = network.make_example(val.next_batch(1), step)
                 epoch_loss = 0
             
         val_step = 0
@@ -187,8 +227,10 @@ if __name__ == "__main__":
             loss  = network.evaluate("dev", val, args)
             val_loss += math.sqrt(loss)
             val_step+=1
-                
         
+            
         network.summarize( val_loss/val_step, False, step)
         print("dev loss: ", val_loss/val_step)
+        print("Example: ")
+        
         #print("dev acc: ", val_accuracy/val_step)
