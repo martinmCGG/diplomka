@@ -115,7 +115,6 @@ class Data:
             istrue = istrue and big["max"][i] >= small["max"][i]
         return istrue
     
-    
     def write_to_file(self, filename, val):
         valset = Data(None,None)
         valset.unique_model_types = self.unique_model_types
@@ -135,7 +134,10 @@ class Data:
         for m in ["min","max"]:
             rt[m] = [bbox[m][i] - sub[i] for i in range(3)]
         return rt
-           
+    
+    def count_models(self): 
+        return sum([len(room.models) for room in self.rooms])
+            
         
 if __name__ == "__main__":
     import argparse

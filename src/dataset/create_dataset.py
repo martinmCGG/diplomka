@@ -46,6 +46,8 @@ class Dataset:
             mapping[category] = i
             i=i+1
         return mapping
+    
+    
 
 
 class RnnDataset(Dataset):
@@ -90,26 +92,27 @@ class RnnDataset(Dataset):
 class ConvDataset(Dataset):
 
     def __init__(self, data, image_size, shuffle_batches=True):
-        self.image_size = image_size
-        
-        self.images = np.zeros([len(data.rooms), image_size, image_size], np.int32)
-        self.labels = np.zeros([len(data.rooms)], np.int32)
-        self.label_cats = np.zeros([len(data.rooms)], np.int32)
+        self.image_size = image_size 
+        self.size = data.count_models()
+        print("Creating {} examples...".format(self.size))
+        self.images = np.zeros([self.size, image_size, image_size], np.int32)
+        self.labels = np.zeros([self.size,2], np.int32)
+        self.label_cats = np.zeros([self.size], np.int32)
         
         data_created = [self.images, self.labels, self.label_cats]
         Dataset.__init__(self, data, data_created, shuffle_batches)
         
+        index = 0
+        for room in data.rooms:
+            for model in room.models:
+                proom = self._proccess_room_model(room,model)
+                self.images[index,:,:] = proom[0]
+                self.labels[index,0] = proom[1][0]
+                self.labels[index,1] = proom[1][1]
+                self.label_cats[index] = proom[1][2]
+                index+=1
         
-        for r in range(len(data.rooms)):
-            room = data.rooms[r]
-            proom = self._proccess_room(room)
-            self.images[r,:,:] = proom[0]
-            self.labels[r,0] = proom[1][0]
-            self.label_cats[r] = proom[1][1]
-        print(np.shape(self.images))
-            
-        
-    def _proccess_room(self, room):
+    def _proccess_room_model(self, room, missing_model):
         image = np.zeros((self.image_size,self.image_size), np.int32)
         bbmax = room.bbox["max"]
         x = bbmax[0]
@@ -119,9 +122,6 @@ class ConvDataset(Dataset):
         
         x = x * pixel_size
         z = z * pixel_size
-        
-        random_index = np.random.randint(len(room.models))
-        label_model = room.models[random_index]
 
         for model in room.models:
             category = self.model_cats[model.type]
@@ -129,13 +129,12 @@ class ConvDataset(Dataset):
             maxx = int(model.bbox["max"][0] * pixel_size)
             minz = int(model.bbox["min"][2] * pixel_size)
             maxz = int(model.bbox["max"][2] * pixel_size)
-            if model != label_model:
+            if model != missing_model:
                 for i in range(minx, maxx):
                     for j in range(minz, maxz):
                         image[i,j] = category
             else:
-                label = [(minx + (maxx - minx)/2)*self.image_size + (minz + (maxz - minz)/2), category]
-        
+                label = [minx + (maxx - minx)/2, minz + (maxz - minz)/2, category]
         return image, label
 
 class RoomClassDataset(Dataset):

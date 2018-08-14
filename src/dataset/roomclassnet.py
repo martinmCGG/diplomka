@@ -23,11 +23,10 @@ class Network:
             self.isTraining = tf.placeholder(tf.bool, name = "isTraining")
             
             embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
-            #network_string = "CB-32-3-1-same,M-2-2,CB-32-3-1-same,M-2-2,F,R-512,D"
-            #cnn = "CB-64-3-1-same,M-2-2,CB-64-3-1-same,M-2-2,F,R-1024"
-            #cnn = "F,R-256" 0.78
-            network_string= "F,R-512,D"
-            #cnn = "CB-32-3-2-same,M-2-2,CB-32-3-2-same,M-2-2,F,R-128"
+            #network_string = "CB-32-3-1-same,M-2-2,CB-32-3-1-same,M-2-2,F,R-512,D" Nejvice 0.75
+            #network_string = "CB-32-3-1-same,M-2-2,CB-32-3-1-same,M-2-2,M-2-2,CB-32-3-1-same,M-2-2,F,R-512,D" Same as above
+            #network_string= "F,R-1024,D,R-1024,D" worse than convolutions
+
             
             output_layer = self._construct_network(network_string, embedded_ids)
             self.predictions = tf.argmax(output_layer, axis=1)
@@ -48,8 +47,6 @@ class Network:
             self._write_summaries2(args.logdir, args.metadata_path)
 
 
-    
-    
     def _construct_embeddings(self, number_of_categories, embedding_size, data):
         self.embedding_var = tf.get_variable('embeddings', [number_of_categories, embedding_size])
         embedded_ids = tf.gather(self.embedding_var, data)    
@@ -114,12 +111,14 @@ class Network:
         loss_summary = tf.summary.scalar("loss", self.loss_value)
         accuracy_summary = tf.summary.scalar("accuracy", self.accuracy_value)
         self.merged_summary_op = tf.summary.merge([loss_summary,accuracy_summary])
+        
+        self.saver = tf.train.Saver([self.embedding_var], max_to_keep=5, keep_checkpoint_every_n_hours = 2)
     
     def train(self, train, args):
         images, labels= train.next_batch(args.batch_size)
-        loss, acc, pred ,_ = self.session.run([self.loss, self.accuracy, self.predictions, self.training],
+        loss, acc, _ = self.session.run([self.loss, self.accuracy,self.training],
                         {self.images: images, self.labels: labels, self.isTraining : True})
-        return loss, acc, pred
+        return loss, acc
 
     
     def evaluate(self,name,dataset,args):
@@ -127,7 +126,6 @@ class Network:
         loss, acc= self.session.run([self.loss, self.accuracy],
                         {self.images: images, self.labels: labels, self.isTraining : False})
         
-        #self.summary_writer_dev.add_summary(summary, self.global_step)
         return loss, acc
     
     def summarize(self, accuracy, loss, train, step):
@@ -138,8 +136,7 @@ class Network:
         else:
             self.summary_writer_dev.add_summary(summary[0], step)
             
-        saver = tf.train.Saver([self.embedding_var])
-        saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
+        self.saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
             
             
 if __name__ == "__main__":
@@ -168,8 +165,6 @@ if __name__ == "__main__":
     )
     if not os.path.exists("logs"): os.mkdir("logs") # TF 1.6 will do this by itself
     args.metadata_path = 'D:\\workspace\\diplomka\\METADATA.tsv'
-    print(args.metadata_path)
-    
     
     with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
         train_data = pickle.load(f)
@@ -191,7 +186,7 @@ if __name__ == "__main__":
         epoch_accuracy = 0
         epoch_loss = 0
         while not train.epoch_finished(args.batch_size):
-            loss,acc,pred = network.train(train, args)
+            loss,acc = network.train(train, args)
             epoch_accuracy += acc
             epoch_loss += loss
             step +=1
