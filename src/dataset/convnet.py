@@ -41,7 +41,9 @@ class Network:
 
             # Initialize variables
             self.session.run(tf.global_variables_initializer())
+            
             self._write_summaries(args)
+            self._write_summaries_contrib(args.logdir)
             
     
     def _construct_embeddings(self, number_of_categories, embedding_size, data):
@@ -55,9 +57,9 @@ class Network:
         self.isTraining = tf.placeholder(tf.bool, name = "isTraining")
         
         if args.type_of_prediction == 'coordinates':
-            self.labels = tf.placeholder(tf.int32, [None,2], name="labels")
+            self.labels = tf.placeholder(tf.float32, [None,2], name="labels")
         elif args.type_of_prediction == 'map':
-            self.labels = tf.placeholder(tf.int32, [None, args.room_size, args.room_size], name="labels")
+            self.labels = tf.placeholder(tf.float32, [None, args.room_size, args.room_size], name="labels")
             
     def _construct_ouput(self, args, input):
         if args.type_of_prediction == 'coordinates':   
@@ -108,12 +110,7 @@ class Network:
         logdir = args.logdir
         metadata_path = args.metadata_path
         
-        self.accuracy_value = tf.placeholder(tf.float32, shape=())
-        self.loss_value = tf.placeholder(tf.float32, shape=())
-        self.image_value = tf.placeholder(tf.float32)
-        
-        self.summary_writer_train = tf.summary.FileWriter(os.path.join(logdir,"train"), graph=tf.get_default_graph())
-        self.summary_writer_dev = tf.summary.FileWriter(os.path.join(logdir,"dev"))
+        self.summary_writer_train = tf.summary.FileWriter(logdir, graph=tf.get_default_graph())
         
         config = projector.ProjectorConfig()
         embedding = config.embeddings.add()
@@ -121,42 +118,71 @@ class Network:
         embedding.metadata_path = metadata_path
 
         projector.visualize_embeddings(self.summary_writer_train, config)
-        if args.type_of_prediction == 'map':
-            self.image_summary = tf.summary.image("Image", self.image_value, max_outputs = 3)
-            
-        loss_summary = tf.summary.scalar("Loss", self.loss_value)
-        #accuracy_summary = tf.summary.scalar("accuracy", self.accuracy_value)
 
-        self.merged_summary_op = tf.summary.merge([loss_summary])        
         self.saver = tf.train.Saver([self.embedding_var], max_to_keep=5, keep_checkpoint_every_n_hours = 2) 
+        
+    def _write_summaries_contrib(self, logdir):
+        
+        self.mean_train_loss, self.mean_train_loss_update = tf.metrics.mean(self.loss, name="train_metric")
+        self.mean_dev_loss, self.mean_dev_loss_update = tf.metrics.mean(self.loss, name="dev_metric")
+        
+        train_running_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope="train_metric")        
+        dev_running_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope="dev_metric")
+
+
+        self.train_running_vars_initializer = tf.variables_initializer(var_list=train_running_vars)
+        self.session.run(self.train_running_vars_initializer)
+        
+        self.dev_running_vars_initializer = tf.variables_initializer(var_list=dev_running_vars)
+        self.session.run(self.dev_running_vars_initializer)
+
+        self.summaries = {}
     
-    def train(self, train, args):
-        images, labels,labels_categories = train.next_batch(args.batch_size)
-        loss, _= self.session.run([self.loss, self.training],
-                        {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : True})
-        return loss
+        summary_writer = tf.contrib.summary.create_file_writer(logdir, flush_millis=10 * 1000)
+        with summary_writer.as_default(), tf.contrib.summary.record_summaries_every_n_global_steps(1):
+            self.summaries["train"] = [tf.contrib.summary.scalar("train/loss", self.mean_train_loss),
+                                       tf.contrib.summary.image("train/predictions", self.predictions, max_images=1),
+                                       tf.contrib.summary.image("train/labels", tf.expand_dims(self.labels,-1),max_images=1)]
+        
+        with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
+            for dataset in ["dev", "test"]:
+                self.summaries[dataset] = [tf.contrib.summary.scalar(dataset + "/loss", self.mean_dev_loss),
+                                           tf.contrib.summary.image(dataset +"/predictions", self.predictions,max_images=1),
+                                           tf.contrib.summary.image(dataset +"/labels", tf.expand_dims(self.labels,-1),max_images=1)]
+        with summary_writer.as_default():
+            tf.contrib.summary.initialize(session=self.session, graph=self.session.graph)
+    
+    def train(self, train, args, step):
+        while not train.epoch_finished(args.batch_size):
+            step +=1
+            if step % args.log_frequency == 0:
+                network.save(step)
+            images, labels, labels_categories = train.next_batch(args.batch_size)
+            feed = {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : True}
+            if step % args.log_frequency != 0:
+                self.session.run([self.training, self.mean_train_loss_update],feed)
+            else:
+                self.session.run([self.training, self.mean_train_loss_update, self.summaries['train']],feed)
+                
+        return step
 
     
-    def evaluate(self,name,dataset,args):
-        images, labels, labels_categories = dataset.next_batch(args.batch_size)
-        loss = self.session.run([self.loss],
-                        {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False})
-        return loss[0]
-    
-    def make_example(self, dato, step):
-        images, labels, labels_categories = dato
-        loss, prediction = self.session.run([self.loss, self.predictions], {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False})
-        summary = self.session.run([self.image_summary],{self.image_value:prediction})
-        self.summary_writer_train.add_summary(summary[0], step)
-        return loss, prediction, labels
-        
-    def summarize(self, loss, train, step):
-        summary = self.session.run([self.merged_summary_op],{self.loss_value:loss})
-        if train:
-            self.summary_writer_train.add_summary(summary[0], step)
-        else:
-            self.summary_writer_dev.add_summary(summary[0], step)
+    def evaluate(self, name, dataset, args):
+        self.session.run([self.dev_running_vars_initializer])
+        while not dev.epoch_finished(args.batch_size):
             
+            is_last = dataset.is_last_batch(args.batch_size)
+            
+            images, labels, labels_categories = dataset.next_batch(args.batch_size)
+            feed = {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False}
+                
+            if is_last:
+                self.session.run([self.summaries[name], self.mean_dev_loss_update],feed)
+            else:
+                self.session.run([self.mean_dev_loss_update], feed)
+    
+                
+    def save(self, step):
         self.saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
         
 if __name__ == "__main__":
@@ -173,9 +199,9 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=8, type=int, help="Batch size.")
     parser.add_argument("--room_size", default=32, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
-    parser.add_argument("--epochs", default=1000, type=int, help="Number of epochs.")
+    parser.add_argument("--epochs", default=10, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--log_frequency", default=100, type=int, help="Frequency of training logging")
+    parser.add_argument("--log_frequency", default=50, type=int, help="Frequency of training logging")
     "coordinates, map"
     parser.add_argument("--type_of_prediction", default="map", type=str, help="Type of predicted")
     
@@ -189,13 +215,13 @@ if __name__ == "__main__":
     if not os.path.exists("logs"): os.mkdir("logs") # TF 1.6 will do this by itself
     args.metadata_path = 'D:\\workspace\\diplomka\\METADATA.tsv'
     
-    with open(os.path.join(args.folder,"strain.pickle"), 'rb') as f:
+    with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
         train_data = pickle.load(f)
-    with open(os.path.join(args.folder,"sval.pickle"), 'rb') as f:
-        val_data = pickle.load(f)
+    with open(os.path.join(args.folder,"val.pickle"), 'rb') as f:
+        dev_data = pickle.load(f)
         
     train = ConvDataset(train_data, args.room_size, args.type_of_prediction)
-    val = ConvDataset(val_data, args.room_size, args.type_of_prediction)
+    dev = ConvDataset(dev_data, args.room_size, args.type_of_prediction)
     args.number_of_categories = train.get_number_of_categories()
     
     # Construct the network
@@ -205,32 +231,8 @@ if __name__ == "__main__":
 
     print("Starting to run training...")
     step = 0
-    epoch_loss = 0
-    # Train
     for i in range(args.epochs):
-        #epoch_accuracy = 0
-        while not train.epoch_finished(args.batch_size):
-            loss = network.train(train, args)
-            epoch_loss += math.sqrt(loss)
-            step +=1
-            if step % args.log_frequency == 0:
-                epoch_loss /= args.log_frequency
-                print("train loss: ", epoch_loss)
-                network.summarize(epoch_loss, True, step)
-                loss, prediction, labels = network.make_example(val.next_batch(1), step)
-                epoch_loss = 0
-            
-        val_step = 0
-        val_loss = 0
-        #val_accuracy = 0
-        while not val.epoch_finished(args.batch_size):
-            loss  = network.evaluate("dev", val, args)
-            val_loss += math.sqrt(loss)
-            val_step+=1
-        
-            
-        network.summarize( val_loss/val_step, False, step)
-        print("dev loss: ", val_loss/val_step)
-        print("Example: ")
-        
-        #print("dev acc: ", val_accuracy/val_step)
+        print("*********** Epoch {} ***********".format(i+1))
+        step += network.train(train, args, step)
+        print("Evaluating on dev set...")
+        network.evaluate("dev", dev, args)

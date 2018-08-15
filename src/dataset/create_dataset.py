@@ -30,11 +30,17 @@ class Dataset:
         return batch
     
     def epoch_finished(self, batch_size):
+        if (len(self.permutation)//batch_size) % 100 == 0: 
+            print('{} batches left.'.format(len(self.permutation)//batch_size))
         if len(self.permutation) < batch_size:
             self.permutation = np.random.permutation(len(self.data_created[0])) if self.shuffle_batches else np.arange(len(self.data_created[0]))
+            
             return True
         
         return False
+    
+    def is_last_batch(self, batch_size):
+        return len(self.permutation) < batch_size*2
     
     def get_number_of_categories(self):
         return len(self.data.unique_model_types)
