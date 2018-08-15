@@ -67,10 +67,13 @@ class Network:
             self.output = output_layer
             self.predictions = output_layer
         elif args.type_of_prediction == 'map':
+            
+            self.treshold = 0.1
+            
             self.output = tf.layers.dense(input,args.room_size*args.room_size, activation=None)
             self.output = tf.reshape(self.output,(-1,args.room_size,args.room_size))
             print(self.output)
-            self.predictions = tf.expand_dims(self.output,-1)
+            self.predictions = tf.cast(tf.greater(self.output, self.treshold), tf.int32)
             
     
     def _define_loss(self,args, input):
@@ -123,52 +126,57 @@ class Network:
         
     def _write_summaries_contrib(self, logdir):
         
-        self.mean_train_loss, self.mean_train_loss_update = tf.metrics.mean(self.loss, name="train_metric")
-        self.mean_dev_loss, self.mean_dev_loss_update = tf.metrics.mean(self.loss, name="dev_metric")
+        self.mean_train_loss, _ = tf.metrics.mean(self.loss, updates_collections=['train_updates'],name ='train_vars' )
+        self.mean_train_iou, _ = tf.metrics.mean_iou(self.labels,self.predictions,2, updates_collections=['train_updates'], name='train_vars')
         
-        train_running_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope="train_metric")        
-        dev_running_vars = tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope="dev_metric")
-
-
-        self.train_running_vars_initializer = tf.variables_initializer(var_list=train_running_vars)
-        self.session.run(self.train_running_vars_initializer)
-        
-        self.dev_running_vars_initializer = tf.variables_initializer(var_list=dev_running_vars)
-        self.session.run(self.dev_running_vars_initializer)
+        self.mean_dev_loss, _ = tf.metrics.mean(self.loss,updates_collections=['dev_updates'], name="dev_vars")
+        self.mean_dev_iou, _ = tf.metrics.mean_iou(self.labels, self.predictions, 2, updates_collections=['dev_updates'], name='dev_vars')
+    
+        self.train_vars_initializer = tf.variables_initializer(var_list=tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope='train_vars'))
+        self.dev_vars_initializer = tf.variables_initializer(var_list=tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope='dev_vars'))
+        self.session.run(self.train_vars_initializer)
+        self.session.run(self.dev_vars_initializer)
 
         self.summaries = {}
     
         summary_writer = tf.contrib.summary.create_file_writer(logdir, flush_millis=10 * 1000)
         with summary_writer.as_default(), tf.contrib.summary.record_summaries_every_n_global_steps(1):
             self.summaries["train"] = [tf.contrib.summary.scalar("train/loss", self.mean_train_loss),
-                                       tf.contrib.summary.image("train/predictions", self.predictions, max_images=1),
+                                       tf.contrib.summary.scalar("train/iou", self.mean_train_iou),
+                                       tf.contrib.summary.image("train/outputs", tf.expand_dims(self.output,-1), max_images=1),
+                                       tf.contrib.summary.image("train/predictions", tf.cast(tf.expand_dims(self.predictions,-1),tf.float32), max_images=1),
                                        tf.contrib.summary.image("train/labels", tf.expand_dims(self.labels,-1),max_images=1)]
         
         with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
             for dataset in ["dev", "test"]:
                 self.summaries[dataset] = [tf.contrib.summary.scalar(dataset + "/loss", self.mean_dev_loss),
-                                           tf.contrib.summary.image(dataset +"/predictions", self.predictions,max_images=1),
+                                           tf.contrib.summary.image(dataset +"/outputs", tf.expand_dims(self.output,-1),max_images=1),
+                                           tf.contrib.summary.scalar(dataset +"/iou", self.mean_dev_iou),
+                                           tf.contrib.summary.image(dataset +"/predictions", tf.cast(tf.expand_dims(self.predictions,-1),tf.float32),max_images=1),
                                            tf.contrib.summary.image(dataset +"/labels", tf.expand_dims(self.labels,-1),max_images=1)]
         with summary_writer.as_default():
             tf.contrib.summary.initialize(session=self.session, graph=self.session.graph)
     
     def train(self, train, args, step):
+        updates = self.session.graph.get_collection('train_updates')
         while not train.epoch_finished(args.batch_size):
             step +=1
-            if step % args.log_frequency == 0:
-                network.save(step)
             images, labels, labels_categories = train.next_batch(args.batch_size)
             feed = {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : True}
             if step % args.log_frequency != 0:
-                self.session.run([self.training, self.mean_train_loss_update],feed)
-            else:
-                self.session.run([self.training, self.mean_train_loss_update, self.summaries['train']],feed)
                 
+                self.session.run([self.training, updates],feed)
+            else:
+                self.session.run([self.training, updates, self.summaries['train']],feed)
+                if step % (args.log_frequency*100) == 0:
+                    self.save(step)
+               
         return step
 
     
     def evaluate(self, name, dataset, args):
-        self.session.run([self.dev_running_vars_initializer])
+        updates = self.session.graph.get_collection('dev_updates')
+        self.session.run([self.dev_vars_initializer])
         while not dev.epoch_finished(args.batch_size):
             
             is_last = dataset.is_last_batch(args.batch_size)
@@ -177,9 +185,9 @@ class Network:
             feed = {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False}
                 
             if is_last:
-                self.session.run([self.summaries[name], self.mean_dev_loss_update],feed)
+                self.session.run([self.summaries[name], updates], feed)
             else:
-                self.session.run([self.mean_dev_loss_update], feed)
+                self.session.run([updates], feed)
     
                 
     def save(self, step):
@@ -201,7 +209,7 @@ if __name__ == "__main__":
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
     parser.add_argument("--epochs", default=10, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
-    parser.add_argument("--log_frequency", default=50, type=int, help="Frequency of training logging")
+    parser.add_argument("--log_frequency", default=200, type=int, help="Frequency of training logging")
     "coordinates, map"
     parser.add_argument("--type_of_prediction", default="map", type=str, help="Type of predicted")
     
@@ -215,9 +223,9 @@ if __name__ == "__main__":
     if not os.path.exists("logs"): os.mkdir("logs") # TF 1.6 will do this by itself
     args.metadata_path = 'D:\\workspace\\diplomka\\METADATA.tsv'
     
-    with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
+    with open(os.path.join(args.folder,"strain.pickle"), 'rb') as f:
         train_data = pickle.load(f)
-    with open(os.path.join(args.folder,"val.pickle"), 'rb') as f:
+    with open(os.path.join(args.folder,"sval.pickle"), 'rb') as f:
         dev_data = pickle.load(f)
         
     train = ConvDataset(train_data, args.room_size, args.type_of_prediction)
