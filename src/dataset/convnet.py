@@ -22,13 +22,9 @@ class Network:
             self._define_placeholders(args)
             
             embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
-            #network_string = "CB-64-3-1-same,CB-64-2-1-same,M-2-2,F,R-1024"
-            network_string = "CB-64-3-1-same,F,R-1024"
+            network_string = "CB-64-2-1-same,CB-64-2-1-same,M-2-2,F,E,R-2048"
+            #network_string = "CB-64-3-2-same,F,R-1024"
             next_layer = self._construct_network(network_string, embedded_ids)
-            
-            embeded_label = tf.gather(self.embedding_var, self.labels_categories)
-            
-            #next_layer = tf.concat((embeded_label, next_layer), axis = 1)
             
             self._construct_ouput(args, next_layer)
             
@@ -70,17 +66,21 @@ class Network:
             
             self.treshold = 0.1
             
-            self.output = tf.layers.dense(input,args.room_size*args.room_size, activation=None)
-            self.output = tf.reshape(self.output,(-1,args.room_size,args.room_size))
+            self.output = tf.layers.dense(input,args.room_size*args.room_size*2, activation=None)
+            self.output = tf.reshape(self.output,(-1,args.room_size,args.room_size,2))
             print(self.output)
-            self.predictions = tf.cast(tf.greater(self.output, self.treshold), tf.int32)
+            self.predictions = tf.argmax(self.output,axis=-1)
             
     
     def _define_loss(self,args, input):
         if args.type_of_prediction == 'coordinates':
             self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
         elif args.type_of_prediction == 'map':
-            self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
+            labels = tf.cast(self.labels, tf.int32)
+            print(labels)
+            print(self.output)
+            self.loss =tf.losses.sparse_softmax_cross_entropy(labels, self.output)
+            #self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
         
         
     def _construct_network(self, network_string, input):
@@ -105,6 +105,9 @@ class Network:
                 next_layer = tf.nn.relu(next_layer)
             elif layer[0] == 'CT':
                 next_layer = tf.layers.conv2d_transpose(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding=layer[4], activation=tf.nn.relu)
+            elif layer[0] == 'E':
+                embeded_label = tf.gather(self.embedding_var, self.labels_categories)
+                next_layer = tf.concat((embeded_label, next_layer), axis = 1)
             print(next_layer)
         return next_layer 
     
@@ -140,17 +143,15 @@ class Network:
         self.summaries = {}
     
         summary_writer = tf.contrib.summary.create_file_writer(logdir, flush_millis=10 * 1000)
-        with summary_writer.as_default(), tf.contrib.summary.record_summaries_every_n_global_steps(1):
+        with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
             self.summaries["train"] = [tf.contrib.summary.scalar("train/loss", self.mean_train_loss),
                                        tf.contrib.summary.scalar("train/iou", self.mean_train_iou),
-                                       tf.contrib.summary.image("train/outputs", tf.expand_dims(self.output,-1), max_images=1),
                                        tf.contrib.summary.image("train/predictions", tf.cast(tf.expand_dims(self.predictions,-1),tf.float32), max_images=1),
                                        tf.contrib.summary.image("train/labels", tf.expand_dims(self.labels,-1),max_images=1)]
         
         with summary_writer.as_default(), tf.contrib.summary.always_record_summaries():
             for dataset in ["dev", "test"]:
                 self.summaries[dataset] = [tf.contrib.summary.scalar(dataset + "/loss", self.mean_dev_loss),
-                                           tf.contrib.summary.image(dataset +"/outputs", tf.expand_dims(self.output,-1),max_images=1),
                                            tf.contrib.summary.scalar(dataset +"/iou", self.mean_dev_iou),
                                            tf.contrib.summary.image(dataset +"/predictions", tf.cast(tf.expand_dims(self.predictions,-1),tf.float32),max_images=1),
                                            tf.contrib.summary.image(dataset +"/labels", tf.expand_dims(self.labels,-1),max_images=1)]
@@ -199,7 +200,7 @@ if __name__ == "__main__":
     import os
 
     # Fix random seed
-    np.random.seed(42)
+    np.random.seed(0)
 
     # Parse arguments
     parser = argparse.ArgumentParser()
@@ -207,7 +208,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=8, type=int, help="Batch size.")
     parser.add_argument("--room_size", default=32, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
-    parser.add_argument("--epochs", default=10, type=int, help="Number of epochs.")
+    parser.add_argument("--epochs", default=50, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--log_frequency", default=200, type=int, help="Frequency of training logging")
     "coordinates, map"
