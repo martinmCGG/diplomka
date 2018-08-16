@@ -30,7 +30,7 @@ class Dataset:
         return batch
     
     def epoch_finished(self, batch_size):
-        if (len(self.permutation)//batch_size) % 100 == 0: 
+        if (len(self.permutation)//batch_size) % 500 == 0: 
             print('{} batches left.'.format(len(self.permutation)//batch_size))
         if len(self.permutation) < batch_size:
             self.permutation = np.random.permutation(len(self.data_created[0])) if self.shuffle_batches else np.arange(len(self.data_created[0]))

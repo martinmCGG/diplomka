@@ -26,8 +26,8 @@ class Network:
                 embedded_cats = tf.gather(self.embedding_var, self.labels_categories)
                 input = tf.concat([input, embedded_cats],-1)
             
-            network_string = "CB-64-2-1-same,CB-64-2-1-same,M-2-2,F,R-2048"
-            #network_string = "CB-64-3-2-same,F,R-1024"
+            network_string = args.network
+            
             next_layer = self._construct_network(network_string, input)
             
             self._construct_ouput(args, next_layer)
@@ -69,11 +69,8 @@ class Network:
             self.output = output_layer
             self.predictions = output_layer
         elif args.type_of_prediction == 'map':
-            
-            self.treshold = 0.1
-            
-            self.output = tf.layers.dense(input,args.room_size*args.room_size*2, activation=None)
-            self.output = tf.reshape(self.output,(-1,args.room_size,args.room_size,2))
+            #self.output = tf.layers.dense(input,args.room_size*args.room_size*2, activation=None)
+            self.output = tf.reshape(input,(-1,args.room_size,args.room_size,2))
             print(self.output)
             self.predictions = tf.argmax(self.output,axis=-1)
             
@@ -83,8 +80,6 @@ class Network:
             self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
         elif args.type_of_prediction == 'map':
             labels = tf.cast(self.labels, tf.int32)
-            print(labels)
-            print(self.output)
             self.loss =tf.losses.sparse_softmax_cross_entropy(labels, self.output)
             #self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
         
@@ -96,7 +91,14 @@ class Network:
         for layer in cnn:
             layer = layer.split('-')
             if layer[0] == 'C':
-                next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=(int(layer[3])), padding=layer[4],activation = tf.nn.relu)
+                if len(layer) == 5:
+                    if layer[4] == 'relu':
+                        activation = tf.nn.relu
+                    else:
+                        activation = None
+                else:
+                    activation = tf.nn.relu
+                next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding='same',activation = activation)
             elif layer[0] == 'M':
                 next_layer = tf.layers.max_pooling2d(next_layer,(int(layer[1])), int(layer[2]))
             elif layer[0] == 'F':
@@ -106,11 +108,11 @@ class Network:
             elif layer[0] == 'D':
                 next_layer = tf.layers.dropout(next_layer, training=self.isTraining)
             elif layer[0] == 'CB':
-                next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding=layer[4])
+                next_layer = tf.layers.conv2d(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding='same')
                 next_layer = tf.contrib.layers.batch_norm(next_layer,)
                 next_layer = tf.nn.relu(next_layer)
             elif layer[0] == 'CT':
-                next_layer = tf.layers.conv2d_transpose(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding=layer[4], activation=tf.nn.relu)
+                next_layer = tf.layers.conv2d_transpose(next_layer, int(layer[1]), int(layer[2]), strides=int(layer[3]), padding='same', activation=tf.nn.relu)
             elif layer[0] == 'E':
                 embeded_label = tf.gather(self.embedding_var, self.labels_categories)
                 next_layer = tf.concat((embeded_label, next_layer), axis = 1)
@@ -200,6 +202,11 @@ class Network:
     def save(self, step):
         self.saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
         
+    def print_parameters_count(self):
+        with self.session.graph.as_default():
+            params_count = np.sum([np.prod(v.shape) for v in tf.trainable_variables()])
+            print("Constructed a network with {} parameters".format(params_count))
+        
 if __name__ == "__main__":
     import argparse
     import datetime
@@ -219,6 +226,7 @@ if __name__ == "__main__":
     parser.add_argument("--log_frequency", default=200, type=int, help="Frequency of training logging")
     "coordinates, map"
     parser.add_argument("--type_of_prediction", default="map", type=str, help="Type of predicted")
+    parser.add_argument("--network", default="CB-256-2-1,M-2-2,CB-512-2-1,M-2-2,CT-256-2-4,C-2-1-1-none", type=str, help="String defining the network")
     
     args = parser.parse_args()
     
@@ -242,6 +250,7 @@ if __name__ == "__main__":
     # Construct the network
     network = Network(threads=args.threads)
     network.construct(args)
+    network.print_parameters_count()
 
 
     print("Starting to run training...")
