@@ -21,10 +21,14 @@ class Network:
             
             self._define_placeholders(args)
             
-            embedded_ids = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
-            network_string = "CB-64-2-1-same,CB-64-2-1-same,M-2-2,F,E,R-2048"
+            input = self._construct_embeddings(FURNITURE_CATS,args.embedding_size, self.images)
+            if args.type_of_prediction == 'map':
+                embedded_cats = tf.gather(self.embedding_var, self.labels_categories)
+                input = tf.concat([input, embedded_cats],-1)
+            
+            network_string = "CB-64-2-1-same,CB-64-2-1-same,M-2-2,F,R-2048"
             #network_string = "CB-64-3-2-same,F,R-1024"
-            next_layer = self._construct_network(network_string, embedded_ids)
+            next_layer = self._construct_network(network_string, input)
             
             self._construct_ouput(args, next_layer)
             
@@ -49,13 +53,15 @@ class Network:
     
     def _define_placeholders(self, args):
         self.images = tf.placeholder(tf.int32, [None, args.room_size,args.room_size], name="images")
-        self.labels_categories = tf.placeholder(tf.int32, [None], name="labels_categories")
         self.isTraining = tf.placeholder(tf.bool, name = "isTraining")
         
         if args.type_of_prediction == 'coordinates':
             self.labels = tf.placeholder(tf.float32, [None,2], name="labels")
+            self.labels_categories = tf.placeholder(tf.int32, [None], name="labels_categories")
+            
         elif args.type_of_prediction == 'map':
             self.labels = tf.placeholder(tf.float32, [None, args.room_size, args.room_size], name="labels")
+            self.labels_categories = tf.placeholder(tf.int32, [None, args.room_size, args.room_size], name="labels_categories")
             
     def _construct_ouput(self, args, input):
         if args.type_of_prediction == 'coordinates':   
