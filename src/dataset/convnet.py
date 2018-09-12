@@ -6,6 +6,7 @@ import pickle
 import math
 from tensorflow.contrib.tensorboard.plugins import projector
 from multiprocessing import reduction
+from imager import save_batch_as_image
 
 class Network:
     def __init__(self, threads, seed=42):
@@ -42,7 +43,7 @@ class Network:
             # Initialize variables
             self.session.run(tf.global_variables_initializer())
             
-            self._write_summaries(args)
+            #self._write_summaries(args)
             self._write_summaries_contrib(args.logdir)
             
     
@@ -69,21 +70,18 @@ class Network:
             self.output = output_layer
             self.predictions = output_layer
         elif args.type_of_prediction == 'map':
-            #self.output = tf.layers.dense(input,args.room_size*args.room_size*2, activation=None)
-            self.output = tf.reshape(input,(-1,args.room_size,args.room_size,2))
+            dense = tf.layers.dense(input,args.room_size*args.room_size*2, activation=None)
+            print(dense)
+            self.output = tf.reshape(dense,(-1,args.room_size,args.room_size,2))
             print(self.output)
             self.predictions = tf.argmax(self.output,axis=-1)
             
-    
     def _define_loss(self,args, input):
         if args.type_of_prediction == 'coordinates':
             self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
         elif args.type_of_prediction == 'map':
             labels = tf.cast(self.labels, tf.int32)
             self.loss =tf.losses.sparse_softmax_cross_entropy(labels, self.output)
-            #self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
-        
-        
     def _construct_network(self, network_string, input):
         next_layer = input
         print(next_layer)
@@ -138,7 +136,8 @@ class Network:
     def _write_summaries_contrib(self, logdir):
         
         self.mean_train_loss, _ = tf.metrics.mean(self.loss, updates_collections=['train_updates'],name ='train_vars' )
-        self.mean_train_iou, _ = tf.metrics.mean_iou(self.labels,self.predictions,2, updates_collections=['train_updates'], name='train_vars')
+        weights = tf.convert_to_tensor((0,1))
+        self.mean_train_iou, _ = tf.metrics.mean_iou(self.labels,self.predictions,2, updates_collections=['train_updates'], name='train_vars', weights = weights)
         
         self.mean_dev_loss, _ = tf.metrics.mean(self.loss,updates_collections=['dev_updates'], name="dev_vars")
         self.mean_dev_iou, _ = tf.metrics.mean_iou(self.labels, self.predictions, 2, updates_collections=['dev_updates'], name='dev_vars')
@@ -178,7 +177,8 @@ class Network:
             else:
                 self.session.run([self.training, updates, self.summaries['train']],feed)
                 if step % (args.log_frequency*100) == 0:
-                    self.save(step)
+                    #self.save(step)
+                    pass
                
         return step
 
@@ -191,13 +191,22 @@ class Network:
             is_last = dataset.is_last_batch(args.batch_size)
             
             images, labels, labels_categories = dataset.next_batch(args.batch_size)
-            feed = {self.images: images, self.labels: labels,self.labels_categories:labels_categories,self.isTraining : False}
+            feed = {self.images: images, self.labels: labels, self.labels_categories:labels_categories,self.isTraining : False}
                 
             if is_last:
                 self.session.run([self.summaries[name], updates], feed)
             else:
                 self.session.run([updates], feed)
     
+    def predict(self,dataset,args):
+        updates = self.session.graph.get_collection('dev_updates')
+        self.session.run([self.dev_vars_initializer])
+        #while not dev.epoch_finished(args.batch_size):
+        
+        images, labels, labels_categories = dataset.next_batch(args.batch_size)
+        feed = {self.images: images, self.labels: labels, self.labels_categories:labels_categories,self.isTraining : False}
+        output, predictions, _ = self.session.run([self.output, self.predictions, updates], feed)
+        save_batch_as_image([images, labels, predictions])
                 
     def save(self, step):
         self.saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
@@ -218,15 +227,15 @@ if __name__ == "__main__":
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to pickled data")
-    parser.add_argument("--batch_size", default=8, type=int, help="Batch size.")
+    parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
     parser.add_argument("--room_size", default=32, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
-    parser.add_argument("--epochs", default=50, type=int, help="Number of epochs.")
+    parser.add_argument("--epochs", default=1, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--log_frequency", default=200, type=int, help="Frequency of training logging")
     "coordinates, map"
     parser.add_argument("--type_of_prediction", default="map", type=str, help="Type of predicted")
-    parser.add_argument("--network", default="CB-256-2-1,M-2-2,CB-512-2-1,M-2-2,CT-256-2-4,C-2-1-1-none", type=str, help="String defining the network")
+    parser.add_argument("--network", default="CB-256-2-1,CB-128-2-1,M-2-2,F,R-512,D", type=str, help="String defining the network")
     
     args = parser.parse_args()
     
@@ -252,7 +261,6 @@ if __name__ == "__main__":
     network.construct(args)
     network.print_parameters_count()
 
-
     print("Starting to run training...")
     step = 0
     for i in range(args.epochs):
@@ -260,3 +268,6 @@ if __name__ == "__main__":
         step += network.train(train, args, step)
         print("Evaluating on dev set...")
         network.evaluate("dev", dev, args)
+    print("-------------------------------END-------------------------------")
+    
+    network.predict(dev, args)
