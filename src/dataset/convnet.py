@@ -46,7 +46,6 @@ class Network:
             #self._write_summaries(args)
             self._write_summaries_contrib(args.logdir)
             
-    
     def _construct_embeddings(self, number_of_categories, embedding_size, data):
         self.embedding_var = tf.get_variable('embeddings', [number_of_categories, embedding_size])
         embedded_ids = tf.gather(self.embedding_var, data)    
@@ -81,7 +80,8 @@ class Network:
             self.loss = tf.losses.mean_squared_error(tf.cast(self.labels, tf.float32), self.output, reduction=tf.losses.Reduction.SUM_OVER_BATCH_SIZE)
         elif args.type_of_prediction == 'map':
             labels = tf.cast(self.labels, tf.int32)
-            self.loss =tf.losses.sparse_softmax_cross_entropy(labels, self.output)
+            self.loss =tf.losses.sparse_softmax_cross_entropy(labels, self.output,)
+    
     def _construct_network(self, network_string, input):
         next_layer = input
         print(next_layer)
@@ -136,11 +136,10 @@ class Network:
     def _write_summaries_contrib(self, logdir):
         
         self.mean_train_loss, _ = tf.metrics.mean(self.loss, updates_collections=['train_updates'],name ='train_vars' )
-        weights = tf.convert_to_tensor((0,1))
-        self.mean_train_iou, _ = tf.metrics.mean_iou(self.labels,self.predictions,2, updates_collections=['train_updates'], name='train_vars', weights = weights)
+        self.mean_train_iou, _ = tf.metrics.mean(self.compute_iou(self.labels, self.predictions), updates_collections=['train_updates'], name='train_vars')
         
         self.mean_dev_loss, _ = tf.metrics.mean(self.loss,updates_collections=['dev_updates'], name="dev_vars")
-        self.mean_dev_iou, _ = tf.metrics.mean_iou(self.labels, self.predictions, 2, updates_collections=['dev_updates'], name='dev_vars')
+        self.mean_dev_iou, _ = tf.metrics.mean(self.compute_iou(self.labels, self.predictions), updates_collections=['dev_updates'], name='dev_vars')
     
         self.train_vars_initializer = tf.variables_initializer(var_list=tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope='train_vars'))
         self.dev_vars_initializer = tf.variables_initializer(var_list=tf.get_collection(tf.GraphKeys.LOCAL_VARIABLES, scope='dev_vars'))
@@ -181,7 +180,6 @@ class Network:
                     pass
                
         return step
-
     
     def evaluate(self, name, dataset, args):
         updates = self.session.graph.get_collection('dev_updates')
@@ -198,7 +196,7 @@ class Network:
             else:
                 self.session.run([updates], feed)
     
-    def predict(self,dataset,args):
+    def predict(self,dataset,args, name):
         updates = self.session.graph.get_collection('dev_updates')
         self.session.run([self.dev_vars_initializer])
         #while not dev.epoch_finished(args.batch_size):
@@ -206,7 +204,7 @@ class Network:
         images, labels, labels_categories = dataset.next_batch(args.batch_size)
         feed = {self.images: images, self.labels: labels, self.labels_categories:labels_categories,self.isTraining : False}
         output, predictions, _ = self.session.run([self.output, self.predictions, updates], feed)
-        save_batch_as_image([images, labels, predictions])
+        save_batch_as_image([images, labels, predictions], name)
                 
     def save(self, step):
         self.saver.save(self.session, os.path.join(args.logdir, "model.ckpt"), step)
@@ -215,7 +213,15 @@ class Network:
         with self.session.graph.as_default():
             params_count = np.sum([np.prod(v.shape) for v in tf.trainable_variables()])
             print("Constructed a network with {} parameters".format(params_count))
-        
+    
+    def compute_iou(self, labels, predictions):
+        predictions = tf.cast(predictions, tf.float32)
+        intersection = tf.reduce_sum(labels * predictions, axis=[1,2])
+        iou = tf.reduce_mean(
+        intersection / (1+tf.reduce_sum(labels, axis=[1,2]) + tf.reduce_sum(predictions, axis=[1,2]) - intersection)
+        )
+        return iou
+    
 if __name__ == "__main__":
     import argparse
     import datetime
@@ -230,12 +236,12 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=32, type=int, help="Batch size.")
     parser.add_argument("--room_size", default=32, type=int, help="Number of items in room")
     parser.add_argument("--embedding_size", default=8, type=int, help="Size of embedding of the categories")
-    parser.add_argument("--epochs", default=1, type=int, help="Number of epochs.")
+    parser.add_argument("--epochs", default=25, type=int, help="Number of epochs.")
     parser.add_argument("--threads", default=40, type=int, help="Maximum number of threads to use.")
     parser.add_argument("--log_frequency", default=200, type=int, help="Frequency of training logging")
     "coordinates, map"
     parser.add_argument("--type_of_prediction", default="map", type=str, help="Type of predicted")
-    parser.add_argument("--network", default="CB-256-2-1,CB-128-2-1,M-2-2,F,R-512,D", type=str, help="String defining the network")
+    parser.add_argument("--network", default="--network CB-64-2-1,CB-64-2-1,M-2-2,F,R-1024,D", type=str, help="String defining the network")
     
     args = parser.parse_args()
     
@@ -247,12 +253,14 @@ if __name__ == "__main__":
     if not os.path.exists("logs"): os.mkdir("logs") # TF 1.6 will do this by itself
     args.metadata_path = 'D:\\workspace\\diplomka\\METADATA.tsv'
     
-    with open(os.path.join(args.folder,"strain.pickle"), 'rb') as f:
+    with open(os.path.join(args.folder,"train.pickle"), 'rb') as f:
         train_data = pickle.load(f)
-    with open(os.path.join(args.folder,"sval.pickle"), 'rb') as f:
+    with open(os.path.join(args.folder,"val.pickle"), 'rb') as f:
         dev_data = pickle.load(f)
-        
+    
     train = ConvDataset(train_data, args.room_size, args.type_of_prediction)
+    
+    
     dev = ConvDataset(dev_data, args.room_size, args.type_of_prediction)
     args.number_of_categories = train.get_number_of_categories()
     
@@ -268,6 +276,9 @@ if __name__ == "__main__":
         step += network.train(train, args, step)
         print("Evaluating on dev set...")
         network.evaluate("dev", dev, args)
+        print("Saving Images...")
+        network.predict(train, args, "train" + str(i))
+        network.predict(dev, args, "dev" + str(i))
     print("-------------------------------END-------------------------------")
     
-    network.predict(dev, args)
+    

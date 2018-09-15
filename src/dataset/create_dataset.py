@@ -9,12 +9,13 @@ import os
 import numpy as np
 np.set_printoptions(suppress=True,linewidth=np.nan,threshold=np.nan)
 
+CATEGORIES_TO_CONSIDER = set()
+
 class Dataset:
     def __init__(self, data, data_created, shuffle_batches=True):
         self.data = data
         self.room_cats = self._make_index_mapping(data.unique_room_types)
         self.model_cats = self._make_index_mapping(data.unique_model_types)
-        
         self.data_created = data_created
         
         self.shuffle_batches = shuffle_batches
@@ -85,7 +86,6 @@ class RnnDataset(Dataset):
         self.labels = np.zeros([len(data.rooms), 3], np.float32)
         self.sequence_lengths = np.zeros([len(data.rooms)], np.int32)
         
-        
         data_created = [self.sequences,self.labels, self.categories, self.labels_categories,  self.sequence_lengths]
         
         Dataset.__init__(self, data, data_created, shuffle_batches)
@@ -140,6 +140,10 @@ class ConvDataset(Dataset):
             maxx = int(model.bbox["max"][0] * pixel_size)
             minz = int(model.bbox["min"][2] * pixel_size)
             maxz = int(model.bbox["max"][2] * pixel_size)
+            if minx == maxx:
+                maxx = minx + 1
+            if minz == maxz:
+                maxz = minz + 1
             if model != missing_model:
                 for i in range(minx, maxx):
                     for j in range(minz, maxz):
@@ -151,9 +155,13 @@ class ConvDataset(Dataset):
                 
                 elif type_of_prediction == 'map':
                     label = np.zeros((self.image_size,self.image_size), np.int32)
+                    loop = False
                     for i in range(minx, maxx):
                         for j in range(minz, maxz):
+                            loop = True
                             label[i,j] = 1
+                    if not loop:
+                        print(minx, maxx, minz, maxz)   
                     model_category = np.zeros((self.image_size,self.image_size), np.int32)
                     for i in range(0, maxx-minx):
                         for j in range(0, maxz-minz):
@@ -203,5 +211,7 @@ class RoomClassDataset(Dataset):
                 for j in range(minz, maxz):
                     image[i,j] = category
         return image
+
+
         
     

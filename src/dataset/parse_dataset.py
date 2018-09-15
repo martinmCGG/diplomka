@@ -29,7 +29,7 @@ class Model:
         
 class Data:
 
-    ignored_categories = ["otherprop"]
+    ignored_categories = ["otherprop","otherstructure","books","picture","floor_mat","person","shower_curtain","pillow","blinds","clothes"]
 
     def load_types(self):
         model_types = {}
@@ -124,9 +124,9 @@ class Data:
         valset.rooms = self.rooms[:border]
         self.rooms = self.rooms[border:]
         
-        with open(os.path.join(filename,"sval.pickle"), 'wb') as f:
+        with open(os.path.join(filename,"val.pickle"), 'wb') as f:
             pickle.dump(valset,f)
-        with open(os.path.join(filename,"strain.pickle"), 'wb') as f:
+        with open(os.path.join(filename,"train.pickle"), 'wb') as f:
             pickle.dump(self,f)
             
     def _subtract_bbox(self, bbox, sub):
