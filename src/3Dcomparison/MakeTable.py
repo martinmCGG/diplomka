@@ -4,14 +4,17 @@ Created on 2. 10. 2018
 @author: miros
 '''
 import os
+from MakeCategories import is_file
 
 def make_table(outfile,folder='.'):
-    files = os.listdir(folder)
+    os.chdir(folder)
+    files = [x for x in os.listdir(folder) if is_file(x,'txt')]
     columns = []
     columns.append(parse_first_column(files[0]))
     for file in files:
         columns.append(parse_column(file))
-    print(columns)
+    
+    print_accuracies(columns)
     
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
@@ -56,12 +59,22 @@ def parse_first_column(file):
         for line in f:
             column.append(line.split()[0])
     return column
-    
+
+def print_accuracies(columns):
+    for i in range(1, len(columns)):
+        all = 0
+        correct = 0
+        for j in range(1, len(columns[i])):
+            if columns[i][j] == columns[0][j]:
+                correct += 1
+            all +=1
+        print('Accuracy of {} : {}'.format(columns[i][0] , correct/all*100))    
+  
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--folder", default="./models_out", type=str, help="Path to data") 
-    parser.add_argument("-o", default="../out.html", type=str, help="Path to output file")
+    parser.add_argument("--folder", default=".", type=str, help="Path to data") 
+    parser.add_argument("-o", default="./table.html", type=str, help="Path to output file")
     
     args = parser.parse_args()
     os.chdir(args.folder)
