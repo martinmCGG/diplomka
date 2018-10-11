@@ -5,16 +5,11 @@ Created on 2. 10. 2018
 '''
 import os
 from MakeCategories import is_file
+    
 
 def make_table(outfile,folder='.'):
-    os.chdir(folder)
-    files = [x for x in os.listdir(folder) if is_file(x,'txt')]
-    columns = []
-    columns.append(parse_first_column(files[0]))
-    for file in files:
-        columns.append(parse_column(file))
-    
-    print_accuracies(columns)
+
+    columns = parse_column(folder)
     
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
@@ -43,6 +38,15 @@ def write_all(file,strings):
     for s in strings:
         file.write(s + '\n')           
     
+def parse_columns(folder):
+    os.chdir(folder)
+    files = [x for x in os.listdir(folder) if is_file(x,'txt')]
+    columns = []
+    columns.append(parse_first_column(files[0]))
+    for file in files:
+        columns.append(parse_column(file))
+    return columns
+
 def parse_column(file):
     column = []
     with open(file, 'r') as f:
