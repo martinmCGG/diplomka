@@ -18,7 +18,8 @@ elif model == 'PNET2':
     command += 'python train_multi_gpu.py --weights log/model.ckpt-{}'.format(args.weights)
 elif model == 'SEQ2SEQ':
     command += 'python run.py --train True --weights logs/mvmodel.ckpt-{}'.format(args.weights)
-    
+elif model =='KDNET':
+    command += 'python train_batch.py --weights logs/model.pth-{}'.format(args.weights)
 print('Training {}'.format(model))
 
 os.system(command)

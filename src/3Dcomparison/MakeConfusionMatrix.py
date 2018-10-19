@@ -98,7 +98,7 @@ def count_accuracy(misses, counts, categories):
     for i in range(len(categories)):
         cats = [misses[x] for x in misses.keys() if x[0] == categories[i]]
         mistakes[i] = sum(cats)
-    return (sum(counts)- sum(mistakes)) / sum(counts)
+    return 100 * (sum(counts)- sum(mistakes)) / sum(counts)
     
     
 def count_misses(file, categories):

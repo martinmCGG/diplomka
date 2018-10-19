@@ -10,13 +10,14 @@ parser.add_argument('--weights',default='', help='Path to pretrained model weigh
 
 args = parser.parse_args()
 
-models = ['MVCNN', 'PNET', 'PNET2', 'SEQ2SEQ']
+models = ['MVCNN', 'PNET', 'PNET2', 'SEQ2SEQ','KDNET']
 
 model_commands={
     'MVCNN': 'python test.py --weights=logs/model.ckpt-',
     'PNET' : 'python evaluate.py --model_path=logs/model.ckpt-',
     'PNET2': 'python evaluate.py --model_path=logs/model.ckpt-',
-    'SEQ2SEQ':'python train.py --train=False --weights=logs/mvmodel.ckpt-'
+    'SEQ2SEQ':'python train.py --train=False --weights=logs/mvmodel.ckpt-',
+    'KDNET':'python train_batch.py --test=True --weights=logs/model.pth-'
     }
 
 model_weights = {}
