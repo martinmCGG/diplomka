@@ -5,7 +5,8 @@ We suppose that the images are sorted by categories in separate folders and we a
 '''
 import os
 import argparse
-    
+#from __future__ import print_function
+
 def prepare_category(index, folder, list_folder, args):
     allfiles = lift_from_subdirectories(folder)
     allmodels = list(set(["_".join(file.split('_')[:-1]) for file in allfiles]))
@@ -52,12 +53,12 @@ def lift_from_subdirectories(folder):
     return newfiles
     
 def make_one_file(category,category_number,number, args, dataset):
-    outfile = os.path.join(args.outfolder, "{0}_{1:0>3}.txt".format(category, number))
+    outfile = "{0}_{1:0>3}.txt".format(category, number)
     with open(outfile,'w') as f:
         print(category_number, file = f)
         print(args.views,file = f)
         for i in range(args.views): 
-            print("{0}/{1}/{2}/{1}_{3:0>4}_{4:0>3}.png".format(args.folder,category,dataset,number,i+1), file=f)
+            print("{0}/{1}/{0}_{2:0>4}_{3:0>3}.png".format(category,dataset,number,i+1), file=f)
         
     return outfile
 

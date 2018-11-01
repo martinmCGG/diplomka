@@ -17,7 +17,7 @@ import theano.tensor as T
 import lasagne
 
 import sys
-sys.path.insert(0, '/models/VRNENS')
+sys.path.insert(0, '/home/krabec/models/VRNENS')
 from utils import checkpoints,metrics_logging
 
 from collections import OrderedDict
@@ -74,19 +74,19 @@ def make_training_functions(cfg,model):
             }
     return tfuncs, tvars, model
 
-def main(args):
+def test(config_file):
     
     # Load model
     lasagne.random.set_rng(np.random.RandomState(0))
-    print(args.config_path)
-    config_module = imp.load_source('config', args.config_path)
+    print(config_file)
+    config_module = imp.load_source('config', config_file)
     cfg = config_module.cfg
    
-    weights_fname =str(args.config_path)[:-3]+'.npz'
+    weights_fname =str(config_file)[:-3]+'.npz'
 
     model = config_module.get_model()
     print('Compiling theano functions...')
-    tfuncs, tvars,model = make_training_functions(cfg,model)
+    tfuncs, tvars, model = make_training_functions(cfg,model)
     metadata = checkpoints.load_weights(weights_fname, model['l_out'])
     best_acc = metadata['best_acc'] if 'best_acc' in metadata else 0
     print('best acc = '+str(best_acc))
@@ -109,8 +109,10 @@ def main(args):
     
     predictions = []
     labels = []
+    pred_array = []
     # Evaluate on test set
     for chunk_index in xrange(num_test_chunks):
+    #for chunk_index in xrange(1):
         upper_range = min(len(yt),(chunk_index+1)*test_chunk_size) # 
         x_shared = np.asarray(xt[chunk_index*test_chunk_size:upper_range,:,:,:,:],dtype=np.float32)
         y_shared = np.asarray(yt[chunk_index*test_chunk_size:upper_range],dtype=np.float32)
@@ -122,9 +124,9 @@ def main(args):
         for bi in xrange(num_batches):
             test_itr+=1
             print(test_itr)
-            [batch_test_class_error,confusion,raw_pred, y] = tfuncs['test_function'](bi) # Get the test       
+            [batch_test_class_error, confusion, raw_pred, y] = tfuncs['test_function'](bi) # Get the test       
             test_class_error.append(batch_test_class_error)
-            
+            pred_array.append(np.array(raw_pred))
             predictions.append(confusion)
             labels.append(y[0])
             # print(confusion)
@@ -133,19 +135,40 @@ def main(args):
     
     # print(confusion_matrix)
     # Save outputs to csv files.
-    np.savetxt(str(args.config_path)[:-3]+'.csv', np.asarray(pred_array), delimiter=",")
+    np.savetxt(str(config_file)[:-3]+'.csv', np.asarray(pred_array), delimiter=",")
     t_class_error = 1-float(np.mean(test_class_error))
     print('Test error is: ' + str(t_class_error))
+    return pred_array, labels
 
+
+
+def evaluate_ensemble(all_preds, labels):
+    all_preds = np.array(all_preds)
+    summed_preds = np.sum(all_preds, axis = 0)
+    final_predictions = np.argmax(summed_preds, 1)
+    return final_predictions
+        
+
+### TODO: Clean this up and add the necessary arguments to enable all of the options we want.
+if __name__=='__main__':
+    
+    all_predictions = []
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('models', type=Path, help='path to folder containing')
+    args = parser.parse_args()
+    
+    for file in sorted(os.listdir(args.models)):
+        if file.split('.')[-1] == 'py':
+            preds, labels = test(os.path.join(args.models,file))
+            all_predictions.append(preds)
+    np.save('preds.npy', np.array(all_predictions))
+    np.save('labels.npy', np.array(labels))
+    
+    #evaluate_ensemble(all_predictions, labels, args.models)
+    predictions = evaluate_ensemble(np.load('preds.npy'), np.load('labels.npy'))
+    
     import sys
     sys.path.insert(0, '/models/vysledky')
     from MakeCategories import make_categories
     make_categories('/models/MVCNN/modelnet40v1', '/models/vysledky/vrnens.txt', predictions, labels, 'VRNENS')
-
-
-### TODO: Clean this up and add the necessary arguments to enable all of the options we want.
-if __name__=='__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('config_path', type=Path, help='config.py file')
-    args = parser.parse_args()
-    main(args)
