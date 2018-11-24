@@ -5,16 +5,12 @@ MAINTAINER Kai Arulkumaran <design@kaixhin.com>
 # Install git, wget, python-dev, pip, BLAS + LAPACK and other dependencies
 RUN apt-get update && apt-get install -y \
   gfortran \
-  git \
-  wget \
   liblapack-dev \
   libopenblas-dev \
-  python-dev \
-  python-pip \
   python-nose
 
-RUN pip install numpy
-RUN pip install scipy
+#RUN pip install numpy
+#RUN pip install scipy
 
 # Remove OS-installed six
 RUN rm /usr/lib/python2.7/dist-packages/six*
