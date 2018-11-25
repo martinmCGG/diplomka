@@ -19,8 +19,7 @@ class MultiProcesor:
         if len(self.files) > self.n_threads *2:
             for i in range(self.n_threads-1):
                 p = Process(target=self.run_conversion, args=(self.files[i*size:(i+1)*size], i, self.lock, self.log_file, args))
-                
-                
+                p.start()
             p = Process(target=self.run_conversion, args=(self.files[(args.t-1)*size:], self.n_threads-1, self.lock, self.log_file, args))
             p.start()
             pool.append(p)
@@ -59,10 +58,12 @@ class MultiProcesor:
                 if len(buffer_cats[j])  == self.max_size:
                     self.log("Thread {} started saving {} {}-th file.".format(id,datasets[j], buffer_written[j]), lock, log_file)
                     self.write_function(buffer[j], buffer_cats[j], datasets[j], id, buffer_written[j], args)
-                    buffer[j] = []
-                    buffer_cats[j] = []
-                    buffer_written[j] += 1
+                    del buffer[j]
+                    buffer.insert(j, [])
+                    del buffer_cats[j]
+                    buffer_cats.insert(j, [])
                     self.log("Thread {} ended saving {} {}-th file.".format(id, datasets[j], buffer_written[j]), lock, log_file)
+                    buffer_written[j] += 1
         for j in range(len(datasets)):
             if len(buffer_cats[j])  > 0:
                 self.log("Thread {} started saving {} {}-th file.".format(id,datasets[j], buffer_written[j]), lock, log_file)

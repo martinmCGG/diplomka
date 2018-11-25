@@ -1,10 +1,7 @@
 from __future__ import print_function
-import sys
 import numpy as np
 import os
-import math
 from obj_files import read_obj_file
-#sys.path.insert(0, "/usr/local/openvdb/python/lib/python2.7/")
 import pyopenvdb as vdb
 
 
@@ -30,13 +27,12 @@ def convert_to_grid(vertices, triangles, quads, grid_size):
             iter.value = 1.0
 
     grid.background = 0.0
-    
     return grid
 
 
 def voxels_to_nparray(grid, grid_size):
     accessor = grid.getAccessor()
-    arr = np.zeros((grid_size,grid_size,grid_size)) 
+    arr = np.zeros((grid_size,grid_size,grid_size), dtype=np.uint8) 
     start = -grid_size // 2 + 1
     stop = grid_size//2 + 1
     for i in range(start, stop):

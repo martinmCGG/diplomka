@@ -10,9 +10,13 @@ from MultiProcesor import MultiProcesor
 def write_for_vrnens(buffer, buffer_cats,dataset, id, n, args):
     features = np.array(buffer)
     features = np.reshape(features, (-1,1,args.v, args.v, args.v))
-    targets = np.array(buffer_cats)
+    cats = np.zeros(features.shape[0])
+    for i in range(len(buffer_cats)):
+        for j in range(args.r):
+            cats[i*args.r+j] = buffer_cats[i]
+    print(features.shape, cats.shape)
     file = os.path.join(args.o, "{}_{}_{}.npz".format(dataset,id,n))
-    np.savez(file ,features=features, targets=targets)
+    np.savez(file ,features=features, targets=cats)
 
 def save_for_VRNENS(args, categories, split):
     files = find_files(args.d, 'obj')
@@ -27,8 +31,7 @@ def create_ROT_MATRIX(rotation):
     matrix[1,0] = np.sin(angle)
     matrix[1,1] = np.cos(angle)
     matrix[2,2] = 1
-    return matrix
-     
+    return matrix   
 
 if __name__ == '__main__':
     import argparse
@@ -36,8 +39,8 @@ if __name__ == '__main__':
     parser.add_argument("-v", default=32, type=int, help="Resolution of the voxel grid")
     parser.add_argument("-d", type=str, help="root directory of .obj files to be voxelizes")
     parser.add_argument("-r", default = 24, type=int, help="Number of rotations of model along vertical axis")
-    parser.add_argument("-t", default = 10, type=int, help="Number of threads")
-    parser.add_argument("-m", default = 500, type=int, help="Maximum number of models to be saved in one npz file")
+    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
+    parser.add_argument("-m", default = 2000, type=int, help="Maximum number of models to be saved in one npz file")
     parser.add_argument("-o", type=str, help="directory of the output files")
     parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
 
