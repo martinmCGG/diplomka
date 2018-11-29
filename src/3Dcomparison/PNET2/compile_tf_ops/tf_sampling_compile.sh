@@ -1,5 +1,5 @@
 #/bin/bash
-
+echo aaaaa
 TF_INC="/usr/local/lib/python2.7/dist-packages/tensorflow/include"
 TF_LIB="/usr/local/lib/python2.7/dist-packages/tensorflow"
 
