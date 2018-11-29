@@ -1,5 +1,5 @@
 #/bin/bash
-echo aaaaa
+nvcc -std=c++11 tf_sampling_g.cu -o tf_sampling_g.cu.o -c -O2 -DGOOGLE_CUDA=1 -x cu -Xcompiler -fPIC 
 TF_INC="/usr/local/lib/python2.7/dist-packages/tensorflow/include"
 TF_LIB="/usr/local/lib/python2.7/dist-packages/tensorflow"
 
