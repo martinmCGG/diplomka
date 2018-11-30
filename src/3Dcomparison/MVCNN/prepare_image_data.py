@@ -5,8 +5,7 @@ We suppose that the images are sorted by categories in separate folders and we a
 '''
 import os
 import argparse
-#from __future__ import print_function
-
+    
 def prepare_category(index, folder, list_folder, args):
     allfiles = lift_from_subdirectories(folder)
     allmodels = list(set(["_".join(file.split('_')[:-1]) for file in allfiles]))
@@ -53,12 +52,12 @@ def lift_from_subdirectories(folder):
     return newfiles
     
 def make_one_file(category,category_number,number, args, dataset):
-    outfile = "{0}_{1:0>3}.txt".format(category, number)
+    outfile = os.path.join(args.outfolder, "{0}_{1:0>3}.txt".format(category, number))
     with open(outfile,'w') as f:
         print(category_number, file = f)
         print(args.views,file = f)
         for i in range(args.views): 
-            print("{0}/{1}/{0}_{2:0>4}_{3:0>3}.png".format(category,dataset,number,i+1), file=f)
+            print("{0}/{1}/{2}/{1}_{3:0>4}_{4:0>3}.png".format(args.folder,category,dataset,number,i+1), file=f)
         
     return outfile
 
@@ -80,8 +79,8 @@ def make_all_files(args):
 def main():
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--folder", default='/home/krabec/models/ROTNET/ModelNet40v2/modelnet40v2png_ori4', type=str, help="root folder of all the images")
-    parser.add_argument("--outfolder", default='/home/krabec/models/MVCNN/datan', type=str, help="out folder")
+    parser.add_argument("--folder", default='modelnet40v2png_ori4', type=str, help="root folder of all the images")
+    parser.add_argument("--outfolder", default='data', type=str, help="out folder")
     parser.add_argument("--views", default=20, type=int, help="number of views per model")
     args = parser.parse_args()
     
