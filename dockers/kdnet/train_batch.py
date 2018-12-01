@@ -10,7 +10,6 @@ from kdtree import make_cKDTree
 from kdnet import KDNet_Batch
 import sys
 import os
-sys.path.append('/home/krabec/models/PNET2')
 import modelnet_dataset
 import modelnet_h5_dataset    
 
@@ -22,7 +21,7 @@ args =  parser.parse_args()
 
 def split_ps(point_set):
     #print point_set.size()
-    num_points = point_set.size()[0]/2
+    num_points = point_set.size()[0]//2
     diff = point_set.max(dim=0)[0] - point_set.min(dim=0)[0]
     dim = torch.max(diff, dim = 0)[1].item()#[0,0]
     cut = torch.median(point_set[:,dim])[0][0]
@@ -83,9 +82,9 @@ def split_ps_reuse(point_set, level, pos, tree, cutdim):
     return
 
 def count_and_exit(sum_correct, sum_sample, predictions, labels):
-    sys.path.insert(0, '/home/krabec/models/vysledky')
+    '''sys.path.insert(0, '/home/krabec/models/vysledky')
     from MakeCategories import make_categories
-    make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/kdnet.txt', predictions, labels, 'KDNET2')
+    make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/kdnet.txt', predictions, labels, 'KDNET2')'''
     sys.exit()
     
     
@@ -96,9 +95,9 @@ levels = (np.log(num_points)/np.log(2)).astype(int)
 net = KDNet_Batch().cuda()
 optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
 
-BASE_DIR = '/home/krabec/models/PNET2'  
-TRAIN_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048/train_files.txt'), batch_size=1, npoints=num_points, shuffle=True)
-TEST_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048/test_files.txt'), batch_size=1, npoints=num_points, shuffle=False)
+BASE_DIR = 'data'  
+TRAIN_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'modelnet40_ply_hdf5_2048/train_files.txt'), batch_size=1, npoints=num_points, shuffle=True)
+TEST_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'modelnet40_ply_hdf5_2048/test_files.txt'), batch_size=1, npoints=num_points, shuffle=False)
 
 DATASET = TEST_DATASET if test else TRAIN_DATASET
 
@@ -175,7 +174,7 @@ for it in range(30000):
     
     for i in range(len(cutdim_batch[0])):
         cutdim_processed.append(torch.stack([item[i] for item in cutdim_batch], 0))
-    pred = net(points_v, cutdim_processed)
+    pred = net(points_v, cutdim_processed[::-1])
     pred_choice = pred.data.max(1)[1]
     correct = pred_choice.eq(target_v.data).cpu().sum()
     loss = F.nll_loss(pred, target_v)
@@ -186,7 +185,7 @@ for it in range(30000):
     if not test:
         optimizer.step()
         if (it+start_epoch) % 2000 == 0 and it!=0:
-            torch.save(net.state_dict(), '/home/krabec/models/KDNET/logs/model.pth-%d' % (it+start_epoch))
+            torch.save(net.state_dict(), 'logs/model.pth-%d' % (it+start_epoch))
         end = time.time()
         print('batch: %d, loss: %f, correct %d/%d' %( it+start_epoch, np.mean(losses), correct, bt))
         print('Time: %f' % ((float(end)-start)/batch_size))

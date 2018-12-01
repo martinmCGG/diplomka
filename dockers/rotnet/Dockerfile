@@ -1,6 +1,6 @@
 FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu14.04
 MAINTAINER caffe-maint@googlegroups.com
-FROM pythoncore
+FROM core
 
 ENV CAFFE_ROOT=/opt/caffe
 WORKDIR $CAFFE_ROOT

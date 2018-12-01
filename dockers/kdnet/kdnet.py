@@ -54,7 +54,7 @@ class KDNet_Batch(nn.Module):
             x = x.view(featdim, batchsize, dim)
             x = x.transpose(1,0).contiguous()
             x = x.transpose(2,1).contiguous() 
-            x = x.view(-1, dim/2, featdim * 2)     
+            x = x.view(-1, dim//2, featdim * 2)     
             x = x.transpose(2,1).contiguous()
             #x = x.view(-1, featdim, dim/2, 2)
             #x = torch.squeeze(torch.max(x, dim = -1)[0], 3)  
@@ -127,7 +127,7 @@ class KDNet_Batch_mp_4d(nn.Module):
             x = torch.index_select(x, dim = 1, index = sel)
             x = x.view(featdim, batchsize, dim)
             x = x.transpose(1,0).contiguous()
-            x = x.view(-1, featdim, dim/2, 2)
+            x = x.view(-1, featdim, dim//2, 2)
             x = torch.squeeze(torch.max(x, dim = -1)[0], 3)
             return x
 
@@ -197,7 +197,7 @@ class KDNet_Batch_mp(nn.Module):
             x = torch.index_select(x, dim = 1, index = sel)
             x = x.view(featdim, batchsize, dim)
             x = x.transpose(1,0).contiguous()
-            x = x.view(-1, featdim, dim/2, 2)
+            x = x.view(-1, featdim, dim//2, 2)
             x = torch.squeeze(torch.max(x, dim = -1)[0], 3)
             return x
 
