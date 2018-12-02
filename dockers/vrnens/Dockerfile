@@ -60,6 +60,8 @@ RUN echo "[global]\ndevice=cuda\nfloatX=float32\noptimizer_including=cudnn\n[lib
 
 RUN git clone https://github.com/ajbrock/Generative-and-Discriminative-Voxel-Modeling.git
 RUN mv Generative-and-Discriminative-Voxel-Modeling vrnens
+RUN git clone https://github.com/dimatura/voxnet.git
 WORKDIR vrnens
 COPY *.py Discriminative/
+RUN mv Discriminative/layers.py /voxnet/voxnet
 ENTRYPOINT /bin/bash 

@@ -20,8 +20,7 @@ import lasagne
 
 import sys
 sys.path.insert(0, '/vrnens')
-print(sys.path)
-from .utils import checkpoints,metrics_logging
+from utils import checkpoints,metrics_logging
 
 from collections import OrderedDict
 
@@ -158,13 +157,12 @@ if __name__=='__main__':
     all_predictions = []
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('models', type=Path, help='path to folder containing models')
+    parser.add_argument('model', type=Path, help='path to file containing model definition')
     args = parser.parse_args()
-    
-    for file in sorted(os.listdir(args.models)):
-        if file.split('.')[-1] == 'py':
-            preds, labels = test(os.path.join(args.models,file))
-            all_predictions.append(preds)
+    file = args.model
+    if file.split('.')[-1] == 'py':
+        preds, labels = test(file)
+        all_predictions.append(preds)
     np.save('preds.npy', np.array(all_predictions))
     np.save('labels.npy', np.array(labels))
     
