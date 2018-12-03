@@ -1,0 +1,14 @@
+diff --git a/src/integrators/directlighting.cpp b/src/integrators/directlighting.cpp
+index 1498a9d..0377eec 100644
+--- a/src/integrators/directlighting.cpp
++++ b/src/integrators/directlighting.cpp
+@@ -67,8 +67,7 @@ Spectrum DirectLightingIntegrator::Li(const RayDifferential &ray,
+     // Find closest ray intersection or return background radiance
+     SurfaceInteraction isect;
+     if (!scene.Intersect(ray, &isect)) {
+-        for (const auto &light : scene.lights) L += light->Le(ray);
+-        return L;
++        return Spectrum(1.f);
+     }
+ 
+     // Compute scattering functions for surface interaction
