@@ -1,9 +1,0 @@
-Please always build the images tagged with the same name as is the name of the folder you are building.
-E.G. when building openvdb use commmand: docker build -t openvdb dockers/openvdb
-
-Image -> Its dependencies
-openvdb -> core
-rotnet -> core
-vrnens -> core
-pointnet -> core
-pointnet2 -> core
