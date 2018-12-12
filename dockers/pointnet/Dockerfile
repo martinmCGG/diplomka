@@ -12,8 +12,8 @@ RUN git clone https://github.com/charlesq34/pointnet.git
 
 WORKDIR /pointnet
 
-RUN wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
-RUN unzip modelnet40_ply_hdf5_2048.zip
-RUN rm modelnet40_ply_hdf5_2048.zip
+RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
+RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
+RUN cd data && rm modelnet40_ply_hdf5_2048.zip
 
 ENTRYPOINT /bin/bash 
