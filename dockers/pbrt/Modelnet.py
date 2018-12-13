@@ -1,4 +1,4 @@
-
+from pathlib import Path
 import os
 
 def get_modelnet_metadata(root_dir, files):
@@ -12,11 +12,9 @@ def get_modelnet_metadata(root_dir, files):
     cats_mapping = {}
     for i in range(len(cats)):
         cats_mapping[cats[i]] = i
-    print(cats)
     for file in files:
         splited = file.split('/')
-        name = splited[-1]
+        name = os.path.join(Path(file).stem)
         categories[name] = cats_mapping[splited[-3]]
         split[name] = coding[splited[-2]]    
-    print(split)
     return categories, split
