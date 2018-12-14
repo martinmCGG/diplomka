@@ -6,9 +6,14 @@ def read_off_file(filename):
     triangles = []
     quads = []
     with open(filename, 'r') as f:
-        line = f.readline()
-        line = f.readline()
+        line = f.readline().strip()
+        if line=='OFF':
+           line = f.readline() 
+        else:
+            line = line[3:]
+
         n_vertices, n_faces, _ = [int(x) for x in line.split()]
+               
         for _ in range(n_vertices):
             line = f.readline()
             vertices.append([float(x) for x in line.split()])
@@ -20,6 +25,7 @@ def read_off_file(filename):
             elif splited[0] == "4":
                 quads.append([int(x) for x in splited[1:5]])
     return rescale_to_unit_sphere(np.array(vertices)), np.array(triangles), np.array(quads)
+    
 
 def rescale_to_unit_sphere(vertices):
     vertices = vertices / np.max(np.abs(vertices))

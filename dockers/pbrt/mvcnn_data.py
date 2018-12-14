@@ -6,6 +6,7 @@ from Modelnet import get_modelnet_metadata
 from multiprocessing import Process, Pool
 from pathlib import Path
 from off2obj import off2obj
+from off_files import read_off_file
 
 def get_name_of_image_file(output_dir, file_id, angle):
     return os.path.join(output_dir , file_id, file_id + "_{:.2f}.png".format(angle))
@@ -133,7 +134,7 @@ if __name__ == '__main__':
     parser.add_argument("-v", default=12, type=int, help="Number of views to render")
     parser.add_argument("--dodecahedron",action='store_true', help="if this is added, views will be rendered from vertices of dodecahedron")
     parser.add_argument("-d", type=str, help="root directory of files to be rendered")
-    parser.add_argument("-t", default = 10, type=int, help="Number of threads")
+    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
     parser.add_argument("-o", type=str, default=".", help="directory of the output files")
     parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
     parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:shapenet or modelnet")
@@ -149,6 +150,7 @@ if __name__ == '__main__':
         files = find_files(args.d, 'off')
         categories, split = get_modelnet_metadata(args.d, files)
         pool = Pool(processes=args.t)
+        #pool.map(read_off_file, files)
         pool.map(off2obj, files)
         files = find_files(args.d, 'obj')
         
