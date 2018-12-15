@@ -1,12 +1,11 @@
 from __future__ import print_function
 import os
-from obj_files import find_files
 from Shapenet import get_shapenet_metadata
 from Modelnet import get_modelnet_metadata
 from multiprocessing import Process, Pool
 from pathlib import Path
-from off2obj import off2obj
-from off_files import read_off_file
+from mesh_files import *
+
 
 def get_name_of_image_file(output_dir, file_id, angle):
     return os.path.join(output_dir , file_id, file_id + "_{:.2f}.png".format(angle))
@@ -125,7 +124,6 @@ def compute_dodecahedron_vertices():
             vertices.append((j,0,i))
             vertices.append((i,j,0))
     vertices = [str(x[0]) + " " + str(x[1])+" " +str(x[2]) for x in vertices]
-    print (vertices)
     return vertices
                
 if __name__ == '__main__':

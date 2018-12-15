@@ -3,7 +3,6 @@ import os
 import json
 import numpy as np
 
-
 def parse_shapenet_split(csv_file):
     split = {}
     coding = {

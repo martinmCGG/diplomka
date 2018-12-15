@@ -6,8 +6,7 @@
 LookAt {3}  0 0 0   0 1 0
 Rotate {2} 0 1 0
 #Camera "perspective" "float fov" [55]
-Camera "orthographic" "float screenwindow" [ -0.5 0.5 -0.5 0.5 ]
-# TODO: orthographic camera?
+Camera "orthographic" #"float screenwindow" [ -0.5 0.5 -0.5 0.5 ]
 
 Film "image"  
 "integer xresolution" [224] "integer yresolution" [224]

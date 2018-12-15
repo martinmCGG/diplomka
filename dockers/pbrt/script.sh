@@ -4,5 +4,5 @@ docker build -t pbrt_w -f Dockerfile /home/krabec/dockers/pbrt
 #docker kill pbrt
 #docker rm pbrt
 
-docker run --rm -d --mount type=bind,source="/home/krabec/Data/ModelNet40",target=/data pbrt_w \
+docker run --rm -it --mount type=bind,source="/home/krabec/Data/ModelNet40Small",target=/data pbrt_w \
 sh -c "python3 mvcnn_data.py -o /data/images -d /data --dodecahedron"
