@@ -2,6 +2,7 @@ from __future__ import print_function
 import os
 import json
 import numpy as np
+from mesh_files import find_files
 
 
 def parse_shapenet_split(csv_file):
@@ -44,12 +45,22 @@ def _set_labels_for_children(categories, parent, data, category):
             if dato['synsetId'] == child:
                 categories[child] = category
                 _set_labels_for_children(categories, dato, data, category)
-                
+
+def get_categories_by_id(shapenet_root_dir, categories):
+    categories_by_id = {}
+    files = find_files(shapenet_root_dir, 'obj')
+    for file in files:
+        splited = file.split('/')
+        categories_by_id[splited[-3]] = categories[splited[-4]]
+    return categories_by_id
+        
+
 def get_shapenet_metadata(shapenet_root_dir):
     jsonfile = os.path.join(shapenet_root_dir, 'taxonomy.json')
     splitfile = os.path.join(shapenet_root_dir, 'all.csv')
     categories = get_shapenet_labels(jsonfile)
     split = parse_shapenet_split(splitfile)
+    categories = get_categories_by_id(shapenet_root_dir, categories)
     return categories, split
 
 

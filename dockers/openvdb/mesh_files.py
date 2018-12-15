@@ -58,6 +58,7 @@ def read_off_file(filename):
             line = line[3:]
 
         n_vertices, n_faces, _ = [int(x) for x in line.split()]
+               
         for _ in range(n_vertices):
             line = f.readline()
             vertices.append([float(x) for x in line.split()])
@@ -73,7 +74,6 @@ def read_off_file(filename):
     
 
 def rescale_to_unit_sphere(vertices):
-    print(np.max(np.linalg.norm(vertices, axis=1)))
     return vertices / np.max(np.linalg.norm(vertices, axis=1))
 
 def centralize(vertices):

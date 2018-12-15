@@ -90,8 +90,6 @@ RUN mv openvdb-5.2.0 openvdb
 #RUN cd c-blosc && cmake .
 #RUN cd /usr/include/c-blosc && cmake --build . -- -j 8 && cmake --build . --target install
 
-#RUN git clone https://github.com/Alobal123/diplomka.git
-#RUN cd diplomka/dockers/OPENVDB && cp Makefile ../../openvdb/openvdb/Makefile
 COPY Makefile openvdb/openvdb/Makefile
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libboost_python-py27.a /usr/lib/x86_64-linux-gnu/libboost_python2.7.a
@@ -102,4 +100,7 @@ RUN cd openvdb/openvdb && make -j 8 . && make install -j 8 .
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH":/usr/local/openvdb/lib/:/usr/include/ilmbase-2.3.0/Half/.libs:/usr/local/lib/"
 ENV PYTHONPATH=$PYTHONPATH:/usr/local/openvdb/python/lib/python2.7/
 
-ENTRYPOINT /bin/bash 
+RUN pip install pathlib
+
+WORKDIR /
+COPY *.py /

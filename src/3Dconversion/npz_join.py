@@ -23,11 +23,8 @@ def join_npz(files, output):
     for key in dict.keys():
         arr = np.concatenate(dict[key])
         bigdict[key] = arr
-    print("Saving...")
     np.savez(output, **bigdict)
-    print("Saved...")
     
-
 def join_h5(files, output):
     dict = {}
     for file in files:
@@ -41,10 +38,10 @@ def join_h5(files, output):
     hf = h5py.File(output, 'w')
     for key in dict.keys():
         arr = np.concatenate(dict[key])
-        spec_dtype = h5py.special_dtype(vlen=np.dtype('float64'))
-        hf.create_dataset(key, data=arr, dtype=spec_dtype)
+        #spec_dtype = h5py.special_dtype(vlen=np.dtype('float64'))
+        hf.create_dataset(key, data=arr)#, dtype=spec_dtype)
     hf.close()
-        
+    
         
         
 if __name__ == '__main__':

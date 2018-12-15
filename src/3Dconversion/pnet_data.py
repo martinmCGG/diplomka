@@ -1,17 +1,20 @@
-
 from __future__ import print_function
 import numpy as np
-from obj_files import find_files
+from mesh_files import find_files
 from Shapenet import get_shapenet_metadata
-from mesh_to_pointcloud import obj_to_pointcloud
+from Modelnet import get_modelnet_metadata
+from mesh_to_pointcloud import file_to_pointcloud
 from MultiProcesor import MultiProcesor
 import h5py 
 import os
 # ['data'], ['label'] h5py format trainfiles.txt and testfiles.txt
 
-def save_for_pnet(args, categories, split):
-    files = find_files(args.d, 'obj')
-    procesor = MultiProcesor(files, args.t, args.l, categories, split, args.m, obj_to_pointcloud, write_for_pnet)
+def save_for_pnet(args, files, categories, split):
+    if args.dataset == 'shapenet':
+        type = 'obj'
+    elif args.dataset == 'modelnet':
+        type = 'off'
+    procesor = MultiProcesor(files, args.t, args.l, categories, split, args.m,type, file_to_pointcloud, write_for_pnet)
     procesor.run(args)
 
 def write_for_pnet(buffer, buffer_cats, dataset, id, n, args):
@@ -36,17 +39,21 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", default=2048, type=int, help="Number of points to smaple")
-    parser.add_argument("-d", type=str, help="root directory of .obj files to be voxelizes")
-    parser.add_argument("-t", default = 4, type=int, help="Number of threads")
-    parser.add_argument("-m", default = 1000, type=int, help="Max number of models to save to one file")
-    parser.add_argument("-o", type=str, help="directory of the output files")
+    parser.add_argument("-d", type=str, help="root directory of .obj files to be voxelized")
+    parser.add_argument("-t", default = 10, type=int, help="Number of threads")
+    parser.add_argument("-m", default = 10000, type=int, help="Max number of models to save to one file")
+    parser.add_argument("-o", type=str, default=".", help="directory of the output files")
     parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
+    parser.add_argument("--dataset",default ="shapenet", type=str, help="Dataset to convert:currently supported")
+    parser.add_argument("--normal",action='store_true', help="if normal information should be saved")
         
     args = parser.parse_args()
-    categories, split = get_shapenet_metadata(args.d)
-    
-    save_for_pnet(args, categories, split)
+    if args.dataset == "shapenet":
+        files = find_files(args.d, 'obj')
+        categories, split = get_shapenet_metadata(args.d)
+    elif args.dataset == "modelnet":
+        files = find_files(args.d, 'off')
+        categories, split = get_modelnet_metadata(args.d, files)
+    save_for_pnet(args, files, categories, split)
     collect_files(args.o)
-    
-    
     
