@@ -43,7 +43,7 @@ def find_area_distribution(points, triangles):
 def file_to_pointcloud(filename, type, args):
     if type == 'shapenet':
         points, triangles, quads = read_obj_file(filename)
-    elif type == 'modelnet    ':
+    elif type == 'modelnet':
         points, triangles, quads = read_off_file(filename)
     if args.normal:
         return mesh_to_point_cloud(points, triangles, args.n, normal=True)
