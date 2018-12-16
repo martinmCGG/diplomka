@@ -58,7 +58,6 @@ def read_off_file(filename):
             line = line[3:]
 
         n_vertices, n_faces, _ = [int(x) for x in line.split()]
-               
         for _ in range(n_vertices):
             line = f.readline()
             vertices.append([float(x) for x in line.split()])
@@ -82,7 +81,6 @@ def centralize(vertices):
 def off2obj(file):
     vertices, triangles, quads = read_off_file(file)
     obj_file_name = os.path.join(os.path.split(file)[0] , Path(file).stem + ".obj")
-    print(obj_file_name)
     with open(obj_file_name, 'w') as f:
         for xyz in vertices:
             f.write('v %g %g %g\n' % tuple(xyz))

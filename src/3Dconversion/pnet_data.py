@@ -38,20 +38,30 @@ if __name__ == '__main__':
     parser.add_argument("o", type=str, help="directory of the output files")
     
     parser.add_argument("-n", default=2048, type=int, help="Number of points to smaple")
-    parser.add_argument("-t", default = 10, type=int, help="Number of threads")
+    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
     parser.add_argument("-m", default = 10000, type=int, help="Max number of models to save to one file")
-    parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
+    parser.add_argument("-l",default ="/data/log.txt", type=str, help="logging file")
     
     parser.add_argument("--dataset",default ="shapenet", type=str, help="Dataset to convert:currently supported")
     parser.add_argument("--normal",action='store_true', help="if normal information should be saved")
         
     args = parser.parse_args()
-    if args.dataset == "shapenet":
-        files = find_files(args.d, 'obj')
-        categories, split = get_shapenet_metadata(args.d)
-    elif args.dataset == "modelnet":
-        files = find_files(args.d, 'off')
-        categories, split = get_modelnet_metadata(args.d, files)
+    
+    with open(args.l, 'w') as f:
+        print("STARTING CONVERSION", file = f)
+    try:
+        if args.dataset == "shapenet":
+            files = find_files(args.d, 'obj')
+            categories, split = get_shapenet_metadata(args.d)
+        elif args.dataset == "modelnet":
+            files = find_files(args.d, 'off')
+            categories, split = get_modelnet_metadata(args.d, files)
+    except:
+        e = sys.exc_info()
+        with open(args.l, 'a') as f:
+            print("Exception occured while reading files.", file=f)
+            print("Exception {}".format(e), file=f)
+        sys.exit(1)
         
     if not os.path.isdir(args.o):
         os.system("mkdir -m 777 {}".format(args.o))
