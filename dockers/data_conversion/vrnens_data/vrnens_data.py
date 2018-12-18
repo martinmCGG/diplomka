@@ -7,6 +7,7 @@ from mesh_files import find_files
 from Shapenet import get_shapenet_metadata
 from Modelnet import get_modelnet_metadata
 from MultiProcesor import MultiProcesor
+from npz_join import join_npz
 
 def write_for_vrnens(buffer, buffer_cats, dataset, id, n, args):
     features = np.array(buffer)
@@ -31,6 +32,14 @@ def create_ROT_MATRIX(rotation):
     matrix[1,1] = np.cos(angle)
     matrix[2,2] = 1
     return matrix   
+
+def collect_files(args):
+    datasets = ['val', 'train', 'test']
+    with open(args.l, 'a') as f:
+        print("Collecting - joining npz files.", file=f)
+    for dataset in datasets:
+        join_npz(args.o, "{}.*\.npz".format(dataset), os.path.join(args.o, "{}.npz".format(dataset)))
+        
 
 if __name__ == '__main__':
     import argparse
@@ -68,5 +77,10 @@ if __name__ == '__main__':
     
     if not os.path.isdir(args.o):
         os.system("mkdir -m 777 {}".format(args.o))
-    save_for_VRNENS(args, categories, split, files)
+    #save_for_VRNENS(args, categories, split, files)
+    collect_files(args)
+    
+    with open(args.l, 'a') as f:
+        print("Ended", file=f)
+
 

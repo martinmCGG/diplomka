@@ -1,7 +1,7 @@
 docker build -t pointcloud .
 
 #Path to the dataset
-dataset="/home/krabec/Data/ModelNet40Small"
+dataset="/home/krabec/data/ModelNet40"
 #Type of the dataset. Currently must be one of (modelnet, shapenet)
 dataset_type="modelnet"
 
