@@ -19,7 +19,10 @@ sys.path.append(parentdir)
 import model
 
 FLAGS = tf.app.flags.FLAGS
-tf.app.flags.DEFINE_string('train_dir', osp.dirname(sys.argv[0]) + '/logs/',
+os.mkdir('./logs/')
+print("--------------traininainign----------------")
+
+tf.app.flags.DEFINE_string('train_dir', './logs/',
                            """Directory where to write event logs """
                            """and checkpoint.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,

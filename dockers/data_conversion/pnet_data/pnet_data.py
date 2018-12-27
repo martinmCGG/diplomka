@@ -1,5 +1,6 @@
 from __future__ import print_function
 import numpy as np
+from random import shuffle
 from mesh_files import find_files
 from Shapenet import get_shapenet_metadata
 from Modelnet import get_modelnet_metadata
@@ -8,6 +9,8 @@ from MultiProcesor import MultiProcesor
 import h5py 
 import os
 # ['data'], ['label'] h5py format trainfiles.txt and testfiles.txt
+
+DATASETS = ['train', 'test', 'val']
 
 def save_for_pnet(args, files, categories, split):
     procesor = MultiProcesor(files, args.t, args.l, categories, split, args.m, args.dataset, file_to_pointcloud, write_for_pnet)
@@ -20,13 +23,13 @@ def write_for_pnet(buffer, buffer_cats, dataset, id, n, args):
     h5f.create_dataset('data', data=features)
     h5f.create_dataset('label', data=targets)
     h5f.close()
-
+    
 def collect_files(dest):
     files = os.listdir(dest)
     files = [file for file in files if file.split('.')[-1] == 'h5']
-    datasets = ['train', 'test', 'val']
-    for dataset in datasets:
-        with open (os.path.join(dest,"{}files.txt").format(dataset), 'w') as f:
+    
+    for dataset in DATASETS:
+        with open (os.path.join(dest,"{}_files.txt").format(dataset), 'w') as f:
             for file in files:
                 if file.split('_')[0] == dataset:
                     print(os.path.join(dest,file),file=f)
@@ -62,10 +65,11 @@ if __name__ == '__main__':
             print("Exception occured while reading files.", file=f)
             print("Exception {}".format(e), file=f)
         sys.exit(1)
-        
+    
     if not os.path.isdir(args.o):
         os.system("mkdir -m 777 {}".format(args.o))
-        
+    
+    shuffle(files)
     save_for_pnet(args, files, categories, split)
     collect_files(args.o)
     

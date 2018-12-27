@@ -25,6 +25,6 @@ RUN apt update && apt install -y libsm6 libxext6
 RUN echo y | apt-get install libfontconfig1 libxrender1
 RUN ./prepare_pretrained_alexnet.sh
 
-COPY globals.py .
+COPY *.py ./
 
-ENTRYPOINT /bin/bash 
+#ENTRYPOINT /bin/bash 

@@ -98,15 +98,16 @@ def save_for_mvcnn(args, files, categories):
         files_to_images(files[i*size:(i+1)*size], 0, args, categories)
     log("Ending...",lock, args.l)
 
-def collect_files(files, split, args):
+def collect_files(files, split, cats, args):
     print("COLLECTING")
     datasets = ['train', 'test', 'val']
     for dataset in range(len(datasets)):
         with open ('{}/{}.txt'.format(args.o, datasets[dataset]), 'w') as f:
             for file in files:
                 file_id = get_file_id(file, args.dataset)
+                cat = categories[file_id]
                 if file_id in split and split[file_id] == dataset:
-                    print(get_name_of_txt_file(args.o, file_id), file = f)
+                    print("{} {}".format(get_name_of_txt_file(args.o, file_id), cat), file = f)
 
 def get_file_id(file, dataset):
     if dataset == "shapenet":
@@ -176,6 +177,6 @@ if __name__ == '__main__':
     if not os.path.isdir(args.o):
         os.system("mkdir -m 777 {}".format(args.o))
     save_for_mvcnn(args, files, categories)
-    collect_files(files, split, args)
+    collect_files(files, split,categories, args)
     
     

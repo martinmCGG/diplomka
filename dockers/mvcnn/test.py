@@ -98,22 +98,28 @@ def test(dataset, ckptfile):
         acc = metrics.accuracy_score(labels, predictions)
         print 'acc:', acc*100
         
-        import sys
+        """import sys
         sys.path.insert(0, '/home/krabec/models/vysledky')
         from MakeCategories import make_categories
-        make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/mvcnn.txt', predictions, labels, 'MVCNN')
+        make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/mvcnn.txt', predictions, labels, 'MVCNN')"""
         
 
 def main(argv):
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("weights", default="./logs/model.ckpt", type=str, help="Path to the trained model")
+    args = parser.parse_args()
     st = time.time()
     print 'start loading data'
-
+    
+    
+    
     listfiles, labels = read_lists(g_.TEST_LOL)
     dataset = Dataset(listfiles, labels, subtract_mean=False, V=g_.NUM_VIEWS)
 
     print 'done loading data, time=', time.time() - st
 
-    test(dataset, FLAGS.weights)
+    test(dataset, args.weights)
 
 
 def read_lists(list_of_lists_file):

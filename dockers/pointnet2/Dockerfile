@@ -28,4 +28,7 @@ RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_
 RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
 RUN cd data && rm modelnet40_ply_hdf5_2048.zip
 
+COPY *.py ./
+#RUN mv ./pointnet2_cls_ssg.py ./models
+
 ENTRYPOINT /bin/bash 

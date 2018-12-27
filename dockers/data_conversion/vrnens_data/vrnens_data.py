@@ -77,7 +77,7 @@ if __name__ == '__main__':
     
     if not os.path.isdir(args.o):
         os.system("mkdir -m 777 {}".format(args.o))
-    #save_for_VRNENS(args, categories, split, files)
+    save_for_VRNENS(args, categories, split, files)
     collect_files(args)
     
     with open(args.l, 'a') as f:

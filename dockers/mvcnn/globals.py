@@ -4,9 +4,9 @@ ModelNet40 for example
 """
 NUM_CLASSES = 40
 NUM_VIEWS = 20
-TRAIN_LOL = './data/trainfiles.txt'
-VAL_LOL = './data/testfiles.txt'
-TEST_LOL = './data/testfiles.txt'
+TRAIN_LOL = '/data/converted/train.txt'
+VAL_LOL = '/data/converted/test.txt'
+TEST_LOL = '/data/converted/test.txt'
 
 
 """
@@ -25,10 +25,10 @@ INIT_LEARNING_RATE = 0.0001
 
 # sample how many shapes for validation
 # this affects the validation time
-VAL_SAMPLE_SIZE = 512
+VAL_SAMPLE_SIZE = 2000
 
 # do a validation every VAL_PERIOD iterations
-VAL_PERIOD = 250
+VAL_PERIOD = 500
 
 # save the progress to checkpoint file every SAVE_PERIOD iterations
 # this takes tens of seconds. Don't set it smaller than 100.

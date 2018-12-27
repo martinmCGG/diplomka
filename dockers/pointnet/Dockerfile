@@ -11,9 +11,9 @@ RUN pip install h5py
 RUN git clone https://github.com/charlesq34/pointnet.git
 
 WORKDIR /pointnet
-
+RUN mkdir data
 RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
 RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
 RUN cd data && rm modelnet40_ply_hdf5_2048.zip
-
-ENTRYPOINT /bin/bash 
+COPY *.py ./
+RUN mkdir logs
