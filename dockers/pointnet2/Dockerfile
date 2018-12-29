@@ -27,8 +27,7 @@ RUN cd tf_ops/grouping/ && sh tf_grouping_compile.sh
 RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
 RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
 RUN cd data && rm modelnet40_ply_hdf5_2048.zip
-
+RUN mkdir logs
 COPY *.py ./
-#RUN mv ./pointnet2_cls_ssg.py ./models
 
 ENTRYPOINT /bin/bash 
