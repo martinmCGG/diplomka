@@ -8,20 +8,20 @@ from pathlib import Path
 from mesh_files import *
 
 
-def get_name_of_image_file(output_dir, file_id, angle):
-    return os.path.join(output_dir , file_id, file_id + "_{:.2f}.png".format(angle))
+def get_name_of_image_file(output_dir, file_id, angle, camera_angle):
+    return os.path.join(output_dir , file_id, file_id + "_{:.2f}_{:.2f}.png".format(angle, camera_angle))
     
 def get_name_of_txt_file(output_dir, file_id):
     return os.path.join(output_dir , file_id, file_id + ".txt")
 
-def render_one_image(geometry, unformated_scene, angle, output_dir, id, file_id, fov, dodecahedron = False):
-    output_file = get_name_of_image_file(output_dir, file_id, angle)
+def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir, id, file_id, fov, dodecahedron = False):
+    output_file = get_name_of_image_file(output_dir, file_id, angle, camera_angle)
     
     if dodecahedron:
-        formated_scene = unformated_scene.format(output_file, geometry, 0, dodecahedron, fov)
+        formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov)
         #print(formated_scene)
     else:
-        formated_scene = unformated_scene.format(output_file, geometry, angle, "1 0.2 0")
+        formated_scene = unformated_scene.format(output_file, geometry, angle, "1 0.2 0", fov)
         
     with open("formated_scene{}.pbrt".format(id), 'w') as f:
         print(formated_scene, file=f)
@@ -30,7 +30,7 @@ def render_one_image(geometry, unformated_scene, angle, output_dir, id, file_id,
     os.system(cmd)
     
     
-def render_model(obj_file, id, file_id, views, output_dir, cat, fov, dodecahedron=False):
+def render_model(obj_file, id, file_id, views, camera_rotations, output_dir, cat, fov, dodecahedron=False):
     geometry = os.path.join(os.path.split(obj_file)[0] , Path(obj_file).stem + ".pbrt")
     os.system("mkdir -m 777 {}".format(os.path.join(output_dir,file_id)))
     
@@ -43,10 +43,11 @@ def render_model(obj_file, id, file_id, views, output_dir, cat, fov, dodecahedro
         views = 20
         
     for view in range(views):
-        if dodecahedron:
-            render_one_image(geometry, unformated_scene, view*360/views, output_dir, id, file_id,fov, dodecahedron=dodecahedron[view])
-        else:
-            render_one_image(geometry, unformated_scene, view*360/views, output_dir, id, file_id,fov)
+        for camera_rotation in range(camera_rotations):
+            if dodecahedron:
+                render_one_image(geometry, unformated_scene, view*360/views, camera_rotation*360/camera_rotations, output_dir, id, file_id,fov, dodecahedron=dodecahedron[view])
+            else:
+                render_one_image(geometry, unformated_scene, view*360/views, camera_rotation*360/camera_rotations, output_dir, id, file_id,fov)
         
     os.system("rm {}".format(geometry))
     with open(get_name_of_txt_file(output_dir, file_id), 'w') as f:
@@ -54,19 +55,22 @@ def render_model(obj_file, id, file_id, views, output_dir, cat, fov, dodecahedro
         print(views, file=f)
         for view in range(views):
             angle = view*360/views
-            print(get_name_of_image_file(output_dir, file_id, angle), file=f)
+            for camera_rotation in range(camera_rotations):
+                camera_angle = camera_rotation*360/camera_rotations
+                print(get_name_of_image_file(output_dir, file_id, angle, camera_angle), file=f)
        
 
 def files_to_images(files, id, args, categories, lock):
     views = args.v
     output_dir = args.o
+    camera_rotations = args.camera_rotations
     log("Starting thread {} on {} files.".format(id, len(files)),lock, args.l)
     for i in range(len(files)):
         file = files[i]
         log("Thread {} is {:.2f}% done.".format(id,float(i)/len(files)*100), lock, args.l)
         try:
             file_id = get_file_id(file, args.dataset)
-            render_model(file,id,file_id, views, output_dir, categories[file_id],args.fov,dodecahedron=args.dodecahedron)
+            render_model(file, id, file_id, views, camera_rotations, output_dir, categories[file_id],args.fov,dodecahedron=args.dodecahedron)
         except:
             e = sys.exc_info()[0]
             log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), lock, args.l)
@@ -95,7 +99,7 @@ def save_for_mvcnn(args, files, categories):
         for p in pool:
             p.join()
     else:
-        files_to_images(files[i*size:(i+1)*size], 0, args, categories)
+        files_to_images(files, 0, args, categories, lock)
     log("Ending...",lock, args.l)
 
 def collect_files(files, split, cats, args):
@@ -149,6 +153,7 @@ if __name__ == '__main__':
     
     parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:shapenet or modelnet")
     parser.add_argument("--dodecahedron",action='store_true', help="if this is added, views will be rendered from vertices of dodecahedron")
+    parser.add_argument("--camera_rotations", default=1, type=int, help="How many times to rotate the camera for")
     
     args = parser.parse_args()
     

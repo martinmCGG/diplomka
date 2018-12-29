@@ -5,7 +5,7 @@
 #{4} fov - for modelnet 68, for shapenet 50
 
 LookAt {3}  0 0 0   0 1 0
-Rotate {2} 0 1 0
+Rotate {2} {3}
 Camera "perspective" "float fov" [{4}]
 #Camera "orthographic" #"float screenwindow" [ -0.5 0.5 -0.5 0.5 ]
 
