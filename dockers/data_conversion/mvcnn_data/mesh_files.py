@@ -7,7 +7,7 @@ def find_files(directory,extension):
     print("Scanning for files...")
     fname = os.path.join(directory,"all_{}_files.txt".format(extension))
     ext_files = []
-    if True:#not os.path.isfile(fname):
+    if not os.path.isfile(fname):
         for folder, subs, files in os.walk(directory):
             for filename in files:
                 if filename.split('.')[-1] == extension:
@@ -82,8 +82,9 @@ def off2obj(file):
     vertices, triangles, quads = read_off_file(file)
     obj_file_name = os.path.join(os.path.split(file)[0] , Path(file).stem + ".obj")
     with open(obj_file_name, 'w') as f:
+        
         for xyz in vertices:
-            f.write('v %g %g %g\n' % tuple(xyz))
+            f.write('v {:6f} {:6f} {:6f}\n'.format(xyz[0],xyz[2],xyz[1]))
         f.write('\n')
         for ijk in triangles:
             f.write('f %d %d %d\n' % (ijk[0]+1, ijk[1]+1, ijk[2]+1))

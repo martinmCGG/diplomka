@@ -4,8 +4,8 @@ import os
 import math
 from mesh_to_volume import mesh_to_voxel_array
 from mesh_files import find_files
-from Shapenet import get_shapenet_metadata
-from Modelnet import get_modelnet_metadata
+import Shapenet
+import Modelnet
 from MultiProcesor import MultiProcesor
 from npz_join import join_npz
 
@@ -64,10 +64,12 @@ if __name__ == '__main__':
         args.matrix = ROT_MATRIX
         if args.dataset == "shapenet":
             files = find_files(args.d, 'obj')
-            categories, split = get_shapenet_metadata(args.d)
+            categories, split = Shapenet.get_metadata(args.d)
+            Shapenet.write_cat_names(args.d, args.o)
         elif args.dataset == "modelnet":
             files = find_files(args.d, 'off')
-            categories, split = get_modelnet_metadata(args.d, files)
+            categories, split= Modelnet.get_metadata(args.d, files)
+            Modelnet.write_cat_names(args.d, args.d)
     except:
         e = sys.exc_info()
         with open(args.l, 'a') as f:

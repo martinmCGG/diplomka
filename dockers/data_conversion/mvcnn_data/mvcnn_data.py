@@ -1,8 +1,8 @@
 from __future__ import print_function
 import os
 import sys
-from Shapenet import get_shapenet_metadata
-from Modelnet import get_modelnet_metadata
+import Shapenet
+import Modelnet
 from multiprocessing import Process, Pool, Lock
 from pathlib import Path
 from mesh_files import *
@@ -18,10 +18,10 @@ def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir
     output_file = get_name_of_image_file(output_dir, file_id, angle, camera_angle)
     
     if dodecahedron:
-        formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov)
+        formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov, dodecahedron)
         #print(formated_scene)
     else:
-        formated_scene = unformated_scene.format(output_file, geometry, angle, "1 0.2 0", fov)
+        formated_scene = unformated_scene.format(output_file, geometry, angle, "1.5 0.2 0", fov, "0 1 0")
         
     with open("formated_scene{}.pbrt".format(id), 'w') as f:
         print(formated_scene, file=f)
@@ -110,7 +110,7 @@ def collect_files(files, split, cats, args):
             for file in files:
                 file_id = get_file_id(file, args.dataset)
                 cat = categories[file_id]
-                if file_id in split and split[file_id] == dataset:
+                if (file_id not in split and dataset=='train') or  split[file_id] == dataset:
                     print("{} {}".format(get_name_of_txt_file(args.o, file_id), cat), file = f)
 
 def get_file_id(file, dataset):
@@ -156,31 +156,36 @@ if __name__ == '__main__':
     parser.add_argument("--camera_rotations", default=1, type=int, help="How many times to rotate the camera for")
     
     args = parser.parse_args()
-    
     with open(args.l, 'w') as f:
         print("STARTING CONVERSION", file = f)
-    
     try:
         if args.dataset == "shapenet":
             files = find_files(args.d, 'obj')
-            categories, split = get_shapenet_metadata(args.d)
+            categories, split = Shapenet.get_metadata(args.d)
+            Shapenet.write_cat_names(args.d, args.o)
             args.fov = 35
         elif args.dataset == "modelnet":
             files = find_files(args.d, 'off')
-            categories, split = get_modelnet_metadata(args.d, files)
+            categories, split= Modelnet.get_metadata(args.d, files)
+            Modelnet.write_cat_names(args.d, args.d)
             pool = Pool(processes=args.t)
             pool.map(off2obj, files)
+            pool.close()
+            pool.join()
             files = find_files(args.d, 'obj')
             args.fov = 68
-    except:
+    except: 
         e = sys.exc_info()
         with open(args.l, 'a') as f:
             print("Exception occured while reading files.", file=f)
             print("Exception {}".format(e), file=f)
         sys.exit(1)
-        
+    
     if not os.path.isdir(args.o):
         os.system("mkdir -m 777 {}".format(args.o))
+
+        
+
     save_for_mvcnn(args, files, categories)
     collect_files(files, split,categories, args)
     

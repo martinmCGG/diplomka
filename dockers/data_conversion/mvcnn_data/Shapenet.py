@@ -19,51 +19,42 @@ def parse_shapenet_split(csv_file):
             split[splited[-2]] = coding[splited[-1]]
     return split
 
-def get_shapenet_labels(jsonfile):
+
+def get_shapenet_labels(root_dir):
     categories = {}
-    with open(jsonfile) as f:
-        data = json.load(f)
-    for dato in data:
-        id = dato['synsetId']
-        if id not in categories:
-            category = dato['name'].split(',')[0]
-            categories[id] = category
-            _set_labels_for_children(categories, dato, data, category)
-    
-    unique_categories =sorted(list(set(categories.values())))
-    categories_mapping = {}
-    for i in range(len(unique_categories)):
-        categories_mapping[unique_categories[i]] = i 
-    for key in categories.keys():
-        categories[key] = categories_mapping[categories[key]]
+    dirs = sorted([f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir,f))])
+    for i in range(len(dirs)):
+        directory = os.path.join(root_dir, dirs[i])
+        ids = os.listdir(directory)
+        for id in ids:
+            categories[id] = i
     return categories
-
-def _set_labels_for_children(categories, parent, data, category):
-    children = parent['children']
-    for child in children:
-        for dato in data:
-            if dato['synsetId'] == child:
-                categories[child] = category
-                _set_labels_for_children(categories, dato, data, category)
-
-def get_categories_by_id(shapenet_root_dir, categories):
-    categories_by_id = {}
-    files = find_files(shapenet_root_dir, 'obj')
-    for file in files:
-        splited = file.split('/')
-        categories_by_id[splited[-3]] = categories[splited[-4]]
-    return categories_by_id
         
 
-def get_shapenet_metadata(shapenet_root_dir):
-    jsonfile = os.path.join(shapenet_root_dir, 'taxonomy.json')
+def get_cat_names(root_dir):
+    jsonfile = os.path.join(root_dir, 'taxonomy.json')
+    cat_names = []
+    dirs = sorted([f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir,f))])
+    with open(jsonfile) as f:
+        data = json.load(f)
+        for dir in dirs:
+            for dato in data:
+                if dato['synsetId'] == dir:
+                    cat_names.append(dato['name'].split(',')[0])
+    return cat_names
+
+def write_cat_names(root_dir, dest):
+    with open(os.path.join(dest, "cat_names.txt"), 'w') as f:
+        categories = get_cat_names(root_dir)
+        for cat in categories:
+            print(cat, file=f)
+            
+
+def get_metadata(shapenet_root_dir):
     splitfile = os.path.join(shapenet_root_dir, 'all.csv')
-    categories = get_shapenet_labels(jsonfile)
     split = parse_shapenet_split(splitfile)
-    categories = get_categories_by_id(shapenet_root_dir, categories)
+    categories = get_shapenet_labels(shapenet_root_dir)
+    cat_names = get_cat_names(shapenet_root_dir)
     return categories, split
 
-
-
-    
 

@@ -2,8 +2,8 @@ from __future__ import print_function
 import numpy as np
 from random import shuffle
 from mesh_files import find_files
-from Shapenet import get_shapenet_metadata
-from Modelnet import get_modelnet_metadata
+import Shapenet
+import Modelnet
 from mesh_to_pointcloud import file_to_pointcloud
 from MultiProcesor import MultiProcesor
 import h5py 
@@ -55,10 +55,12 @@ if __name__ == '__main__':
     try:
         if args.dataset == "shapenet":
             files = find_files(args.d, 'obj')
-            categories, split = get_shapenet_metadata(args.d)
+            categories, split = Shapenet.get_metadata(args.d)
+            Shapenet.write_cat_names(args.d, args.o)
         elif args.dataset == "modelnet":
             files = find_files(args.d, 'off')
-            categories, split = get_modelnet_metadata(args.d, files)
+            categories, split= Modelnet.get_metadata(args.d, files)
+            Modelnet.write_cat_names(args.d, args.d)
     except:
         e = sys.exc_info()
         with open(args.l, 'a') as f:

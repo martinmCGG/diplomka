@@ -3,9 +3,10 @@
 #{2} angle
 #{3} coordinates of the camera
 #{4} fov - for modelnet 68, for shapenet 50
+#{5} axis of rotation
 
 LookAt {3}  0 0 0   0 1 0
-Rotate {2} {3}
+Rotate {2} {5}
 Camera "perspective" "float fov" [{4}]
 #Camera "orthographic" #"float screenwindow" [ -0.5 0.5 -0.5 0.5 ]
 
@@ -22,7 +23,7 @@ WorldBegin
 AttributeBegin
 CoordSysTransform "camera"
 Translate 0 0 0
-LightSource "point" "rgb I" [ 1 1 1 ] "rgb scale" [1.4 1.4 1.4]
+LightSource "point" "rgb I" [ 1 1 1 ] "rgb scale" [1.1 1.1 1.1]
 #LightSource "distant" "rgb I" [ 1 1 1 ] "point from" [ 0 10 0 ] "point to" [ 0 0 0 ]
 #LightSource "infinite" "color L" [ .5 .5 .5 ] 
 AttributeEnd
