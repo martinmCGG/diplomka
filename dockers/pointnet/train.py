@@ -13,23 +13,25 @@ sys.path.append(os.path.join(BASE_DIR, 'models'))
 sys.path.append(os.path.join(BASE_DIR, 'utils'))
 import provider
 import tf_util
+from Logger import Logger
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
 parser.add_argument('--model', default='pointnet_cls', help='Model name: pointnet_cls or pointnet_cls_basic [default: pointnet_cls]')
 parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
 parser.add_argument('--num_point', type=int, default=2048, help='Point Number [256/512/1024/2048] [default: 1024]')
-parser.add_argument('--max_epoch', type=int, default=250, help='Epoch to run [default: 250]')
-parser.add_argument('--batch_size', type=int, default=32, help='Batch Size during training [default: 32]')
+parser.add_argument('--max_epoch', type=int, default=100, help='Epoch to run [default: 250]')
+parser.add_argument('--batch_size', type=int, default=64, help='Batch Size during training [default: 32]')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial learning rate [default: 0.001]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
 parser.add_argument('--decay_step', type=int, default=200000, help='Decay step for lr decay [default: 200000]')
 parser.add_argument('--decay_rate', type=float, default=0.8, help='Decay rate for lr decay [default: 0.8]')
-parser.add_argument('--weights', help='Path to pretrained model weights')
+parser.add_argument('--weights',type=int, help='Number of model weights')
 
 parser.add_argument('--data', default=os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048'), help='Path to dataset textfiles')
 FLAGS = parser.parse_args()
+
 
 
 BATCH_SIZE = FLAGS.batch_size
@@ -110,10 +112,10 @@ def train():
             tf.summary.scalar('bn_decay', bn_decay)
 
             # Get model and loss 
-            pred, end_points = MODEL.get_model(pointclouds_pl, is_training_pl, bn_decay=bn_decay)
+            pred, end_points = MODEL.get_model(pointclouds_pl, is_training_pl, NUM_CLASSES=NUM_CLASSES, bn_decay=bn_decay)
             loss = MODEL.get_loss(pred, labels_pl, end_points)
             tf.summary.scalar('loss', loss)
-
+            
             correct = tf.equal(tf.argmax(pred, 1), tf.to_int64(labels_pl))
             accuracy = tf.reduce_sum(tf.cast(correct, tf.float32)) / float(BATCH_SIZE)
             tf.summary.scalar('accuracy', accuracy)
@@ -128,7 +130,7 @@ def train():
             train_op = optimizer.minimize(loss, global_step=batch)
             
             # Add ops to save and restore all the variables.
-            saver = tf.train.Saver(max_to_keep=1000)
+            saver = tf.train.Saver(max_to_keep=15)
             
         # Create a session
         config = tf.ConfigProto()
@@ -143,17 +145,22 @@ def train():
         train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'),
                                   sess.graph)
         test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'))
-
+        
+        init = tf.global_variables_initializer()
+        sess.run(init, {is_training_pl: True})
+        
         # Init variables
         start_epoch = 0
-        init = tf.global_variables_initializer()
-        if WEIGHTS and WEIGHTS[-1] != '-':
-            saver.restore(sess, WEIGHTS)
-            epoch = int(WEIGHTS.split('-')[-1])
-        # To fix the bug introduced in TF 0.12.1 as in
-        # http://stackoverflow.com/questions/41543774/invalidargumenterror-for-tensor-bool-tensorflow-0-12-1
-        #sess.run(init)
-        sess.run(init, {is_training_pl: True})
+        
+        if WEIGHTS:
+            w = os.path.join(LOG_DIR, "model.ckpt-{}".format(WEIGHTS))
+            saver.restore(sess, w)
+            start_epoch = WEIGHTS + 1
+            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"pnet_acc_eval_accuracy.csv")))
+            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'pnet_loss_eval_loss.csv')))
+            
+
+        
 
         ops = {'pointclouds_pl': pointclouds_pl,
                'labels_pl': labels_pl,
@@ -163,8 +170,8 @@ def train():
                'train_op': train_op,
                'merged': merged,
                'step': batch}
-
-        for epoch in range(start_epoch, MAX_EPOCH+start_epoch):
+        
+        for epoch in range(start_epoch, MAX_EPOCH+start_epoch+1):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
              
@@ -198,7 +205,7 @@ def train_one_epoch(sess, ops, train_writer):
         total_correct = 0
         total_seen = 0
         loss_sum = 0
-       
+
         for batch_idx in range(num_batches):
             start_idx = batch_idx * BATCH_SIZE
             end_idx = (batch_idx+1) * BATCH_SIZE
@@ -206,9 +213,11 @@ def train_one_epoch(sess, ops, train_writer):
             # Augment batched point clouds by rotation and jittering
             rotated_data = provider.rotate_point_cloud(current_data[start_idx:end_idx, :, :])
             jittered_data = provider.jitter_point_cloud(rotated_data)
+            
             feed_dict = {ops['pointclouds_pl']: jittered_data,
                          ops['labels_pl']: current_label[start_idx:end_idx],
                          ops['is_training_pl']: is_training,}
+            
             summary, step, _, loss_val, pred_val = sess.run([ops['merged'], ops['step'],
                 ops['train_op'], ops['loss'], ops['pred']], feed_dict=feed_dict)
             train_writer.add_summary(summary, step)
@@ -217,10 +226,13 @@ def train_one_epoch(sess, ops, train_writer):
             total_correct += correct
             total_seen += BATCH_SIZE
             loss_sum += loss_val
-        
-        log_string('mean loss: %f' % (loss_sum / float(num_batches)))
-        log_string('accuracy: %f' % (total_correct / float(total_seen)))
-
+            
+        acc = total_correct / float(total_seen)
+        loss = loss_sum / float(num_batches)
+        log_string('mean loss: %f' % loss)
+        LOSS_LOGGER.log(loss, "train_loss")
+        log_string('accuracy: %f' % acc)
+        ACC_LOGGER.log(acc, "train_accuracy")
         
 def eval_one_epoch(sess, ops, test_writer):
     """ ops: dict mapping from string to tf ops """
@@ -239,8 +251,7 @@ def eval_one_epoch(sess, ops, test_writer):
         
         file_size = current_data.shape[0]
         num_batches = file_size // BATCH_SIZE
-        if num_batches==0:
-            print "NUMBER OF SAMPLES MUST BE AT LEAST BATCH_SIZE BIG IN EVERY FILE!"
+
         for batch_idx in range(num_batches):
             
             start_idx = batch_idx * BATCH_SIZE
@@ -255,18 +266,27 @@ def eval_one_epoch(sess, ops, test_writer):
             correct = np.sum(pred_val == current_label[start_idx:end_idx])
             total_correct += correct
             total_seen += BATCH_SIZE
-            loss_sum += (loss_val*BATCH_SIZE)
+            loss_sum += (loss_val / float(num_batches))
             for i in range(start_idx, end_idx):
                 l = current_label[i]
                 total_seen_class[l] += 1
                 total_correct_class[l] += (pred_val[i-start_idx] == l)
-            
-    log_string('eval mean loss: %f' % (loss_sum / float(total_seen)))
-    log_string('eval accuracy: %f'% (total_correct / float(total_seen)))
+    
+    loss = loss_sum / float(len(TEST_FILES))       
+    log_string('eval mean loss: %f' % loss)
+    LOSS_LOGGER.log(loss, "eval_loss")
+    acc = total_correct / float(total_seen)
+    log_string('eval accuracy: %f' % acc)
+    ACC_LOGGER.log(acc, "eval_accuracy")
     log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
          
 
-
 if __name__ == "__main__":
+    LOSS_LOGGER = Logger("pnet_loss")
+    ACC_LOGGER = Logger("pnet_acc")
     train()
     LOG_FOUT.close()
+    ACC_LOGGER.save(LOG_DIR)
+    LOSS_LOGGER.save(LOG_DIR)
+    ACC_LOGGER.plot(dest=LOG_DIR)
+    LOSS_LOGGER.plot(dest=LOG_DIR)

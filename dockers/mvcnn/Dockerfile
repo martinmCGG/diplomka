@@ -27,4 +27,4 @@ RUN ./prepare_pretrained_alexnet.sh
 
 COPY *.py ./
 
-#ENTRYPOINT /bin/bash 
+ENTRYPOINT /bin/bash 

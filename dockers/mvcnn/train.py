@@ -11,6 +11,7 @@ import sklearn.metrics as metrics
 
 from input import Dataset
 import globals as g_
+from Logger import Logger
 
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
@@ -19,10 +20,14 @@ sys.path.append(parentdir)
 import model
 
 FLAGS = tf.app.flags.FLAGS
-os.mkdir('./logs/')
-print("--------------traininainign----------------")
+try:
+    os.mkdir('./logs/')
+except:
+    pass
 
-tf.app.flags.DEFINE_string('train_dir', './logs/',
+
+FLAGS = tf.app.flags.FLAGS
+tf.app.flags.DEFINE_string('train_dir', osp.dirname(sys.argv[0]) + '/tmp/',
                            """Directory where to write event logs """
                            """and checkpoint.""")
 tf.app.flags.DEFINE_boolean('log_device_placement', False,
@@ -32,30 +37,38 @@ tf.app.flags.DEFINE_string('weights', '',
 tf.app.flags.DEFINE_string('caffemodel', '', 
                             """finetune with a model converted by caffe-tensorflow""")
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--train_dir', default='logs', help='Directory where to write event logs [default: log]')
+parser.add_argument('--log_device_placement', default=False, help='Whether to log device placement.' )
+parser.add_argument('--weights',type=int, help='Number of model weights')
+parser.add_argument('--caffemodel', default='alexnet_imagenet.npy', help='Directory where to write event logs [default: log]')
+
+args = parser.parse_args()
+args.log_dir = args.train_dir
 np.set_printoptions(precision=3)
 
 
-def train(dataset_train, dataset_val, ckptfile='', caffemodel=''):
+def train(dataset_train, dataset_val, weights='', caffemodel=''):
     print 'train() called'
-    is_finetune = bool(ckptfile)
     V = g_.NUM_VIEWS
-    batch_size = FLAGS.batch_size
-
+    batch_size = g_.BATCH_SIZE
+    
     dataset_train.shuffle()
     dataset_val.shuffle()
     data_size = dataset_train.size()
     print 'training size:', data_size
 
-
     with tf.Graph().as_default():
 
-        if not is_finetune or ckptfile[-1]=='-':
-            startstep = 0
-            is_finetune = False
+        if not bool(weights):
+            startepoch = 0
         else:
-            startstep = int(ckptfile.split('-')[-1])
-                            
-        global_step = tf.Variable(startstep, trainable=False)
+            startepoch = weights + 1
+            ckptfile = os.path.join(args.train_dir, 'model.ckpt-'+str(weights))
+            ACC_LOGGER.load((os.path.join(args.log_dir,"mvcnn_acc_train_accuracy.csv"),os.path.join(args.log_dir,"mvcnn_acc_eval_accuracy.csv")))
+            LOSS_LOGGER.load((os.path.join(args.log_dir,"mvcnn_loss_train_loss.csv"), os.path.join(args.log_dir,'mvcnn_loss_eval_loss.csv')))                            
+        global_step = tf.Variable(0, trainable=False)
          
         # placeholders for graph input
         view_ = tf.placeholder('float32', shape=(None, V, 227, 227, 3), name='im0')
@@ -81,9 +94,9 @@ def train(dataset_train, dataset_val, ckptfile='', caffemodel=''):
         saver = tf.train.Saver(tf.all_variables(), max_to_keep=1000)
 
         init_op = tf.global_variables_initializer()
-        sess = tf.Session(config=tf.ConfigProto(log_device_placement=FLAGS.log_device_placement))
+        sess = tf.Session(config=tf.ConfigProto(log_device_placement=args.log_device_placement))
         
-        if is_finetune:
+        if args.weights:
             # load checkpoint file
             saver.restore(sess, ckptfile)
             print 'restore variables done'
@@ -97,13 +110,17 @@ def train(dataset_train, dataset_val, ckptfile='', caffemodel=''):
             sess.run(init_op)
             print 'init_op done'
 
-        summary_writer = tf.summary.FileWriter(FLAGS.train_dir,
+        summary_writer = tf.summary.FileWriter(args.train_dir,
                                                graph=sess.graph) 
 
-        step = startstep
-        for epoch in xrange(200):
+        total_seen = 0
+        total_correct = 0
+        total_loss = 0
+        
+        step = 0
+        for epoch in xrange(startepoch, g_.TRAIN_FOR + startepoch + 1):
             print 'epoch:', epoch
-
+            
             for batch_x, batch_y in dataset_train.batches(batch_size):
                 step += 1
 
@@ -115,63 +132,79 @@ def train(dataset_train, dataset_val, ckptfile='', caffemodel=''):
                 _, pred, loss_value = sess.run(
                         [train_op, prediction,  loss,],
                         feed_dict=feed_dict)
-
+                
+                total_loss += loss_value
+                correct = np.sum(pred == batch_y)
+                total_correct+=correct
+                total_seen+=batch_size
+                
                 duration = time.time() - start_time
 
                 assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
 
-                # print training information
-                if step % 10 == 0 or step - startstep <= 30:
+                log_period = 10
+                if step % log_period == 0:
                     sec_per_batch = float(duration)
                     print '%s: step %d, loss=%.2f (%.1f examples/sec; %.3f sec/batch)' \
                          % (datetime.now(), step, loss_value,
                                     FLAGS.batch_size/duration, sec_per_batch)
-
-                        
-                # validation
-                if step % g_.VAL_PERIOD == 0:# and step > 0:
-                    val_losses = []
-                    predictions = np.array([])
                     
-                    val_y = []
-                    for val_step, (val_batch_x, val_batch_y) in \
-                            enumerate(dataset_val.sample_batches(batch_size, g_.VAL_SAMPLE_SIZE)):
-                        val_feed_dict = {view_: val_batch_x,
-                                         y_  : val_batch_y,
-                                         keep_prob_: 1.0 }
-                        val_loss, pred = sess.run([loss, prediction], feed_dict=val_feed_dict)
-                        val_losses.append(val_loss)
-                        predictions = np.hstack((predictions, pred))
-                        val_y.extend(val_batch_y)
-
-                    val_loss = np.mean(val_losses)
+                    acc = total_correct / float(total_seen)
+                    ACC_LOGGER.log(acc,"train_accuracy")
+                    loss_ = total_loss / float(log_period) 
+                    LOSS_LOGGER.log(loss_,"train_loss")                   
                     
-                    acc = metrics.accuracy_score(val_y[:predictions.size], np.array(predictions))
-                    print '%s: step %d, validation loss=%.4f, acc=%f' %\
-                            (datetime.now(), step, val_loss, acc*100.)
-
-                    # validation summary
-                    val_loss_summ = sess.run(validation_summary,
-                            feed_dict={validation_loss: val_loss})
-                    val_acc_summ = sess.run(validation_acc_summary, 
-                            feed_dict={validation_acc: acc})
-                    summary_writer.add_summary(val_loss_summ, step)
-                    summary_writer.add_summary(val_acc_summ, step)
-                    summary_writer.flush()
-
-
+                    total_seen = 0
+                    total_correct = 0
+                    total_loss = 0
+                    
                 if step % 100 == 0:
                     # print 'running summary'
                     summary_str = sess.run(summary_op, feed_dict=feed_dict)
                     summary_writer.add_summary(summary_str, step)
                     summary_writer.flush()
 
-                if step % g_.SAVE_PERIOD == 0 and step > startstep:
-                    checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
-                    saver.save(sess, checkpoint_path, global_step=step)
-
-
-
+            if epoch % g_.SAVE_PERIOD == 0 and epoch>0:
+                checkpoint_path = os.path.join(args.train_dir, 'model.ckpt-'+str(epoch))
+                saver.save(sess, checkpoint_path)
+                    
+            val_losses = []
+            predictions = []
+            labels = []
+                
+            for batch_x, batch_y in dataset_val.batches(batch_size):
+    
+                start_time = time.time()
+                feed_dict = {view_: batch_x,
+                             y_ : batch_y,
+                             keep_prob_: 1.0}
+    
+                pred, loss_value = sess.run(
+                        [prediction,  loss,],
+                        feed_dict=feed_dict)
+                
+                val_losses.append(loss_value)
+                assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
+    
+                predictions.extend(pred.tolist())
+                labels.extend(batch_y.tolist())
+            val_loss = np.mean(val_losses)
+            acc = metrics.accuracy_score(labels, predictions)     
+            print '%s: step %d, validation loss=%.4f, acc=%f' %\
+                    (datetime.now(), step, val_loss, acc*100.)
+            LOSS_LOGGER.log(val_loss, "eval_loss")
+            ACC_LOGGER.log(acc, "eval_accuracy")
+            
+            # validation summary
+            val_loss_summ = sess.run(validation_summary,
+                    feed_dict={validation_loss: val_loss})
+            val_acc_summ = sess.run(validation_acc_summary, 
+                    feed_dict={validation_acc: acc})
+            summary_writer.add_summary(val_loss_summ, step)
+            summary_writer.add_summary(val_acc_summ, step)
+            summary_writer.flush()
+    
+    
 def main(argv):
     st = time.time() 
     print 'start loading data'
@@ -183,7 +216,7 @@ def main(argv):
 
     print 'done loading data, time=', time.time() - st
 
-    train(dataset_train, dataset_val, FLAGS.weights, FLAGS.caffemodel)
+    train(dataset_train, dataset_val, args.weights, args.caffemodel)
 
 
 def read_lists(list_of_lists_file):
@@ -191,8 +224,14 @@ def read_lists(list_of_lists_file):
     listfiles, labels  = zip(*[(l[0], int(l[1])) for l in listfile_labels])
     return listfiles, labels
     
-
-
+    
 if __name__ == '__main__':
+    LOSS_LOGGER = Logger("mvcnn_loss")
+    ACC_LOGGER = Logger("mvcnn_acc")
     main(sys.argv)
+    ACC_LOGGER.save(args.train_dir)
+    LOSS_LOGGER.save(args.train_dir)
+    ACC_LOGGER.plot(dest=args.train_dir)
+    LOSS_LOGGER.plot(dest=args.train_dir)
+    
 

@@ -29,5 +29,6 @@ RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
 RUN cd data && rm modelnet40_ply_hdf5_2048.zip
 RUN mkdir logs
 COPY *.py ./
+RUN mv pointnet2_cls_ssg.py ./models
 
 ENTRYPOINT /bin/bash 

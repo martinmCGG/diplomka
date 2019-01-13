@@ -19,24 +19,27 @@ sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 import provider
 import modelnet_dataset
 import modelnet_h5_dataset
+import Evaluation_tools as et
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
 parser.add_argument('--model', default='pointnet2_cls_ssg', help='Model name. [default: pointnet2_cls_ssg]')
 parser.add_argument('--batch_size', type=int, default=32, help='Batch Size during training [default: 16]')
 parser.add_argument('--num_point', type=int, default=1024, help='Point Number [256/512/1024/2048] [default: 1024]')
-parser.add_argument('--model_path', default='logs/model.ckpt', help='model checkpoint file path [default: logs/model.ckpt]')
+
 parser.add_argument('--dump_dir', default='dump', help='dump folder path [dump]')
 parser.add_argument('--normal', action='store_true', help='Whether to use normal information')
 parser.add_argument('--num_votes', type=int, default=1, help='Aggregate classification scores from multiple rotations [default: 1]')
 
+parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
+parser.add_argument('--weights',type=int, help='Number of model weights')
 parser.add_argument('--data', default=os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048'), help='Path to dataset textfiles')
 FLAGS = parser.parse_args()
 
 
 BATCH_SIZE = FLAGS.batch_size
 NUM_POINT = FLAGS.num_point
-MODEL_PATH = FLAGS.model_path
+MODEL_PATH = os.path.join(FLAGS.log_dir, "model.ckpt-{}".format(FLAGS.weights))
 GPU_INDEX = FLAGS.gpu
 MODEL = importlib.import_module(FLAGS.model) # import network module
 DUMP_DIR = FLAGS.dump_dir
@@ -45,8 +48,7 @@ LOG_FOUT = open(os.path.join(DUMP_DIR, 'log_evaluate.txt'), 'w')
 LOG_FOUT.write(str(FLAGS)+'\n')
 
 NUM_CLASSES = 40
-SHAPE_NAMES = [line.rstrip() for line in \
-    open(os.path.join(ROOT_DIR, 'data/modelnet40_ply_hdf5_2048/shape_names.txt'))] 
+SHAPE_NAMES = et.get_categories(FLAGS.data)
 
 HOSTNAME = socket.gethostname()
 
@@ -167,11 +169,10 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
     class_accuracies = np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float)
     for i, name in enumerate(SHAPE_NAMES):
         log_string('%10s:\t%0.3f' % (name, class_accuracies[i]))
-
-    import sys
-    sys.path.insert(0, '/home/krabec/models/vysledky')
-    from MakeCategories import make_categories
-    make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/pnet2.txt', predictions, labels, 'PNET2')
+    
+    eval_file = os.path.join(FLAGS.log_dir, 'pnet2.txt')
+    et.write_eval_file(FLAGS.data, eval_file, predictions, labels, 'PNET2')
+    et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
 
 if __name__=='__main__':
     with tf.Graph().as_default():

@@ -23,6 +23,7 @@ import provider
 import tf_util
 import modelnet_dataset
 import modelnet_h5_dataset
+from Logger import Logger
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--num_gpus', type=int, default=4, help='How many gpus to use [default: 1]')
@@ -30,7 +31,7 @@ parser.add_argument('--model', default='pointnet2_cls_ssg', help='Model name [de
 parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
 parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
 parser.add_argument('--max_epoch', type=int, default=500, help='Epoch to run [default: 251]')
-parser.add_argument('--batch_size', type=int, default=4, help='Batch Size during training [default: 32]')
+parser.add_argument('--batch_size', type=int, default=64, help='Batch Size during training [default: 32]')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial learning rate [default: 0.001]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
@@ -73,7 +74,7 @@ BN_DECAY_CLIP = 0.99
 
 HOSTNAME = socket.gethostname()
 
-NUM_CLASSES = 2
+NUM_CLASSES = 40
 WEIGHTS = FLAGS.weights
 
 # Shapenet official train/test split
@@ -179,7 +180,7 @@ def train():
             # -------------------------------------------
             # Allocating variables on CPU first will greatly accelerate multi-gpu training.
             # Ref: https://github.com/kuza55/keras-extras/issues/21
-            MODEL.get_model(pointclouds_pl, is_training_pl, bn_decay=bn_decay)
+            MODEL.get_model(pointclouds_pl, is_training_pl,NUM_CLASSES=NUM_CLASSES, bn_decay=bn_decay)
             
             tower_grads = []
             pred_gpu = []
@@ -211,7 +212,7 @@ def train():
             # Merge pred and losses from multiple GPUs
             pred = tf.concat(pred_gpu, 0)
             total_loss = tf.reduce_mean(total_loss_gpu)
-
+            
             # Get training operator 
             grads = average_gradients(tower_grads)
             train_op = optimizer.apply_gradients(grads, global_step=batch)
@@ -301,10 +302,12 @@ def train_one_epoch(sess, ops, train_writer):
         total_correct += correct
         total_seen += bsize
         loss_sum += loss_val
-        if (batch_idx+1)%50 == 0:
+        if (batch_idx+1)%10 == 0:
             log_string(' ---- batch: %03d ----' % (batch_idx+1))
-            log_string('mean loss: %f' % (loss_sum / 50))
+            log_string('mean loss: %f' % (loss_sum / 10))
+            LOSS_LOGGER.log((loss_sum / 10), "train_loss")
             log_string('accuracy: %f' % (total_correct / float(total_seen)))
+            ACC_LOGGER.log((total_correct / float(total_seen)), "train_accuracy")
             total_correct = 0
             total_seen = 0
             loss_sum = 0
@@ -357,7 +360,9 @@ def eval_one_epoch(sess, ops, test_writer):
             total_correct_class[l] += (pred_val[i] == l)
     
     log_string('eval mean loss: %f' % (loss_sum / float(batch_idx)))
+    LOSS_LOGGER.log((loss_sum / float(batch_idx)), "eval_loss")
     log_string('eval accuracy: %f'% (total_correct / float(total_seen)))
+    ACC_LOGGER.log((total_correct / float(total_seen)), "eval_accuracy")
     log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
     EPOCH_CNT += 1
 
@@ -366,6 +371,11 @@ def eval_one_epoch(sess, ops, test_writer):
 
 
 if __name__ == "__main__":
-    log_string('pid: %s'%(str(os.getpid())))
+    LOSS_LOGGER = Logger("pnet2_loss")
+    ACC_LOGGER = Logger("pnet2_acc")
     train()
     LOG_FOUT.close()
+    ACC_LOGGER.save(LOG_DIR)
+    LOSS_LOGGER.save(LOG_DIR)
+    ACC_LOGGER.plot(dest=LOG_DIR)
+    LOSS_LOGGER.plot(dest=LOG_DIR)

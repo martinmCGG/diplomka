@@ -22,6 +22,7 @@ import provider
 import tf_util
 import modelnet_dataset
 import modelnet_h5_dataset
+from Logger import Logger
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
@@ -29,7 +30,7 @@ parser.add_argument('--model', default='pointnet2_cls_ssg', help='Model name [de
 parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
 parser.add_argument('--num_point', type=int, default=2048, help='Point Number [default: 2048]')
 parser.add_argument('--max_epoch', type=int, default=251, help='Epoch to run [default: 251]')
-parser.add_argument('--batch_size', type=int, default=4, help='Batch Size during training [default: 16]')
+parser.add_argument('--batch_size', type=int, default=64, help='Batch Size during training [default: 16]')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial learning rate [default: 0.001]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
@@ -133,7 +134,7 @@ def train():
             tf.summary.scalar('bn_decay', bn_decay)
 
             # Get model and loss 
-            pred, end_points = MODEL.get_model(pointclouds_pl, is_training_pl, bn_decay=bn_decay)
+            pred, end_points = MODEL.get_model(pointclouds_pl, is_training_pl,NUM_CLASSES=NUM_CLASSES, bn_decay=bn_decay)
             MODEL.get_loss(pred, labels_pl, end_points)
             losses = tf.get_collection('losses')
             total_loss = tf.add_n(losses, name='total_loss')
@@ -156,7 +157,7 @@ def train():
             train_op = optimizer.minimize(total_loss, global_step=batch)
             
             # Add ops to save and restore all the variables.
-            saver = tf.train.Saver()
+            saver = tf.train.Saver(max_to_keep=15)
         
         # Create a session
         config = tf.ConfigProto()
@@ -170,12 +171,18 @@ def train():
         train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'), sess.graph)
         test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'), sess.graph)
         
-        if WEIGHTS and WEIGHTS[-1] != '-':
-            saver.restore(sess, WEIGHTS)
-        
         # Init variables
         init = tf.global_variables_initializer()
         sess.run(init)
+                
+        if WEIGHTS:
+            w = os.path.join(LOG_DIR, "model.ckpt-{}".format(WEIGHTS))
+            saver.restore(sess, w)
+            start_epoch = WEIGHTS + 1
+            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet2_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"pnet2_acc_eval_accuracy.csv")))
+            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet2_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'pnet2_loss_eval_loss.csv')))
+        
+
 
         ops = {'pointclouds_pl': pointclouds_pl,
                'labels_pl': labels_pl,
@@ -234,10 +241,13 @@ def train_one_epoch(sess, ops, train_writer):
         total_correct += correct
         total_seen += bsize
         loss_sum += loss_val
+    
         if (batch_idx+1)%200 == 0:
             log_string(' ---- batch: %03d ----' % (batch_idx+1))
-            log_string('mean loss: %f' % (loss_sum / 50))
+            log_string('mean loss: %f' % (loss_sum / 200))
+            LOSS_LOGGER.log((loss_sum / 200), "train_loss")
             log_string('accuracy: %f' % (total_correct / float(total_seen)))
+            ACC_LOGGER.log((total_correct / float(total_seen)), "train_accuracy")
             total_correct = 0
             total_seen = 0
             loss_sum = 0
@@ -290,7 +300,9 @@ def eval_one_epoch(sess, ops, test_writer):
             total_correct_class[l] += (pred_val[i] == l)
     
     log_string('eval mean loss: %f' % (loss_sum / float(batch_idx)))
+    LOSS_LOGGER.log((loss_sum / float(len(TEST_FILES))), "eval_loss")
     log_string('eval accuracy: %f'% (total_correct / float(total_seen)))
+    ACC_LOGGER.log((total_correct / float(total_seen)), "eval_accuracy")
     log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
     EPOCH_CNT += 1
 
@@ -299,6 +311,11 @@ def eval_one_epoch(sess, ops, test_writer):
 
 
 if __name__ == "__main__":
-    log_string('pid: %s'%(str(os.getpid())))
+    LOSS_LOGGER = Logger("pnet2_loss")
+    ACC_LOGGER = Logger("pnet2_acc")
     train()
     LOG_FOUT.close()
+    ACC_LOGGER.save(LOG_DIR)
+    LOSS_LOGGER.save(LOG_DIR)
+    ACC_LOGGER.plot(dest=LOG_DIR)
+    LOSS_LOGGER.plot(dest=LOG_DIR)

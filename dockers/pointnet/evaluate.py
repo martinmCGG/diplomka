@@ -13,23 +13,25 @@ sys.path.append(os.path.join(BASE_DIR, 'models'))
 sys.path.append(os.path.join(BASE_DIR, 'utils'))
 import provider
 import pc_util
-
+import Evaluation_tools as et
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
 parser.add_argument('--model', default='pointnet_cls', help='Model name: pointnet_cls or pointnet_cls_basic [default: pointnet_cls]')
 parser.add_argument('--batch_size', type=int, default=32, help='Batch Size during training [default: 1]')
 parser.add_argument('--num_point', type=int, default=1024, help='Point Number [256/512/1024/2048] [default: 1024]')
-parser.add_argument('--model_path', default='log/model.ckpt', help='model checkpoint file path [default: log/model.ckpt]')
 parser.add_argument('--dump_dir', default='dump', help='dump folder path [dump]')
 parser.add_argument('--visu', action='store_true', help='Whether to dump image for error case [default: False]')
-parser.add_argument('--data', default=os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048'), help='Path to dataset textfiles')
+parser.add_argument('--data', default=BASE_DIR, help='Path to dataset textfiles')
+parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
+parser.add_argument('--weights',type=int, help='Number of model weights')
+
 FLAGS = parser.parse_args()
 
 
 BATCH_SIZE = FLAGS.batch_size
 NUM_POINT = FLAGS.num_point
-MODEL_PATH = FLAGS.model_path
+MODEL_PATH = os.path.join(FLAGS.log_dir, "model.ckpt-{}".format(FLAGS.weights))
 GPU_INDEX = FLAGS.gpu
 MODEL = importlib.import_module(FLAGS.model) # import network module
 DUMP_DIR = FLAGS.dump_dir
@@ -38,8 +40,7 @@ LOG_FOUT = open(os.path.join(DUMP_DIR, 'log_evaluate.txt'), 'w')
 LOG_FOUT.write(str(FLAGS)+'\n')
 
 NUM_CLASSES = 40
-SHAPE_NAMES = [line.rstrip() for line in \
-    open(os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048/shape_names.txt'))] 
+SHAPE_NAMES = et.get_categories(FLAGS.data)
 
 HOSTNAME = socket.gethostname()
 
@@ -74,7 +75,7 @@ def evaluate(num_votes):
     config.allow_soft_placement = True
     config.log_device_placement = True
     sess = tf.Session(config=config)
-
+    
     # Restore variables from disk.
     saver.restore(sess, MODEL_PATH)
     log_string("Model restored.")
@@ -100,19 +101,16 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
     
     predictions = []
     labels = []
-    print(len(TEST_FILES))
     
     for fn in range(len(TEST_FILES)):
         log_string('----'+str(fn)+'----')
         current_data, current_label = provider.loadDataFile(TEST_FILES[fn])
         current_data = current_data[:,0:NUM_POINT,:]
         current_label = np.squeeze(current_label)
-        print(current_data.shape)
         
         file_size = current_data.shape[0]
         num_batches = file_size // BATCH_SIZE
-        print(file_size)
-    
+
         
         for batch_idx in range(num_batches):
             start_idx = batch_idx * BATCH_SIZE
@@ -172,16 +170,14 @@ def eval_one_epoch(sess, ops, num_votes=1, topk=1):
     log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
     
 
-    
     class_accuracies = np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float)
     for i, name in enumerate(SHAPE_NAMES):
         log_string('%10s:\t%0.3f' % (name, class_accuracies[i]))
     
-    """print(len(predictions))
-    import sys
-    sys.path.insert(0, '/home/krabec/models/vysledky')
-    from MakeCategories import make_categories
-    make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/pnet.txt', predictions, labels, 'PNET')"""
+    
+    eval_file = os.path.join(FLAGS.log_dir, 'pnet.txt')
+    et.write_eval_file(FLAGS.data, eval_file, predictions, labels, 'PNET')
+    et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
 
 
 if __name__=='__main__':
