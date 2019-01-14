@@ -1,6 +1,7 @@
 import sys
 import time
 import numpy as np  
+import os
 import tensorflow as tf
 sys.path.append('/seq2seq/mvcnn')
 from input import Dataset
@@ -38,8 +39,6 @@ def alexnet(views, keep_prob):
 
         fc6 = _fc('fc6', flat, 4096, dropout=keep_prob, reuse=reuse)
         fc7 = _fc('fc7', fc6, 4096, dropout=keep_prob, reuse = reuse)
-        print(fc7)
-        print(pool)
         pool[i] = fc7
         
     return pool
@@ -52,14 +51,13 @@ def load_alexnet(sess, caffetf_modelpath):
         name = l
         _load_param(sess, name, data_dict[l])
 
-def extract_features(dataset, caffemodel):
-    V = 20
-    batch_size = 32
+def extract_features(dataset, caffemodel, views , batch_size= 32):
+    V = views
 
     data_size = dataset.size()
     print 'dataset size:', data_size
 
-    features = np.zeros([data_size, 20, 4096])
+    features = np.zeros([data_size, V, 4096])
     labels = np.zeros([data_size], dtype = np.int32)
 
     with tf.Graph().as_default():
@@ -96,8 +94,6 @@ def extract_features(dataset, caffemodel):
 
             feature = np.array(feature)
             feature = np.moveaxis(feature, 0, 1)
-            if step%10 == 0:
-                print(time.time() - start_time)
             
             offset = batch_y.shape[0]
             index = batch_size*(step-1)
@@ -111,22 +107,18 @@ def read_lists(list_of_lists_file):
     listfiles, labels  = zip(*[(l[0], int(l[1])) for l in listfile_labels])
     return listfiles, labels
 
-def save_data(name, features, labels):
-    np.save('./data/{}_features.npy'.format(name), features)
-    np.save('./data/{}_labels.npy'.format(name), labels)
+def save_data(name, features, labels, out_dir):
+    np.save(os.path.join(out_dir,'{}_features.npy'.format(name)), features)
+    np.save(os.path.join(out_dir,'{}_labels.npy'.format(name)), labels)
 
-def create_data(listfiles, name):
+def create_data(listfiles, name, out_dir, views, batch_size = 32):
     st = time.time()
     print 'start loading data'
-    
     listfiles, labels = read_lists(listfiles)
-    dataset = Dataset(listfiles, labels, subtract_mean=False, V=20)
-    features, labels = extract_features(dataset, 'mvcnn/alexnet_imagenet.npy')
-    save_data(name, features, labels)
+    dataset = Dataset(listfiles, labels, subtract_mean=False, V=views)
+    features, labels = extract_features(dataset, 'mvcnn/alexnet_imagenet.npy', views, batch_size= batch_size)
+    save_data(name, features, labels, out_dir)
     print 'done loading data, time=', time.time() - st
     
-
-create_data('data/testfiles.txt', 'test')
-create_data('data/trainfiles.txt', 'train')
 
 

@@ -1,19 +1,19 @@
 import tensorflow as tf
 import numpy as np
 import os
-
+from Logger import Logger
 from seq_rnn_model import SequenceRNNModel
 import model_data
 import csv
 from sys import argv
+import Evaluation_tools as et
 
 # data path parameter
-tf.flags.DEFINE_string('data_path', '', 'file dir for saving features and labels')
-tf.flags.DEFINE_string('weights', '', 'file dir for saving features and labels')
-tf.flags.DEFINE_string("save_seq_basicmvmodel_path", "/home1/shangmingyang/data/3dmodel/trained_seq_mvmodel/basic/seq_mvmodel.ckpt", "file path to save model")
-tf.flags.DEFINE_string('seq_basicmvmodel_path', '/home1/shangmingyang/data/3dmodel/trained_seq_mvmodel/basic/seq_mvmodel.ckpt-100', 'trained mvmodel path')
-tf.flags.DEFINE_string("save_seq_embeddingmvmodel_path", "/home1/shangmingyang/data/3dmodel/trained_seq_mvmodel/embedding/seq_mvmodel.ckpt", "file path to save model")
-tf.flags.DEFINE_string('seq_embeddingmvmodel_path', '/home1/shangmingyang/data/3dmodel/trained_seq_mvmodel/embedding/seq_mvmodel.ckpt-70', 'trained mvmodel path')
+tf.flags.DEFINE_string('log_dir', '', 'file dir for saving features and labels')
+tf.flags.DEFINE_string('data', '', 'path to data')
+tf.flags.DEFINE_string('weights', '', 'number of model to finetune or test')
+
+
 tf.flags.DEFINE_string('checkpoint_path', './logs', 'trained model checkpoint')
 tf.flags.DEFINE_string('test_acc_file', 'seq_acc.csv', 'test acc file')
 
@@ -50,7 +50,8 @@ def main(argv):
 
 
 def train(weights):
-    data =  model_data.read_data(FLAGS.data_path, n_views=FLAGS.n_views)
+    LOG_DIR = FLAGS.log_dir
+    data =  model_data.read_data(FLAGS.data, n_views=FLAGS.n_views)
     seq_rnn_model = SequenceRNNModel(FLAGS.n_input_fc, FLAGS.n_views, FLAGS.n_hidden, FLAGS.decoder_embedding_size, FLAGS.n_classes+1, FLAGS.n_hidden,
                                      learning_rate=FLAGS.learning_rate,
                                      keep_prob=FLAGS.keep_prob,
@@ -60,7 +61,7 @@ def train(weights):
                                      use_attention=FLAGS.use_attention,
                                      use_embedding=FLAGS.use_embedding,
                                      num_heads=FLAGS.num_heads)
-                                     #init_decoder_embedding=model_data.read_class_yes_embedding(FLAGS.data_path))
+                                     #init_decoder_embedding=model_data.read_class_yes_embedding(FLAGS.log_dir))
     config = tf.ConfigProto()
     
     config.gpu_options.allow_growth = True
@@ -74,43 +75,79 @@ def train(weights):
         saver = tf.train.Saver(max_to_keep=FLAGS.n_max_keep_model)
         init = tf.global_variables_initializer()
         sess.run(init)
-        startepoch = 1
+        startepoch = 0
         
-        if weights[-1] != '-':
-            saver.restore(sess, weights)
-            startepoch = int(weights.split('-')[-1])
+        if weights:
+            weights = int(weights)
+            w = os.path.join(LOG_DIR, "model.ckpt-{}".format(weights))
+            saver.restore(sess, w)
+            startepoch = weights + 1
+            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"seq2seq_acc_eval_accuracy.csv")))
+            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'seq2seq_loss_eval_loss.csv')))
             
         epoch = startepoch
         
-        while epoch <= FLAGS.training_epoches + startepoch:
+        accs = []
+        losses = []
+        while epoch <= FLAGS.training_epoches + startepoch + 1:
             batch = 1
+            
             while batch * FLAGS.batch_size <= data.train.size():
                 batch_encoder_inputs, batch_decoder_inputs = data.train.next_batch(FLAGS.batch_size)
-                # target_labels = get_target_labels(batch_decoder_inputs)
+                target_labels = get_target_labels(batch_decoder_inputs)
                 batch_encoder_inputs = batch_encoder_inputs.reshape((FLAGS.batch_size, FLAGS.n_views, FLAGS.n_input_fc))
                 batch_encoder_inputs, batch_decoder_inputs, batch_target_weights = seq_rnn_model.get_batch(batch_encoder_inputs, batch_decoder_inputs, batch_size=FLAGS.batch_size)
-                _, loss, _, _ = seq_rnn_model.step(sess, batch_encoder_inputs, batch_decoder_inputs, batch_target_weights,forward_only=False)
-                # predict_labels = seq_rnn_model.predict(outputs)
-                # acc = accuracy(predict_labels, target_labels)
-                print("epoch %d batch %d: loss=%f" %(epoch, batch, loss))
+                loss, logits = seq_rnn_model.step(sess, batch_encoder_inputs, batch_decoder_inputs, batch_target_weights,forward_only=False)
+                predict_labels = seq_rnn_model.predict(logits)
+                acc = accuracy(predict_labels, target_labels)
+                accs.append(acc)
+                losses.append(loss)
+                
+                if batch%10 == 0:
+                    loss = np.mean(losses)
+                    acc = np.mean(accs)
+                    LOSS_LOGGER.log(loss, "train_loss")
+                    ACC_LOGGER.log(acc, "train_accuracy")
+                    print("epoch %d batch %d: loss=%f" %(epoch, batch, loss))
+                    accs = []
+                    losses = []
                 batch += 1
             # if epoch % display_epoch == 0:
             #     print("epoch %d:display" %(epoch))
-            if epoch % FLAGS.save_epoches == 0:
-                saver.save(sess, get_modelpath(), global_step=epoch)
+            if epoch % FLAGS.save_epoches == 0 and epoch>0:
+                saver.save(sess, get_modelpath(epoch))
             #     # do test using test dataset
-            #     test_encoder_inputs, test_decoder_inputs = data.test.next_batch(data.test.size())
-            #     target_labels = get_target_labels(test_decoder_inputs)
-            #     test_encoder_inputs = test_encoder_inputs.reshape((-1, n_steps, n_input))
-            #     test_encoder_inputs, test_decoder_inputs, test_target_weights = seq_rnn_model.get_batch(test_encoder_inputs, test_decoder_inputs, batch_size=data.test.size())
-            #     _, _, outputs = seq_rnn_model.step(sess, test_encoder_inputs, test_decoder_inputs, test_target_weights, forward_only=True) # don't do optimize
-            #     predict_labels = seq_rnn_model.predict(outputs)
-            #     acc = accuracy(predict_labels, target_labels)
-            #     print("epoch %d:save, acc=%f" %(epoch, acc))
+            
+            batch = 1
+            test_accs = []
+            test_losses = []
+            while batch * FLAGS.batch_size <= data.test.size():
+                test_encoder_inputs, test_decoder_inputs = data.test.next_batch(FLAGS.batch_size)
+                target_labels = get_target_labels(test_decoder_inputs)
+                test_encoder_inputs = test_encoder_inputs.reshape((FLAGS.batch_size, FLAGS.n_views, FLAGS.n_input_fc))
+                test_encoder_inputs, test_decoder_inputs, test_target_weights = seq_rnn_model.get_batch(test_encoder_inputs, test_decoder_inputs, batch_size=FLAGS.batch_size)
+                logits, loss = seq_rnn_model.step(sess, test_encoder_inputs, test_decoder_inputs, test_target_weights, forward_only=True) 
+                predict_labels = seq_rnn_model.predict(logits)
+                acc, class_acc = accuracy(predict_labels, target_labels)
+                test_accs.append(acc)
+                test_losses.append(loss)
+                batch += 1
+                
+            acc =  np.mean(test_accs)
+            loss = np.mean(test_losses)
+            print("epoch %d:save, acc=%f" %(epoch,acc))
+            LOSS_LOGGER.log(loss, "eval_loss")
+            ACC_LOGGER.log(acc, "eval_accuracy")
             epoch += 1
+    
+    
+    ACC_LOGGER.save(LOG_DIR)
+    LOSS_LOGGER.save(LOG_DIR)
+    ACC_LOGGER.plot(dest=LOG_DIR)
+    LOSS_LOGGER.plot(dest=LOG_DIR)
 
-def test(model_file):
-    data = model_data.read_data(FLAGS.data_path, n_views=FLAGS.n_views, read_train=False)
+def test(weights):
+    data = model_data.read_data(FLAGS.data, n_views=FLAGS.n_views, read_train=False)
     test_data = data.test
     seq_rnn_model = SequenceRNNModel(FLAGS.n_input_fc, FLAGS.n_views, FLAGS.n_hidden, FLAGS.decoder_embedding_size, FLAGS.n_classes+1, FLAGS.n_hidden,
                                      batch_size=test_data.size(),
@@ -125,12 +162,6 @@ def test(model_file):
     with tf.Session(config=config) as sess:
         seq_rnn_model.build_model()
         saver = tf.train.Saver()
-
-
-        """with open(FLAGS.checkpoint_path) as f:
-            models = f.readlines()[1:]
-            models = [line.split(":")[1] for line in models]
-            models = [line[2:-2] for line in models]"""
         
         test_encoder_inputs, test_decoder_inputs = test_data.next_batch(test_data.size(), shuffle=False)
         target_labels = get_target_labels(test_decoder_inputs)
@@ -138,30 +169,31 @@ def test(model_file):
         test_encoder_inputs = test_encoder_inputs.reshape((-1, FLAGS.n_views, FLAGS.n_input_fc))
         test_encoder_inputs, test_decoder_inputs, test_target_weights = seq_rnn_model.get_batch(test_encoder_inputs,
                                                                                                 test_decoder_inputs,batch_size=test_data.size())
+        saver.restore(sess, get_modelpath(weights))
+        
+        logits, loss = seq_rnn_model.step(sess, test_encoder_inputs, test_decoder_inputs, test_target_weights, forward_only=True)  # don't do optimize
 
-        models = [model_file]
-        for model_path in models:
-            #model_path =os.path.join(FLAGS.checkpoint_path, model_path)
-            #print(model_path)
-            saver.restore(sess, model_path)
-
-            _, _, outputs, hidden = seq_rnn_model.step(sess, test_encoder_inputs, test_decoder_inputs, test_target_weights, forward_only=True)  # don't do optimize
-            #np.save("/home1/shangmingyang/data/ImgJoint3D/feature/shapenet55_nocolor_val", hidden)
-            #attns_weights = np.array([attn_weight[0] for attn_weight in attns_weights])
-            #attns_weights = np.transpose(attns_weights, (1, 0, 2))
-            #np.save('modelnet10_test_attn', attns_weights)
-            predict_labels = seq_rnn_model.predict(outputs, all_min_no=False)
-            print("predict:", predict_labels)
-            np.save("predict", predict_labels)
-            acc = accuracy(predict_labels, target_labels)
-            acc.insert(0, model_path)
-            with open(FLAGS.test_acc_file, 'a') as f:
-                w = csv.writer(f)
-                w.writerow(acc)
-            
-            print("model:%s, acc_instance=%f, acc_class=%f" % (model_path, acc[1], acc[2]))
-            
-            write_testing_results([x-1 for x in target_labels], [x-1 for x in predict_labels])
+        predict_labels = seq_rnn_model.predict(logits, all_min_no=False)
+        print("predict:", len(predict_labels))
+        np.save("predict", predict_labels)
+        acc = accuracy(predict_labels, target_labels)
+        
+        with open(FLAGS.test_acc_file, 'a') as f:
+            w = csv.writer(f)
+            w.writerow(acc)
+        
+        print("model:%s, acc_instance=%f, acc_class=%f" % ("Model", acc[0], acc[1]))
+        LOSS_LOGGER.log(loss, "eval_loss")
+        ACC_LOGGER.log(acc[0], "eval_accuracy")
+    
+    predictions = [x-1 for x in predict_labels]  
+    labels = [x-1 for x in target_labels]
+    eval_file = os.path.join(FLAGS.log_dir, 'seq2seq.txt')
+    et.write_eval_file(FLAGS.data, eval_file, predictions , labels , 'SEQ2SEQ')
+    et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
+        
+        
+        #write_testing_results([x-1 for x in target_labels], [x-1 for x in predict_labels])
 
 def get_target_labels(seq_labels):
     target_labels = []
@@ -191,26 +223,14 @@ def accuracy(predict, target, mode="average_class"):
                 w.writerow([k, acc_classes_map[k]])
         return  [np.mean(np.equal(predict, target)), np.mean(np.array(acc_classes))]
 
-def get_modelpath():
-    if FLAGS.use_embedding and FLAGS.train:
-        return FLAGS.save_seq_embeddingmvmodel_path
-    elif FLAGS.use_embedding and not FLAGS.train:
-        return FLAGS.seq_embeddingmvmodel_path
-    elif not FLAGS.use_embedding and FLAGS.train:
-        return FLAGS.save_seq_basicmvmodel_path
-    else:
-        return FLAGS.seq_basicmvmodel_path
-
-def write_testing_results(predictions, labels):
-    import sys
-    sys.path.insert(0, '/home/krabec/models/vysledky')
-    from MakeCategories import make_categories
-    make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/seq2seq.txt', predictions, labels, 'SEQ2SEQ')
+def get_modelpath(epoch):
+    return os.path.join(FLAGS.log_dir, "model.ckpt-{}".format(epoch))
 
 if __name__ == '__main__':
-    print(argv)
+
     import argparse
     parser = argparse.ArgumentParser()
+    
     parser.add_argument("--train", default=None, type=bool, help="train or test")
     parser.add_argument('--weights')
     
@@ -234,10 +254,19 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_path')
     parser.add_argument('--test_acc_file')
     
+    parser.add_argument('--data', default='/data/converted', type=str)
+    parser.add_argument('--log_dir',default='logs', type=str)
     args = parser.parse_args()
-    FLAGS.data_path = '/home/krabec/models/SEQ2SEQ/data/'
+    
+    LOSS_LOGGER = Logger("seq2seq_loss")
+    ACC_LOGGER = Logger("seq2seq_acc")
+
+    FLAGS.log_dir = args.log_dir
+    FLAGS.data = args.data
     FLAGS.weights = args.weights
     FLAGS.train = args.train
     
     tf.app.run(main,argv)
     
+
+
