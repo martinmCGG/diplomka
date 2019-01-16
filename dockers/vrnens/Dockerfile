@@ -13,12 +13,16 @@ RUN apt-get update && apt-get install -y \
   python-pip \
   python-nose
   
- RUN pip install numpy
- RUN pip install scipy
-
-
+  
 # Remove OS-installed six
 RUN rm /usr/lib/python2.7/dist-packages/six*
+RUN pip install --upgrade pip
+RUN pip install numpy
+RUN pip install scipy
+RUN pip install matplotlib
+RUN pip install pandas
+
+
 
 # Set CUDA_ROOT
 ENV CUDA_ROOT /usr/local/cuda/bin
@@ -64,4 +68,7 @@ RUN git clone https://github.com/dimatura/voxnet.git
 WORKDIR vrnens
 COPY *.py Discriminative/
 RUN mv Discriminative/layers.py /voxnet/voxnet
+
+WORKDIR /vrnens/Discriminative
+RUN mkdir logs
 ENTRYPOINT /bin/bash 

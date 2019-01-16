@@ -27,7 +27,7 @@ from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 
 lr_schedule = { 0: 0.002,12:0.0002}
 
-cfg = {'batch_size' : 1,
+cfg = {'batch_size' : 24,
        'learning_rate' : lr_schedule,
        'decay_rate' : 0,
        'reg' : 0.001,
@@ -35,12 +35,12 @@ cfg = {'batch_size' : 1,
        'dims' : (32, 32, 32),
        'n_channels' : 1,
        'n_classes' : 40,
-       'batches_per_chunk': 1,
-       'max_epochs' : 250,
+       'batches_per_chunk': 20,
+       'max_epochs' : 5,
        'max_jitter_ij' : 2,
        'max_jitter_k' : 2,
-       'n_rotations' : 12,
-       'checkpoint_every_nth' : 2,
+       'n_rotations' : 24,
+       'checkpoint_every_nth' : 1,
        }
        
 # Convenience function for creating inception blocks.  

@@ -21,13 +21,13 @@ import lasagne
 import sys
 sys.path.insert(0, '/vrnens')
 from utils import checkpoints,metrics_logging
-
+from Evaluation
 from collections import OrderedDict
 
 # Define the training functions
-def make_training_functions(cfg,model):
+def make_training_functions(cfg, model, args):
     
-    
+    test_function_file = os.path.join(args.log_dir,"test_function")    
     # Inputs
     X = T.TensorType('float32', [False]*5)('X')    
 
@@ -52,7 +52,7 @@ def make_training_functions(cfg,model):
     
     # Error rate
     classifier_test_error_rate = T.cast( T.mean( T.neq(pred, T.mean(y,dtype='int32'))), 'float32' )
-
+    classifier_loss = T.cast(T.mean(T.nnet.categorical_crossentropy(T.nnet.softmax(y_hat), y)), 'float32')
     # Shared Variables
     X_shared = lasagne.utils.shared_empty(5, dtype='float32')
 
@@ -60,10 +60,10 @@ def make_training_functions(cfg,model):
 
     # Test function
         
-    test_error_fn = theano.function([batch_index], [classifier_test_error_rate,pred,raw_pred,y], givens={
-            X: X_shared[test_batch_slice],
-            y:  T.cast( y_shared[test_batch_slice], 'int32')      
-        })    
+    test_error_fn = theano.function([batch_index], [classifier_loss, classifier_test_error_rate ,pred, raw_pred, y], givens={
+            X: X_shared[batch_slice],
+            y:  T.cast( y_shared[batch_slice], 'int32')      
+        }) 
     tfuncs = {
              'test_function':test_error_fn,
             }
@@ -88,7 +88,7 @@ def test(config_file):
 
     model = config_module.get_model()
     print('Compiling theano functions...')
-    tfuncs, tvars, model = make_training_functions(cfg,model)
+    tfuncs, tvars, model = make_training_functions(cfg, model, args)
     metadata = checkpoints.load_weights(weights_fname, model['l_out'])
     best_acc = metadata['best_acc'] if 'best_acc' in metadata else 0
     print('best acc = '+str(best_acc))
@@ -124,8 +124,6 @@ def test(config_file):
         tvars['y_shared'].set_value(y_shared, borrow=True)
         lvs, accs = [],[]      
         for bi in xrange(num_batches):
-            test_itr+=1
-            print(test_itr)
             [batch_test_class_error, confusion, raw_pred, y] = tfuncs['test_function'](bi) # Get the test       
             test_class_error.append(batch_test_class_error)
             pred_array.append(np.array(raw_pred))
@@ -154,22 +152,23 @@ def evaluate_ensemble(all_preds, labels):
 ### TODO: Clean this up and add the necessary arguments to enable all of the options we want.
 if __name__=='__main__':
     
-    all_predictions = []
 
     parser = argparse.ArgumentParser()
     parser.add_argument('model', type=Path, help='path to file containing model definition')
+    parser.add_argument('--data', default="/data/converted", help='path to data folder')
+    parser.add_argument('--log_dir', default="logs", help='path to data folder')
+    parser.add_argument('--weights', type=int, help='number of model to test')
     args = parser.parse_args()
     file = args.model
-    if file.split('.')[-1] == 'py':
-        preds, labels = test(file)
-        all_predictions.append(preds)
-    np.save('preds.npy', np.array(all_predictions))
-    np.save('labels.npy', np.array(labels))
     
-    #evaluate_ensemble(all_predictions, labels, args.models)
-    predictions = evaluate_ensemble(np.load('preds.npy'), np.load('labels.npy'))
+    predictions, labels = test(model,weights)
+
+    #np.save('preds.npy', np.array(all_predictions))
+    #np.save('labels.npy', np.array(labels))
+    #evaluate_ensemble(all_predictions, labels)
+    #predictions = evaluate_ensemble(np.load('preds.npy'), np.load('labels.npy'))
     
-    '''import sys
-    sys.path.insert(0, '/models/vysledky')
-    from MakeCategories import make_categories
-    make_categories('/models/MVCNN/modelnet40v1', '/models/vysledky/vrnens.txt', predictions, labels, 'VRNENS')'''
+    import Evaluation_tools as et
+    eval_file = os.path.join(args.log_dir, 'vrnens.txt')
+    et.write_eval_file(FLAGS.data, eval_file, predictions, labels, 'VRNENS')
+    et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
