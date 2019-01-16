@@ -146,7 +146,8 @@ def main():
     
     args = parser.parse_args()
 
-    make_table(args.o, datset_dir = args.dataset, folder = args.folder)
+    make_table(args.o, dataset_dir = args.dataset, folder = args.folder)
+    
     
 if __name__ == '__main__':
     main()

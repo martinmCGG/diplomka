@@ -88,59 +88,71 @@ class SequenceRNNModel(object):
         else:
             return rnn.GRUCell(hidden_size)
 
-    def build_model(self):
+    def build_model(self, scope):
         # encoder
-        self.encoder_inputs = tf.placeholder(tf.float32, [None, self.encoder_n_steps, self.encoder_n_input], name="encoder")
-        self.encoder_outputs, self.encoder_hidden_state = self.encoder_RNN(self.encoder_inputs)
-        # decoder
-        self.decoder_inputs = [tf.placeholder(tf.int32, shape=[None], name="decoder{0}".format(i)) for i in range(self.decoder_n_steps + 1)]
-        self.target_weights = [tf.placeholder(tf.float32, shape=[None], name="weight{0}".format(i)) for i in range(self.decoder_n_steps)]
-        self.targets = [self.decoder_inputs[i+1] for i in range(self.decoder_n_steps)]
-        decoder_cell = self.single_cell(self.decoder_n_hidden)
-        decoder_proj_w = tf.get_variable("proj_w", [self.decoder_n_hidden, self.decoder_symbols_size])
-        decoder_proj_b = tf.get_variable("proj_b", [self.decoder_symbols_size])
-        self.decoder_output_projection = (decoder_proj_w, decoder_proj_b)
-        if self.decoder_output_projection is None:
-            decoder_cell = rnn.core_rnn_cell.OutputProjectionWrapper(decoder_cell, self.decoder_symbols_size)
-        if not self.use_embedding:
-            constant_embedding = np.ones([self.decoder_symbols_size, 1], dtype=np.float32)
-            for i in range(self.decoder_symbols_size):
-                constant_embedding[i] = np.array([i], dtype=np.float32)
-            self.fake_embedding =tf.constant(constant_embedding)
-        self.attns_weights = None
-        if self.use_attention:
-            # attention
-            top_states = [tf.reshape(e, [-1, 1, self.decoder_n_hidden]) for e in self.encoder_outputs]
-            self.attention_states = tf.concat(top_states, 1)
-        if not self.use_embedding and not self.use_attention:
-            self.outputs, self.decoder_hidden_state = self.noembedding_rnn_decoder(self.decoder_inputs[:self.decoder_n_steps], self.encoder_hidden_state, decoder_cell)
-        elif not self.use_embedding and self.use_attention:
-            self.outputs, self.decoder_hidden_state, self.attns_weights = self.noembedding_attention_rnn_decoder(
-                self.decoder_inputs[:self.decoder_n_steps], self.encoder_hidden_state, self.attention_states, decoder_cell, num_heads=self.num_heads)
-        elif self.use_embedding and not self.use_attention:
-            self.outputs, self.decoder_hidden_state = embedding_rnn_decoder(self.decoder_inputs[:self.decoder_n_steps], self.encoder_hidden_state,
-                decoder_cell, self.decoder_symbols_size, self.decoder_embedding_size, output_projection=self.decoder_output_projection, feed_previous=self.feed_previous)
-        else:
-            self.encoder_hidden_bn = self.encoder_hidden_state# tf.contrib.layers.batch_norm(self.encoder_hidden_state, center=True, scale=True, is_training=self.is_training)
-            self.outputs, self.decoder_hidden_state, self.attns_weights = self.self_embedding_attention_decoder(self.decoder_inputs[:self.decoder_n_steps],
-                self.encoder_hidden_bn, self.attention_states, decoder_cell, self.decoder_symbols_size, self.decoder_embedding_size,
-                output_projection=self.decoder_output_projection, feed_previous=self.feed_previous, num_heads=self.num_heads, init_embedding=self.init_decoder_embedding)
-        # do wx+b for output, to generate decoder_symbols_size length
-        for i in range(self.decoder_n_steps-1): #ignore last output, we only care 40 classes
-            self.outputs[i] = tf.matmul(self.outputs[i], self.decoder_output_projection[0]) + self.decoder_output_projection[1]
-        
-        self.logits = tf.nn.softmax(self.outputs[:-1], dim=-1, name="output_softmax")
-        if self.feed_previous:
-            # do softmax
+        with tf.variable_scope(scope):
+            self.encoder_inputs = tf.placeholder(tf.float32, [None, self.encoder_n_steps, self.encoder_n_input], name="encoder")
+            self.encoder_outputs, self.encoder_hidden_state = self.encoder_RNN(self.encoder_inputs)
+            # decoder
+            self.decoder_inputs = [tf.placeholder(tf.int32, shape=[None], name="decoder{0}".format(i)) for i in range(self.decoder_n_steps + 1)]
+            self.target_weights = [tf.placeholder(tf.float32, shape=[None], name="weight{0}".format(i)) for i in range(self.decoder_n_steps)]
+            self.targets = [self.decoder_inputs[i+1] for i in range(self.decoder_n_steps)]
+            decoder_cell = self.single_cell(self.decoder_n_hidden)
+            decoder_proj_w = tf.get_variable("proj_w", [self.decoder_n_hidden, self.decoder_symbols_size])
+            decoder_proj_b = tf.get_variable("proj_b", [self.decoder_symbols_size])
+            self.decoder_output_projection = (decoder_proj_w, decoder_proj_b)
+            if self.decoder_output_projection is None:
+                decoder_cell = rnn.core_rnn_cell.OutputProjectionWrapper(decoder_cell, self.decoder_symbols_size)
+            if not self.use_embedding:
+                constant_embedding = np.ones([self.decoder_symbols_size, 1], dtype=np.float32)
+                for i in range(self.decoder_symbols_size):
+                    constant_embedding[i] = np.array([i], dtype=np.float32)
+                self.fake_embedding =tf.constant(constant_embedding)
+            self.attns_weights = None
+            if self.use_attention:
+                # attention
+                top_states = [tf.reshape(e, [-1, 1, self.decoder_n_hidden]) for e in self.encoder_outputs]
+                self.attention_states = tf.concat(top_states, 1)
+            if not self.use_embedding and not self.use_attention:
+                self.outputs, self.decoder_hidden_state = self.noembedding_rnn_decoder(self.decoder_inputs[:self.decoder_n_steps], self.encoder_hidden_state, decoder_cell)
+            elif not self.use_embedding and self.use_attention:
+                self.outputs, self.decoder_hidden_state, self.attns_weights = self.noembedding_attention_rnn_decoder(
+                    self.decoder_inputs[:self.decoder_n_steps], self.encoder_hidden_state, self.attention_states, decoder_cell, num_heads=self.num_heads)
+            elif self.use_embedding and not self.use_attention:
+                self.outputs, self.decoder_hidden_state = embedding_rnn_decoder(self.decoder_inputs[:self.decoder_n_steps], self.encoder_hidden_state,
+                    decoder_cell, self.decoder_symbols_size, self.decoder_embedding_size, output_projection=self.decoder_output_projection, feed_previous=self.feed_previous)
+            else:
+                self.encoder_hidden_bn = self.encoder_hidden_state# tf.contrib.layers.batch_norm(self.encoder_hidden_state, center=True, scale=True, is_training=self.is_training)
+                self.outputs, self.decoder_hidden_state, self.attns_weights = self.self_embedding_attention_decoder(self.decoder_inputs[:self.decoder_n_steps],
+                    self.encoder_hidden_bn, self.attention_states, decoder_cell, self.decoder_symbols_size, self.decoder_embedding_size,
+                    output_projection=self.decoder_output_projection, feed_previous=self.feed_previous, num_heads=self.num_heads, init_embedding=self.init_decoder_embedding)
+            # do wx+b for output, to generate decoder_symbols_size length
+            for i in range(self.decoder_n_steps-1): #ignore last output, we only care 40 classes
+                self.outputs[i] = tf.matmul(self.outputs[i], self.decoder_output_projection[0]) + self.decoder_output_projection[1]
             
-            if self.attns_weights is not None:
-                self.attns_weights = self.attns_weights[:-1]
-        self.cost = sequence_loss(self.outputs, self.targets, self.target_weights)
-        # cost function
-        if self.is_training:
-            #self.optimizer = tf.train.MomentumOptimizer(learning_rate=self.learning_rate, momentum=0.9).minimize(self.cost)
-            self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
-            #self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
+            self.logits = tf.nn.softmax(self.outputs[:-1], dim=-1, name="output_softmax")
+            if self.feed_previous:
+                # do softmax
+                if self.attns_weights is not None:
+                    self.attns_weights = self.attns_weights[:-1]
+            self.cost = sequence_loss(self.outputs, self.targets, self.target_weights)
+            # cost function
+            if self.is_training:
+                #self.optimizer = tf.train.MomentumOptimizer(learning_rate=self.learning_rate, momentum=0.9).minimize(self.cost)
+                self.optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
+                #self.optimizer = tf.train.GradientDescentOptimizer(learning_rate=self.learning_rate).minimize(self.cost)
+            self.variables = tf.trainable_variables(scope=scope)
+        
+    
+    def assign_weights(self, session, weights, scope):
+        variables = tf.trainable_variables(scope=scope)
+        copy_ops = [variables[i].assign(weights[i]) for i in range(len(weights))]
+        session.run(copy_ops)
+    
+    def get_weights(self, session):
+        return session.run(self.variables)
+    
+    
     def _extract_argmax(self, embedding, output_projection=None):
         def loop_function(prev, _):
             if output_projection is not None:
