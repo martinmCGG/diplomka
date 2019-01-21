@@ -61,19 +61,32 @@ class Logger:
             dataframe = dataframe[['time', name, 'epochs']]
             dataframe.to_csv(os.path.join(dest,"{}_{}.csv".format(self.name, name)))
             
-    def load(self, file_list, epoch=None):
+    def load(self, file_list, epoch=None, name = None):
         self.data = {}
         for file in file_list:
             data = pandas.read_csv(file)
             
             if epoch:
                 data = data[data['epochs']<=epoch]
-
-            name = list(data)[2]
+            if name:
+                pass
+            else:
+                name = list(data)[2]
             self.data[name] = Logger_Entry(times=list(data['time']), data=list(data[name]), epochs=list(data['epochs']))
             self.data[name].begin_time = data['time'].min()
             self.data[name].offset = time.time() - data['time'].max()
                 
+
+def load_and_plot(directory, regex, name="Plot"):
+    logger = Logger(name)
+    import re 
+    models = os.listdir(directory)
+    for model in models:
+        model_directory = os.path.join(directory, model, "out")
+        csv_files = os.listdir(model_directory)
+        csv_files = [x for x in csv_files if re.match(regex, x)]
+        logger.load(csv_files)
+    logger.plot(directory)
     
     
         

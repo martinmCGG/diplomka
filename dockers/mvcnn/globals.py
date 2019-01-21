@@ -17,20 +17,15 @@ BATCH_SIZE = 64
 # this must be more than twice the BATCH_SIZE
 INPUT_QUEUE_SIZE = 4 * BATCH_SIZE
 
-TRAIN_FOR = 20
+TRAIN_FOR = 60
 """
 constants for training the model
 """
 INIT_LEARNING_RATE = 0.0001
 
-# sample how many shapes for validation
-# this affects the validation time
-VAL_SAMPLE_SIZE = 2000
 
-# do a validation every VAL_PERIOD iterations
-VAL_PERIOD = 1000
 
 # save the progress to checkpoint file every SAVE_PERIOD iterations
 # this takes tens of seconds. Don't set it smaller than 100.
-SAVE_PERIOD = 1
+SAVE_PERIOD = 10
 

@@ -30,7 +30,7 @@ parser.add_argument('--num_gpus', type=int, default=4, help='How many gpus to us
 parser.add_argument('--model', default='pointnet2_cls_ssg', help='Model name [default: pointnet2_cls_ssg]')
 parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
 parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
-parser.add_argument('--max_epoch', type=int, default=500, help='Epoch to run [default: 251]')
+parser.add_argument('--max_epoch', type=int, default=80, help='Epoch to run [default: 251]')
 parser.add_argument('--batch_size', type=int, default=64, help='Batch Size during training [default: 32]')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial learning rate [default: 0.001]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
@@ -38,7 +38,7 @@ parser.add_argument('--optimizer', default='adam', help='adam or momentum [defau
 parser.add_argument('--decay_step', type=int, default=200000, help='Decay step for lr decay [default: 200000]')
 parser.add_argument('--decay_rate', type=float, default=0.7, help='Decay rate for lr decay [default: 0.7]')
 parser.add_argument('--normal', action='store_true', help='Whether to use normal information')
-parser.add_argument('--weights', help='Path to pretrained model weights')
+parser.add_argument('--weights', type=int, help='Number of model to finetune')
 
 parser.add_argument('--data', default=os.path.join(BASE_DIR, 'data/modelnet40_ply_hdf5_2048'), help='Path to dataset textfiles')
 FLAGS = parser.parse_args()
@@ -235,14 +235,20 @@ def train():
         merged = tf.summary.merge_all()
         train_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'train'), sess.graph)
         test_writer = tf.summary.FileWriter(os.path.join(LOG_DIR, 'test'), sess.graph)
-
-        # Init variables
-        start_epoch = 0
-        init = tf.global_variables_initializer()
-        if WEIGHTS and WEIGHTS[-1] != '-':
-            saver.restore(sess, WEIGHTS)
-            start_epoch = int(WEIGHTS.split('-')[-1])
+        
+        init = tf.global_variables_initializer()        
         sess.run(init)
+        start_epoch = 0
+        
+        # Init variables
+        if WEIGHTS:
+            w = os.path.join(LOG_DIR, "model.ckpt-{}".format(WEIGHTS))
+            saver.restore(sess, w)
+            start_epoch = WEIGHTS + 1
+
+            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet2_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"pnet2_acc_eval_accuracy.csv")), epoch=WEIGHTS)
+            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet2_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'pnet2_loss_eval_loss.csv')), epoch=WEIGHTS)
+        
 
         ops = {'pointclouds_pl': pointclouds_pl,
                'labels_pl': labels_pl,
@@ -257,23 +263,26 @@ def train():
         
         
         best_acc = -1
-        for epoch in range(start_epoch, MAX_EPOCH+start_epoch):
+        for epoch in range(start_epoch, MAX_EPOCH+start_epoch+1):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
              
-            train_one_epoch(sess, ops, train_writer)
-            eval_one_epoch(sess, ops, test_writer)
-
+            train_one_epoch(sess, ops, train_writer, epoch)
+            eval_one_epoch(sess, ops, test_writer, epoch)
+            
+            ACC_LOGGER.save(LOG_DIR)
+            LOSS_LOGGER.save(LOG_DIR)
+            ACC_LOGGER.plot(dest=LOG_DIR)
+            LOSS_LOGGER.plot(dest=LOG_DIR)
             # Save the variables to disk.
             if epoch % 10 == 0:
                 save_path = saver.save(sess, os.path.join(LOG_DIR, "model.ckpt-{}".format(epoch)))
                 log_string("Model saved in file: %s" % save_path)
 
 
-def train_one_epoch(sess, ops, train_writer):
+def train_one_epoch(sess, ops, train_writer, epoch):
     """ ops: dict mapping from string to tf ops """
     is_training = True
-    
     log_string(str(datetime.now()))
 
     # Make sure batch data is of same size
@@ -305,9 +314,9 @@ def train_one_epoch(sess, ops, train_writer):
         if (batch_idx+1)%10 == 0:
             log_string(' ---- batch: %03d ----' % (batch_idx+1))
             log_string('mean loss: %f' % (loss_sum / 10))
-            LOSS_LOGGER.log((loss_sum / 10), "train_loss")
+            LOSS_LOGGER.log((loss_sum / 10), epoch, "train_loss")
             log_string('accuracy: %f' % (total_correct / float(total_seen)))
-            ACC_LOGGER.log((total_correct / float(total_seen)), "train_accuracy")
+            ACC_LOGGER.log((total_correct / float(total_seen)), epoch, "train_accuracy")
             total_correct = 0
             total_seen = 0
             loss_sum = 0
@@ -315,9 +324,8 @@ def train_one_epoch(sess, ops, train_writer):
 
     TRAIN_DATASET.reset()
         
-def eval_one_epoch(sess, ops, test_writer):
+def eval_one_epoch(sess, ops, test_writer, epoch):
     """ ops: dict mapping from string to tf ops """
-    global EPOCH_CNT
     is_training = False
 
     # Make sure batch data is of same size
@@ -333,7 +341,7 @@ def eval_one_epoch(sess, ops, test_writer):
     total_correct_class = [0 for _ in range(NUM_CLASSES)]
     
     log_string(str(datetime.now()))
-    log_string('---- EPOCH %03d EVALUATION ----'%(EPOCH_CNT))
+    log_string('---- EPOCH %03d EVALUATION ----'%(epoch))
     
     while TEST_DATASET.has_next_batch():
         batch_data, batch_label = TEST_DATASET.next_batch(augment=False)
@@ -360,11 +368,10 @@ def eval_one_epoch(sess, ops, test_writer):
             total_correct_class[l] += (pred_val[i] == l)
     
     log_string('eval mean loss: %f' % (loss_sum / float(batch_idx)))
-    LOSS_LOGGER.log((loss_sum / float(batch_idx)), "eval_loss")
+    LOSS_LOGGER.log((loss_sum / float(batch_idx)),epoch, "eval_loss")
     log_string('eval accuracy: %f'% (total_correct / float(total_seen)))
-    ACC_LOGGER.log((total_correct / float(total_seen)), "eval_accuracy")
+    ACC_LOGGER.log((total_correct / float(total_seen)), epoch, "eval_accuracy")
     log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
-    EPOCH_CNT += 1
 
     TEST_DATASET.reset()
     return total_correct/float(total_seen)
@@ -375,7 +382,3 @@ if __name__ == "__main__":
     ACC_LOGGER = Logger("pnet2_acc")
     train()
     LOG_FOUT.close()
-    ACC_LOGGER.save(LOG_DIR)
-    LOSS_LOGGER.save(LOG_DIR)
-    ACC_LOGGER.plot(dest=LOG_DIR)
-    LOSS_LOGGER.plot(dest=LOG_DIR)

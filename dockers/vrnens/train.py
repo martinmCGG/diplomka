@@ -184,20 +184,17 @@ def main(args):
     # Compile functions
     print('Compiling theano functions...')
     tfuncs, tvars, model = make_training_functions(cfg, model, args)
-    
-    if args.just_compile:
-        sys.exit(0)
    
     weights = args.weights
     if not bool(weights):
         startepoch = 0
     else:
         startepoch = weights + 1
-        ckptfile = os.path.join(args.train_dir, 'model.ckpt-'+str(weights))
-        ACC_LOGGER.load((os.path.join(args.log_dir,"vrnens_acc_train_accuracy.csv"),os.path.join(args.log_dir,"vrnens_acc_eval_accuracy.csv")))
-        LOSS_LOGGER.load((os.path.join(args.log_dir,"vrnens_loss_train_loss.csv"), os.path.join(args.log_dir,'vrnens_loss_eval_loss.csv')))
+        ckptfile = os.path.join(args.log_dir, 'model.ckpt-'+str(weights)+'.npz')
+        #ACC_LOGGER.load((os.path.join(args.log_dir,"vrnens_acc_train_accuracy.csv"),os.path.join(args.log_dir,"vrnens_acc_eval_accuracy.csv")))
+        #LOSS_LOGGER.load((os.path.join(args.log_dir,"vrnens_loss_train_loss.csv"), os.path.join(args.log_dir,'vrnens_loss_eval_loss.csv')))
         print('loading weights')
-        metadata = checkpoints.load_weights(ckptfilele, model['l_out'])
+        metadata = checkpoints.load_weights(ckptfile, model['l_out'])
    
     # Get weights and metrics filename
     #weights_fname =str(args.config_path)[:-3]+'.npz'
@@ -238,7 +235,7 @@ def main(args):
     print(num_chunks, chunk_size, num_chunks*chunk_size)
     # Get current learning rate
     new_lr = np.float32(tvars['learning_rate'].get_value())
-    
+    test(x_test, y_test, cfg, tfuncs, tvars, args, 0)
     # Loop across training epochs!
     for epoch in xrange(startepoch,cfg['max_epochs']+startepoch):
         
@@ -293,8 +290,8 @@ def main(args):
                 itr += 1
                 if itr % 10 == 0:
                     [closs,c_acc] = [float(np.mean(lvs)),1.0-float(np.mean(accs))]
-                    ACC_LOGGER.log(c_acc,"train_accuracy")
-                    LOSS_LOGGER.log(closs,"train_loss")  
+                    ACC_LOGGER.log(c_acc,epoch,"train_accuracy")
+                    LOSS_LOGGER.log(closs,epoch,"train_loss")  
                     lvs, accs = [],[] 
                     print('epoch: {0:^3d}, itr: {1:d}, c_loss: {2:.6f}, class_acc: {3:.5f}'.format(epoch, itr, closs, c_acc))
 
@@ -308,18 +305,20 @@ def main(args):
             checkpoints.save_weights(weights_fname, model['l_out'],
                                                 {'itr': itr, 'ts': time.time(),
                                                 'learning_rate': new_lr}) 
-        test(x_test, y_test, cfg, tfuncs, tvars)
-
+        test(x_test, y_test, cfg, tfuncs, tvars, args, epoch)
+        ACC_LOGGER.save(args.log_dir)
+        LOSS_LOGGER.save(args.log_dir)
+        ACC_LOGGER.plot(dest=args.log_dir)
+        LOSS_LOGGER.plot(dest=args.log_dirr)   
     print('training done')
 
 
-def test(x_test, y_test, cfg, tfuncs, tvars):
+def test(x_test, y_test, cfg, tfuncs, tvars, args, epoch):
     print("testing")
     n_rotations = cfg['n_rotations']
     chunk_size = cfg['batch_size']*cfg['batches_per_chunk']
     num_chunks = int(math.ceil(len(y_test)/float(chunk_size)))
-    print(len(x_test))
-    print(chunk_size, test_chunks)
+
     losses = []
     accs = []
     for chunk_index in xrange(num_chunks):
@@ -338,10 +337,12 @@ def test(x_test, y_test, cfg, tfuncs, tvars):
             accs.append(batch_test_class_error)
             
     loss, acc = [float(np.mean(losses)),1.0-float(np.mean(accs))]    
-    #print('EVAL: c_loss: {2:.6f}, class_acc: {3:.5f}'.format(loss, acc))
+
     print(loss, acc )
-    LOSS_LOGGER.log(loss, "eval_loss")
-    ACC_LOGGER.log(acc, "eval_accuracy")    
+    LOSS_LOGGER.log(loss, epoch, "eval_loss")
+    ACC_LOGGER.log(acc, epoch, "eval_accuracy")
+    
+ 
            
 
 ### TODO: Clean this up and add the necessary arguments to enable all of the options we want.
@@ -351,12 +352,8 @@ if __name__=='__main__':
     parser.add_argument('data_path',type =str, default = '/data/converted')
     parser.add_argument('--weights',type=int, help='number of model to finetune')
     parser.add_argument('--log_dir', default="logs", help='path to data folder')
-    parser.add_argument('--just_compile', action='store_true')
     args = parser.parse_args()
     LOSS_LOGGER = Logger("vrnens_loss")
     ACC_LOGGER = Logger("vrnens_acc")
     main(args)
-    ACC_LOGGER.save(args.log_dir)
-    LOSS_LOGGER.save(args.log_dir)
-    ACC_LOGGER.plot(dest=args.log_dir)
-    LOSS_LOGGER.plot(dest=args.log_dirr)
+

@@ -56,7 +56,7 @@ def test(dataset):
 
         init_op = tf.global_variables_initializer()
         sess = tf.Session(config=tf.ConfigProto(log_device_placement=FLAGS.log_device_placement))
-        ckptfile = os.path.join(FLAGS.train_dir, 'model.ckpt-'+str(weights))
+        ckptfile = os.path.join(FLAGS.train_dir, 'model.ckpt-'+str(weights)+'npz')
         saver.restore(sess, ckptfile)
         print 'restore variables done'
 

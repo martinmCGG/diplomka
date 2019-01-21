@@ -20,7 +20,7 @@ parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU
 parser.add_argument('--model', default='pointnet_cls', help='Model name: pointnet_cls or pointnet_cls_basic [default: pointnet_cls]')
 parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
 parser.add_argument('--num_point', type=int, default=2048, help='Point Number [256/512/1024/2048] [default: 1024]')
-parser.add_argument('--max_epoch', type=int, default=100, help='Epoch to run [default: 250]')
+parser.add_argument('--max_epoch', type=int, default=50, help='Epoch to run [default: 250]')
 parser.add_argument('--batch_size', type=int, default=64, help='Batch Size during training [default: 32]')
 parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial learning rate [default: 0.001]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
@@ -156,11 +156,10 @@ def train():
             w = os.path.join(LOG_DIR, "model.ckpt-{}".format(WEIGHTS))
             saver.restore(sess, w)
             start_epoch = WEIGHTS + 1
-            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"pnet_acc_eval_accuracy.csv")))
-            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'pnet_loss_eval_loss.csv')))
+            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet_acc_train_accuracy.csv"), os.path.join(FLAGS.log_dir,"pnet_acc_eval_accuracy.csv")), epoch=WEIGHTS)
+            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'pnet_loss_eval_loss.csv')), epoch=WEIGHTS)
             
 
-        
 
         ops = {'pointclouds_pl': pointclouds_pl,
                'labels_pl': labels_pl,
@@ -171,12 +170,22 @@ def train():
                'merged': merged,
                'step': batch}
         
-        for epoch in range(start_epoch, MAX_EPOCH+start_epoch+1):
+        ACC_LOGGER.save(LOG_DIR)
+        LOSS_LOGGER.save(LOG_DIR)
+        ACC_LOGGER.plot(dest=LOG_DIR)
+        LOSS_LOGGER.plot(dest=LOG_DIR)
+        
+        for epoch in range(start_epoch, MAX_EPOCH+start_epoch):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
              
-            train_one_epoch(sess, ops, train_writer)
-            eval_one_epoch(sess, ops, test_writer)
+            train_one_epoch(sess, ops, train_writer, epoch)
+            eval_one_epoch(sess, ops, test_writer, epoch)
+            
+            ACC_LOGGER.save(LOG_DIR)
+            LOSS_LOGGER.save(LOG_DIR)
+            ACC_LOGGER.plot(dest=LOG_DIR)
+            LOSS_LOGGER.plot(dest=LOG_DIR)
             
             # Save the variables to disk.
             if epoch % 10 == 0:
@@ -185,7 +194,7 @@ def train():
 
 
 
-def train_one_epoch(sess, ops, train_writer):
+def train_one_epoch(sess, ops, train_writer, epoch):
     """ ops: dict mapping from string to tf ops """
     is_training = True
     
@@ -230,11 +239,11 @@ def train_one_epoch(sess, ops, train_writer):
         acc = total_correct / float(total_seen)
         loss = loss_sum / float(num_batches)
         log_string('mean loss: %f' % loss)
-        LOSS_LOGGER.log(loss, "train_loss")
+        LOSS_LOGGER.log(loss, epoch, "train_loss")
         log_string('accuracy: %f' % acc)
-        ACC_LOGGER.log(acc, "train_accuracy")
+        ACC_LOGGER.log(acc, epoch, "train_accuracy")
         
-def eval_one_epoch(sess, ops, test_writer):
+def eval_one_epoch(sess, ops, test_writer, epoch):
     """ ops: dict mapping from string to tf ops """
     is_training = False
     total_correct = 0
@@ -274,10 +283,10 @@ def eval_one_epoch(sess, ops, test_writer):
     
     loss = loss_sum / float(len(TEST_FILES))       
     log_string('eval mean loss: %f' % loss)
-    LOSS_LOGGER.log(loss, "eval_loss")
+    LOSS_LOGGER.log(loss, epoch, "eval_loss")
     acc = total_correct / float(total_seen)
     log_string('eval accuracy: %f' % acc)
-    ACC_LOGGER.log(acc, "eval_accuracy")
+    ACC_LOGGER.log(acc, epoch, "eval_accuracy")
     log_string('eval avg class acc: %f' % (np.mean(np.array(total_correct_class)/np.array(total_seen_class,dtype=np.float))))
          
 
@@ -286,7 +295,4 @@ if __name__ == "__main__":
     ACC_LOGGER = Logger("pnet_acc")
     train()
     LOG_FOUT.close()
-    ACC_LOGGER.save(LOG_DIR)
-    LOSS_LOGGER.save(LOG_DIR)
-    ACC_LOGGER.plot(dest=LOG_DIR)
-    LOSS_LOGGER.plot(dest=LOG_DIR)
+

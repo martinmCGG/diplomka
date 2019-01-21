@@ -3,8 +3,6 @@
 # This code evaluates a model's output on every example of the modelnet40 test set, using 24 rotations.
 # You may need to modify the binary range of this function to fit the model you're currently evaluating.
 
-
-
 import argparse
 import imp
 import time
@@ -21,7 +19,6 @@ import lasagne
 import sys
 sys.path.insert(0, '/vrnens')
 from utils import checkpoints,metrics_logging
-from Evaluation
 from collections import OrderedDict
 
 # Define the training functions
@@ -52,7 +49,7 @@ def make_training_functions(cfg, model, args):
     
     # Error rate
     classifier_test_error_rate = T.cast( T.mean( T.neq(pred, T.mean(y,dtype='int32'))), 'float32' )
-    classifier_loss = T.cast(T.mean(T.nnet.categorical_crossentropy(T.nnet.softmax(y_hat), y)), 'float32')
+    classifier_loss = T.cast(T.mean(T.nnet.categorical_crossentropy(T.nnet.softmax(y_hat_deterministic), y)), 'float32')
     # Shared Variables
     X_shared = lasagne.utils.shared_empty(5, dtype='float32')
 
@@ -76,15 +73,15 @@ def make_training_functions(cfg, model, args):
             }
     return tfuncs, tvars, model
 
-def test(config_file):
+def test(args):
     
-    # Load model
+    config_file =args.model
     lasagne.random.set_rng(np.random.RandomState(0))
     print(config_file)
     config_module = imp.load_source('config', config_file)
     cfg = config_module.cfg
    
-    weights_fname =str(config_file)[:-3]+'.npz'
+    weights_fname = os.path.join(args.log_dir, 'model.ckpt-'+str(args.weights)+'.npz')
 
     model = config_module.get_model()
     print('Compiling theano functions...')
@@ -96,14 +93,14 @@ def test(config_file):
     print('Testing...')
     
     # Get Test Data 
-    xt = np.asarray(np.load('../datasets/modelnet40_rot_test.npz')['features'],dtype=np.float32)
-    yt = np.asarray(np.load('../datasets/modelnet40_rot_test.npz')['targets'],dtype=np.float32)
+    x_t = np.load(os.path.join(args.data, 'test.npz'))['features']
+    y_t = np.load(os.path.join(args.data, 'test.npz'))['targets']
 
     n_rotations = 24  
     confusion_matrix = np.zeros((40,40),dtype=np.int)
-    num_test_batches = int(math.ceil(float(len(xt))/float(n_rotations)))
+    num_test_batches = int(math.ceil(float(len(x_t))/float(n_rotations)))
     test_chunk_size = n_rotations*cfg['batches_per_chunk']
-    num_test_chunks=int(math.ceil(float(len(xt))/test_chunk_size))
+    num_test_chunks=int(math.ceil(float(len(x_t))/test_chunk_size))
   
     test_class_error = []
     pred_array = []
@@ -115,19 +112,21 @@ def test(config_file):
     # Evaluate on test set
     for chunk_index in xrange(num_test_chunks):
     #for chunk_index in xrange(1):
-        upper_range = min(len(yt),(chunk_index+1)*test_chunk_size) # 
-        x_shared = np.asarray(xt[chunk_index*test_chunk_size:upper_range,:,:,:,:],dtype=np.float32)
-        y_shared = np.asarray(yt[chunk_index*test_chunk_size:upper_range],dtype=np.float32)
+        upper_range = min(len(y_t),(chunk_index+1)*test_chunk_size) # 
+        x_shared = np.asarray(x_t[chunk_index*test_chunk_size:upper_range,:,:,:,:],dtype=np.float32)
+        y_shared = np.asarray(y_t[chunk_index*test_chunk_size:upper_range],dtype=np.float32)
 
         num_batches = int(math.ceil(float(len(x_shared))/n_rotations))
-        tvars['X_shared'].set_value(6.0 * x_shared-1.0, borrow=True)
+        tvars['X_shared'].set_value(4.0 * x_shared-1.0, borrow=True)
         tvars['y_shared'].set_value(y_shared, borrow=True)
         lvs, accs = [],[]      
         for bi in xrange(num_batches):
-            [batch_test_class_error, confusion, raw_pred, y] = tfuncs['test_function'](bi) # Get the test       
-            test_class_error.append(batch_test_class_error)
-            pred_array.append(np.array(raw_pred))
-            predictions.append(confusion)
+            [classifier_loss, test_error_rate ,pred, raw_pred, y] =  tfuncs['test_function'](bi)
+            #print(classifier_loss, test_error_rate ,pred, raw_pred, y)
+            #[batch_test_class_error, confusion, raw_pred, y] = tfuncs['test_function'](bi) # Get the test       
+            test_class_error.append(test_error_rate)
+            pred_array.append(np.array(pred))
+            predictions.append(pred)
             labels.append(y[0])
             # print(confusion)
             # confusion_matrix+=confusion
@@ -135,9 +134,10 @@ def test(config_file):
     
     # print(confusion_matrix)
     # Save outputs to csv files.
-    np.savetxt(str(config_file)[:-3]+'.csv', np.asarray(pred_array), delimiter=",")
-    t_class_error = 1-float(np.mean(test_class_error))
-    print('Test error is: ' + str(t_class_error))
+    #np.savetxt(str(config_file)[:-3]+'.csv', np.asarray(pred_array), delimiter=",")
+    #t_class_error = 1-float(np.mean(test_class_error))
+    print('Test acc is: ' + str(1 - np.mean(test_class_error)))
+
     return pred_array, labels
 
 
@@ -154,14 +154,14 @@ if __name__=='__main__':
     
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('model', type=Path, help='path to file containing model definition')
-    parser.add_argument('--data', default="/data/converted", help='path to data folder')
+    parser.add_argument('model', help='path to file containing model definition')
+    parser.add_argument('data', default="/data/converted", help='path to data folder')
     parser.add_argument('--log_dir', default="logs", help='path to data folder')
     parser.add_argument('--weights', type=int, help='number of model to test')
     args = parser.parse_args()
     file = args.model
     
-    predictions, labels = test(model,weights)
+    predictions, labels = test(args)
 
     #np.save('preds.npy', np.array(all_predictions))
     #np.save('labels.npy', np.array(labels))
@@ -170,5 +170,5 @@ if __name__=='__main__':
     
     import Evaluation_tools as et
     eval_file = os.path.join(args.log_dir, 'vrnens.txt')
-    et.write_eval_file(FLAGS.data, eval_file, predictions, labels, 'VRNENS')
-    et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
+    et.write_eval_file(args.data, eval_file, predictions, labels, 'VRNENS')
+    et.make_matrix(args.data, eval_file, args.log_dir)

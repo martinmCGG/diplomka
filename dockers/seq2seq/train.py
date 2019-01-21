@@ -94,14 +94,14 @@ def train(weights):
             w = os.path.join(args.log_dir, "model.ckpt-{}".format(weights))
             saver.restore(sess, w)
             startepoch = weights + 1
-            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"seq2seq_acc_eval_accuracy.csv")))
-            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'seq2seq_loss_eval_loss.csv')))
+            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"seq2seq_acc_eval_accuracy.csv")), epoch=weights)
+            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'seq2seq_loss_eval_loss.csv')), epoch=weights)
             
         epoch = startepoch
         
         accs = []
         losses = []
-        while epoch <= FLAGS.training_epoches + startepoch + 1:
+        while epoch <= FLAGS.training_epoches + startepoch:
             batch = 1
             
             while batch * FLAGS.batch_size <= data.train.size():
@@ -118,8 +118,8 @@ def train(weights):
                 if batch%10 == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accs)
-                    LOSS_LOGGER.log(loss, "train_loss")
-                    ACC_LOGGER.log(acc, "train_accuracy")
+                    LOSS_LOGGER.log(loss, epoch, "train_loss")
+                    ACC_LOGGER.log(acc, epoch, "train_accuracy")
                     print("epoch %d batch %d: loss=%f" %(epoch, batch, loss))
                     accs = []
                     losses = []
@@ -131,14 +131,13 @@ def train(weights):
             #     # do test using test dataset
             
             weights = seq_rnn_model.get_weights(sess)
-            eval_during_training(weights, seq_rnn_model_test)
+            eval_during_training(weights, seq_rnn_model_test, epoch)
             epoch += 1
     
-    
-    ACC_LOGGER.save(LOG_DIR)
-    LOSS_LOGGER.save(LOG_DIR)
-    ACC_LOGGER.plot(dest=LOG_DIR)
-    LOSS_LOGGER.plot(dest=LOG_DIR)
+            ACC_LOGGER.save(LOG_DIR)
+            LOSS_LOGGER.save(LOG_DIR)
+            ACC_LOGGER.plot(dest=LOG_DIR)
+            LOSS_LOGGER.plot(dest=LOG_DIR)
 
 
 def _test(data, seq_rnn_model, sess):
@@ -157,7 +156,7 @@ def _test(data, seq_rnn_model, sess):
     acc = accuracy(predict_labels, target_labels)
     return acc, loss, predict_labels, target_labels
 
-def eval_during_training(weights, model):
+def eval_during_training(weights, model, epoch):
     data = model_data.read_data(FLAGS.data, n_views=FLAGS.n_views, read_train=False)
     data = data.test
     config = tf.ConfigProto()
@@ -168,8 +167,8 @@ def eval_during_training(weights, model):
         model.assign_weights(sess, weights, "eval")
         acc,loss, _, _ = _test(data, model, sess)
     print("evaluation, acc=%f" %(acc[0]))
-    LOSS_LOGGER.log(loss, "eval_loss")
-    ACC_LOGGER.log(acc[0], "eval_accuracy")
+    LOSS_LOGGER.log(loss, epoch,"eval_loss")
+    ACC_LOGGER.log(acc[0],epoch, "eval_accuracy")
     
     
 def eval_alone(weights):

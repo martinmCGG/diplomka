@@ -4,14 +4,33 @@ Created on 4. 10. 2018
 @author: miros
 '''
 import os
-from MakeTable import write_all
-from MakeCategories import get_categories
-from MakeCategories import is_file
 
 
-def make_matrices(out,folder='.'):
-    os.chdir(folder)
-    categories = get_categories('/home/krabec/models/MVCNN/modelnet40v1')
+def get_categories(dataset_dir):
+    with open(os.path.join(dataset_dir, 'cat_names.txt'), 'r') as f:
+        cats = [x.strip() for x in f.readlines()]
+    return cats
+
+def write_all(file,strings):
+    for s in strings:
+        file.write(s + '\n')    
+
+def is_file(file,extension):
+    splited = file.split('.')
+    if len(splited) > 0:
+        if splited[-1] == extension:
+            return True
+    return False
+
+def write_eval_file(dataset_dir,outfile, preds, labels, name):
+    cats = get_categories(dataset_dir)
+    with open(outfile, 'w') as f:
+        f.write(name + '\n')
+        for i in range(len(preds)):
+            f.write("{} {}\n".format(cats[labels[i]], cats[preds[i]]) ) 
+
+def make_table(out, dataset_dir='.', folder='.'):
+    categories = get_categories(dataset_dir)
     files = [x for x in os.listdir(folder) if is_file(x,'txt')]
     with open(out, 'w') as f:
         write_all(f,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
@@ -20,9 +39,8 @@ def make_matrices(out,folder='.'):
     for file in files:
         misses, counts = count_misses(file, categories)
         counts = [counts[cat] for cat in categories]
-        make_matrix(misses, categories, file)
         class_accs = get_class_acs(misses, counts, categories)
-        make_table(class_accs,out, file)
+        make_subtable(class_accs,out, file)
         
     with open(out, 'a') as f:
         write_row(f, 41*[' '], separator = 'td')
@@ -35,19 +53,18 @@ def make_matrices(out,folder='.'):
         add_accuracies_to_table(misses, counts, categories, class_accs, out, file.split('.')[-2])
         
     with open(out,'a') as f:
-         write_all(f,['</table>','</body>','</html>'])
-         
-    
+        write_all(f,['</table>','</body>','</html>'])
+       
+
 def add_accuracies_to_table(misses,counts, categories,class_accs,out, name):
 
     accuracy = round(count_accuracy(misses, counts, categories),2)
     avg_class_acc = round(sum(class_accs)/len(categories),2)
     
     with open(out,'a') as f:
-         write_row(f, [name, accuracy, avg_class_acc], separator = 'td')
+        write_row(f, [name, accuracy, avg_class_acc], separator = 'td')
          
-def make_table(class_accs, out, name):
-    
+def make_subtable(class_accs, out, name):
     with open(out,'a') as f:
         write_row(f, [name] + [round(x,2) for x in class_accs] , separator = 'td')
     return class_accs
@@ -62,14 +79,14 @@ def get_class_acs(misses, counts, categories):
     class_accs = [(counts[i] - mistakes[i]) / counts[i] *100 for i in range(len(categories))]
     return class_accs
 
-def make_matrix(misses,categories,file):
-    
+def make_matrix(dataset_dir, file, outdir):
+    categories = get_categories(dataset_dir)
     outfile = file.split('.')[0] + '.html'
+    misses, counts = count_misses(file, categories)
+    
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
-        
         write_row(out, ['Truth/Predicted'] + categories, separator = 'th')
-        
         for i in range(len(categories)):
             misses_i = [misses[x] for x in misses.keys() if x[0] == categories[i]]
             write_row(out, [categories[i]] + misses_i, 'td', colors = True)
@@ -120,16 +137,16 @@ def count_misses(file, categories):
     return misses, counts
 
 
-
 def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--folder", default=".", type=str, help="Path to data")
     parser.add_argument("-o", default="./table.html", type=str, help="Path to output file") 
+    parser.add_argument("--dataset", help="Path to output file")
     
     args = parser.parse_args()
-    os.chdir(args.folder)
-    make_matrices(args.o)
+
+    make_table(args.o, datset_dir = args.dataset, folder = args.folder)
     
 if __name__ == '__main__':
     main()

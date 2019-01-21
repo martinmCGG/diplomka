@@ -6,7 +6,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", default=32, type=int, help="Resolution of the voxel grid")
-    parser.add_argument("-f", default= "D:\\workspace\\diplomka\\src\\3Dconversion\\test_0_0.npz", type=str, help="npz file to load")
+    parser.add_argument("-f", default= "D:\\workspace\\diplomka\\src\\3Dconversion\\test.npz", type=str, help="npz file to load")
     parser.add_argument("-r", default = 24, type=int, help="Number of rotations of model along vertical axis")
     args = parser.parse_args()
 
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     xt = np.asarray(np.load(args.f)['features'],dtype=np.float32)
     yt = np.asarray(np.load(args.f)['targets'],dtype=np.float32)
     N = args.v
-    index = 30
+    index = 0
     ma = xt[index].reshape((N,N,N))
     print(np.count_nonzero(xt[0] - xt[1]))
     

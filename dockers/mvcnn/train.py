@@ -66,8 +66,8 @@ def train(dataset_train, dataset_val, weights='', caffemodel=''):
         else:
             startepoch = weights + 1
             ckptfile = os.path.join(args.train_dir, 'model.ckpt-'+str(weights))
-            ACC_LOGGER.load((os.path.join(args.log_dir,"mvcnn_acc_train_accuracy.csv"),os.path.join(args.log_dir,"mvcnn_acc_eval_accuracy.csv")))
-            LOSS_LOGGER.load((os.path.join(args.log_dir,"mvcnn_loss_train_loss.csv"), os.path.join(args.log_dir,'mvcnn_loss_eval_loss.csv')))                            
+            ACC_LOGGER.load((os.path.join(args.log_dir,"mvcnn_acc_train_accuracy.csv"),os.path.join(args.log_dir,"mvcnn_acc_eval_accuracy.csv")), epoch = weights)
+            LOSS_LOGGER.load((os.path.join(args.log_dir,"mvcnn_loss_train_loss.csv"), os.path.join(args.log_dir,'mvcnn_loss_eval_loss.csv')), epoch = weights)                            
         global_step = tf.Variable(0, trainable=False)
          
         # placeholders for graph input
@@ -118,7 +118,7 @@ def train(dataset_train, dataset_val, weights='', caffemodel=''):
         total_loss = 0
         
         step = 0
-        for epoch in xrange(startepoch, g_.TRAIN_FOR + startepoch + 1):
+        for epoch in xrange(startepoch, g_.TRAIN_FOR + startepoch):
             print 'epoch:', epoch
             
             for batch_x, batch_y in dataset_train.batches(batch_size):
@@ -150,9 +150,9 @@ def train(dataset_train, dataset_val, weights='', caffemodel=''):
                                     FLAGS.batch_size/duration, sec_per_batch)
                     
                     acc = total_correct / float(total_seen)
-                    ACC_LOGGER.log(acc,"train_accuracy")
+                    ACC_LOGGER.log(acc, epoch, "train_accuracy")
                     loss_ = total_loss / float(log_period) 
-                    LOSS_LOGGER.log(loss_,"train_loss")                   
+                    LOSS_LOGGER.log(loss_, epoch,"train_loss")                   
                     
                     total_seen = 0
                     total_correct = 0
@@ -192,9 +192,13 @@ def train(dataset_train, dataset_val, weights='', caffemodel=''):
             acc = metrics.accuracy_score(labels, predictions)     
             print '%s: step %d, validation loss=%.4f, acc=%f' %\
                     (datetime.now(), step, val_loss, acc*100.)
-            LOSS_LOGGER.log(val_loss, "eval_loss")
-            ACC_LOGGER.log(acc, "eval_accuracy")
+            LOSS_LOGGER.log(val_loss, epoch, "eval_loss")
+            ACC_LOGGER.log(acc, epoch, "eval_accuracy")
             
+            ACC_LOGGER.save(args.train_dir)
+            LOSS_LOGGER.save(args.train_dir)
+            ACC_LOGGER.plot(dest=args.train_dir)
+            LOSS_LOGGER.plot(dest=args.train_dir)
             # validation summary
             val_loss_summ = sess.run(validation_summary,
                     feed_dict={validation_loss: val_loss})
@@ -229,9 +233,5 @@ if __name__ == '__main__':
     LOSS_LOGGER = Logger("mvcnn_loss")
     ACC_LOGGER = Logger("mvcnn_acc")
     main(sys.argv)
-    ACC_LOGGER.save(args.train_dir)
-    LOSS_LOGGER.save(args.train_dir)
-    ACC_LOGGER.plot(dest=args.train_dir)
-    LOSS_LOGGER.plot(dest=args.train_dir)
-    
+
 

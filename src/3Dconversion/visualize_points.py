@@ -6,12 +6,13 @@ import h5py
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("-f", default= "D:\\workspace\\diplomka\\src\\3Dconversion\\test_0_0.h5", type=str, help="npz file to load")
+    parser.add_argument("-f", default= "D:\\workspace\\diplomka\\src\\3Dconversion\\val_0_0.h5", type=str, help="npz file to load")
     args = parser.parse_args()
     
     f = h5py.File(args.f, 'r')
-    index = 2
-    print( list(f.keys()))
+    index = 50
+    labels = np.array(f['label'])
+    print(labels[index])
     points = np.array(f['data'])
     fig = plt.figure()
     ax = Axes3D(fig)
