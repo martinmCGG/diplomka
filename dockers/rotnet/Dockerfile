@@ -3,21 +3,61 @@ MAINTAINER caffe-maint@googlegroups.com
 
 ENV CAFFE_ROOT=/opt/caffe
 WORKDIR $CAFFE_ROOT
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        libatlas-base-dev \
+        libboost-all-dev \
+        libgflags-dev \
+        libgoogle-glog-dev \
+        libhdf5-serial-dev \
+        libleveldb-dev \
+        liblmdb-dev \
+        libopencv-dev \
+        libprotobuf-dev \
+        libsnappy-dev \
+        protobuf-compiler \
+        python-dev \
+        python-numpy \
+        python-pip \
+        python-setuptools \
+        python-scipy && \
+    rm -rf /var/lib/apt/lists/*
+	
 RUN pip install --upgrade pip
+RUN pip install requests[security]
 RUN pip install scikit-image --ignore-installed six --ignore-installed numpy --ignore-installed scipy
 RUN pip install protobuf
 RUN pip install opencv-python
 RUN pip install futures
-# FIXME: clone a specific git tag and use ARG instead of ENV once DockerHub supports this.
-ENV CLONE_TAG=master
-RUN apt-get install libhdf5-dev
-RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/Alobal123/diplomka.git
-RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/kanezaki/caffe-rotationnet2
 
-RUN cp diplomka/dockers/ROTNET/Makefile.config caffe-rotationnet2/Makefile.config
-RUN cd caffe-rotationnet2 && make && make pycaffe
+ENV CLONE_TAG=master
+RUN echo y | apt-get install libhdf5-dev
+#RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/Alobal123/diplomka.git
+
+RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/kanezaki/caffe-rotationnet2.git
+COPY Makefile.config caffe-rotationnet2/
+#RUN cp diplomka/dockers/ROTNET/Makefile.config caffe-rotationnet2/Makefile.config
+RUN cd caffe-rotationnet2 && make -j 16 && make -j 16 pycaffe
 
 ENV PYCAFFE_ROOT $CAFFE_ROOT/caffe-rotationnet2/python
 ENV PYTHONPATH $PYCAFFE_ROOT:$PYTHONPATH
 ENV PATH $CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
 RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+WORKDIR /
+RUN git clone https://github.com/kanezaki/rotationnet.git
+WORKDIR /rotationnet
+RUN bash get_modelnet_png.sh 
+
+RUN apt-get update && apt-get install -y --no-install-recommends dtrx
+
+#RUN wget http://www.cs.berkeley.edu/~rbg/r-cnn-release1-data.tgz  
+#RUN dtrx r-cnn-release1-data.tgz
+
+RUN /opt/caffe/caffe-rotationnet2/data/ilsvrc12/get_ilsvrc_aux.sh
+RUN mkdir logs
+COPY caffe_nets ./caffe_nets
+COPY *.prototxt ./Training/
+
