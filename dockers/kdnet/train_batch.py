@@ -1,3 +1,4 @@
+from __future__ import print_function
 from datasets import PartDataset
 import numpy as np
 import torch
@@ -11,13 +12,20 @@ from kdnet import KDNet_Batch
 import sys
 import os
 import modelnet_dataset
-import modelnet_h5_dataset    
+import modelnet_h5_dataset   
+from Logger import Logger
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--weights',default='-', help='Path to pretrained model weights')
-parser.add_argument('--test', type=bool, default=False, help='Whether to test')
+parser.add_argument('--weights',default=None, type=int, help='Number of model to finetune or evaluate')
+parser.add_argument('--test', action='store_true', help='Whether to test')
+parser.add_argument('--num_points', type=int, default=2048, help='Number of points')
+parser.add_argument('--data', type=str, default='/data/converted', help='Path to data')
+parser.add_argument('--log_dir', type=str, default='./logs', help='Log directory')
+parser.add_argument('--max_epoch', type=int, default=50, help='Number of points')
+parser.add_argument('--batch_size', type=int, default=128, help='Batch size')
 args =  parser.parse_args()
+
 
 def split_ps(point_set):
     #print point_set.size()
@@ -44,8 +52,6 @@ def split_ps(point_set):
     left_ps = torch.index_select(point_set, dim = 0, index = left_idx)
     right_ps = torch.index_select(point_set, dim = 0, index = right_idx)
     return left_ps, right_ps, dim
-
-
 def split_ps_reuse(point_set, level, pos, tree, cutdim):
     sz = point_set.size()
     num_points = np.array(sz)[0]/2
@@ -81,87 +87,55 @@ def split_ps_reuse(point_set, level, pos, tree, cutdim):
 
     return
 
-def count_and_exit(sum_correct, sum_sample, predictions, labels):
-    '''sys.path.insert(0, '/home/krabec/models/vysledky')
-    from MakeCategories import make_categories
-    make_categories('/home/krabec/models/MVCNN/modelnet40v1', '/home/krabec/models/vysledky/kdnet.txt', predictions, labels, 'KDNET2')'''
-    sys.exit()
+
+def train(args):
+    start_epoch = 0
+    net = KDNet_Batch().cuda()
+    optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)    
+    batch_size = args.batch_size
+    LOG_DIR = args.log_dir    
     
+    if args.weights!=None:
+        weights = int(args.weights)
+        start_epoch = weights
+        net.load_state_dict(torch.load(os.path.join(args.log_dir,'model-{}.pth'.format(weights))))
+        ACC_LOGGER.load((os.path.join(args.log_dir,"kdnet_acc_train_accuracy.csv"),os.path.join(args.log_dir,"kdnet_acc_eval_accuracy.csv")), epoch=weights)
+        LOSS_LOGGER.load((os.path.join(args.log_dir,"kdnet_loss_train_loss.csv"), os.path.join(args.log_dir,'kdnet_loss_eval_loss.csv')), epoch=weights)
     
-num_points = 2048
-test = args.test
-
-levels = (np.log(num_points)/np.log(2)).astype(int)
-net = KDNet_Batch().cuda()
-optimizer = optim.SGD(net.parameters(), lr=0.01, momentum=0.9)
-
-BASE_DIR = 'data'  
-TRAIN_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'modelnet40_ply_hdf5_2048/train_files.txt'), batch_size=1, npoints=num_points, shuffle=True)
-TEST_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'modelnet40_ply_hdf5_2048/test_files.txt'), batch_size=1, npoints=num_points, shuffle=False)
-
-DATASET = TEST_DATASET if test else TRAIN_DATASET
-
-batch_size = 128   
-start_epoch = 0
-if test:
-    net.load_state_dict(torch.load(args.weights))
-    net.eval()
-elif args.weights[-1] != '-':
-    net.load_state_dict(torch.load(args.weights))
-    start_epoch = int(args.weights.split('-')[-1])
-
-sum_correct = 0
-sum_sample = 0
-predictions = []
-labels = []
-exit = False
+    BASE_DIR = args.data  
+    TRAIN_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'train_files.txt'), batch_size=1, npoints=args.num_points, shuffle=True)
+    TEST_DATASET = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(BASE_DIR, 'test_files.txt'), batch_size=1, npoints=args.num_points, shuffle=False)
     
-for it in range(30000):
-    optimizer.zero_grad()
-    losses = []
-    corrects = []
+    for epoch in range(start_epoch, start_epoch+args.max_epoch):
+        eval(TEST_DATASET, net, args, epoch=epoch)
+        train_one_epoch(TRAIN_DATASET, net, optimizer, epoch, args)
+        if epoch % 5 == 0:
+            torch.save(net.state_dict(), os.path.join(args.log_dir,'model-{}.pth'.format(epoch)))
+        ACC_LOGGER.save(LOG_DIR)
+        LOSS_LOGGER.save(LOG_DIR)
+        ACC_LOGGER.plot(dest=LOG_DIR)
+        LOSS_LOGGER.plot(dest=LOG_DIR)
+  
+def forward(DATASET, net, args, test=False):
+    levels = (np.log(args.num_points)/np.log(2)).astype(int)
     points_batch = []
     cutdim_batch = []
     targets = []
-    bt = batch_size
+    bt = args.batch_size
     start = time.time()
+    exit = False
     for batch in range(bt):
         #j = np.random.randint(l)
         #point_set, class_label = d[j]
         if not DATASET.has_next_batch():
-            if test:
-                exit = True
-                break
-            else:
-                DATASET.reset()
-                DATASET.has_next_batch()
-            
+            exit = True    
+            DATASET.reset()
+            DATASET.has_next_batch()
+            break;
         batch_data, class_label = DATASET.next_batch(augment= not test)
-        point_set = np.reshape(batch_data,(num_points,3))
+        point_set = np.reshape(batch_data,(args.num_points,3))
         cutdim, tree = make_cKDTree(point_set, depth=levels)
         targets.append(torch.tensor(class_label).long())
-        
-        """if batch == 0 and it ==0:
-            tree = [[] for i in range(levels + 1)]
-            cutdim = [[] for i in range(levels)]
-            tree[0].append(point_set)
-
-            for level in range(levels):
-                for item in tree[level]:
-                    left_ps, right_ps, dim = split_ps(item)
-                    tree[level+1].append(left_ps)
-                    tree[level+1].append(right_ps)
-                    cutdim[level].append(dim)
-                    cutdim[level].append(dim)
-
-        else:
-            tree[0] = [point_set]
-            for level in range(levels):
-                for pos, item in enumerate(tree[level]):
-                    split_ps_reuse(item, level, pos, tree, cutdim)
-                        #print level, pos"""
-
-        
         cutdim_v = [(torch.from_numpy(np.array(item).astype(np.int64))) for item in cutdim]
         points = torch.stack((torch.FloatTensor(tree[-1]),))
         points_batch.append(torch.unsqueeze(torch.squeeze(points), 0).transpose(2,1))
@@ -170,35 +144,80 @@ for it in range(30000):
     points_v = Variable(torch.cat(points_batch, 0)).cuda()
     target_v = Variable(torch.cat(targets, 0)).cuda()
     cutdim_processed = []
-    
-    
     for i in range(len(cutdim_batch[0])):
         cutdim_processed.append(torch.stack([item[i] for item in cutdim_batch], 0))
     pred = net(points_v, cutdim_processed[::-1])
     pred_choice = pred.data.max(1)[1]
     correct = pred_choice.eq(target_v.data).cpu().sum()
     loss = F.nll_loss(pred, target_v)
-    if not test:
-        loss.backward()
-    losses.append(loss.data[0])
-    
-    if not test:
-        optimizer.step()
-        if (it+start_epoch) % 2000 == 0 and it!=0:
-            torch.save(net.state_dict(), 'logs/model.pth-%d' % (it+start_epoch))
-        end = time.time()
-        print('batch: %d, loss: %f, correct %d/%d' %( it+start_epoch, np.mean(losses), correct, bt))
-        print('Time: %f' % ((float(end)-start)/batch_size))
-    else:
-        sum_correct += correct
-        sum_sample += bt
-        if sum_sample > 0:
-            print("accuracy: %d/%d = %f" % (sum_correct, sum_sample, float(sum_correct) / float(sum_sample)))
-        predictions+=(pred_choice.tolist())
-        labels+=(target_v.tolist())
-    if exit:
-        count_and_exit(sum_correct, sum_sample, predictions, labels)
-    
+    return pred_choice.tolist(), target_v.tolist(), loss, correct, exit
+      
+def backward(loss, optimizer):
+    loss.backward()
+    optimizer.step()
 
+def train_one_epoch(dataset, net, optimizer, epoch, args):
+    it = 0
+    losses = []
+    corrects = [] 
+    batch_size = args.batch_size
+    while True:
+        it+=1
+        optimizer.zero_grad()
+        _, _, loss, correct, exit = forward(dataset, net, args)
+        losses.append(loss.item())
+        corrects.append(correct.item())
+        backward(loss, optimizer)
+        if it%10 == 0:
+            loss = np.mean(losses)
+            acc =  sum(corrects) /  float(10*batch_size)
+            print('epoch: %d, loss: %f, acc %f' %(epoch, loss , acc))       
+            LOSS_LOGGER.log(loss, epoch, "train_loss")
+            ACC_LOGGER.log(acc, epoch, "train_accuracy")
+            losses = []
+            corrects = []  
+        if exit:
+            break
+
+def eval(dataset, net, args, epoch = None):
+    size = dataset.size
+    losses = []
+    corrects = [] 
+    predictions = []
+    labels = []
+    batch_size = args.batch_size
+    while True:
+        preds, labs, loss, correct, exit = forward(dataset, net, args, test=True)
+        losses.append(loss.item())
+        corrects.append(correct.item())
+        predictions += preds
+        labels += labs
+        if exit:
+            break    
     
+    loss = np.mean(losses)
+    acc =  sum(corrects) /  dataset.size
+    if not args.test:
+        print('EVAL: epoch: %d, loss: %f, acc %f' %(epoch, loss , acc))  
+        LOSS_LOGGER.log(loss, epoch, "eval_loss")
+        ACC_LOGGER.log(acc, epoch, "eval_accuracy")
+        
+    else:
+        print('EVAL: loss: %f, acc %f' %(loss , acc)) 
+        import Evaluation_tools as et
+        eval_file = os.path.join(args.log_dir, 'kdnet.txt')
+        et.write_eval_file(args.data, eval_file, predictions , labels , 'KDNET')
+        et.make_matrix(args.data, eval_file, args.log_dir)
+    
+  
+if args.test:
+    net = KDNet_Batch().cuda()
+    net.load_state_dict(torch.load(os.path.join(args.log_dir,'model-{}.pth'.format(args.weights))))
+    dataset = modelnet_h5_dataset.ModelNetH5Dataset(os.path.join(args.data, 'test_files.txt'), batch_size=1, npoints=args.num_points, shuffle=False)
+    eval(dataset, net, args)
+    #net.eval()     
+else:
+    LOSS_LOGGER = Logger("kdnet_loss")
+    ACC_LOGGER = Logger("kdnet_acc")
+    train(args)
 

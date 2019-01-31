@@ -13,14 +13,16 @@ RUN git clone https://github.com/fxia22/kdnet.pytorch
 RUN mv kdnet.pytorch kdnet
 WORKDIR /kdnet
 
-RUN mkdir data
+#RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
+#RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
+#RUN cd data && rm modelnet40_ply_hdf5_2048.zip
 
-RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
-RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
-RUN cd data && rm modelnet40_ply_hdf5_2048.zip
-
+RUN pip install --upgrade pip
 RUN pip install progressbar
 RUN pip install h5py
+RUN pip install matplotlib
+RUN pip install pandas
 
+RUN mkdir logs
 COPY *.py ./
 ENTRYPOINT /bin/bash 

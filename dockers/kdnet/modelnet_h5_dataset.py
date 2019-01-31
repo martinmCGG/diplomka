@@ -59,6 +59,7 @@ class ModelNetH5Dataset(object):
         self.shuffle = shuffle
         self.h5_files = getDataFiles(self.list_filename)
         self.reset()
+        self._size = None
 
     def reset(self):
         ''' reset order of h5 files '''
@@ -68,6 +69,16 @@ class ModelNetH5Dataset(object):
         self.current_label = None
         self.current_file_idx = 0
         self.batch_idx = 0
+    
+    @property
+    def size(self):
+        if not self._size:
+            self._size = 0
+            for filename in self.h5_files:
+                data, labels = load_h5(filename)
+                self._size += labels.shape[0]
+        return self._size
+        
    
     def _augment_batch_data(self, batch_data):
         rotated_data = provider.rotate_point_cloud(batch_data)
@@ -96,7 +107,6 @@ class ModelNetH5Dataset(object):
         return 3
 
     def has_next_batch(self):
-        # TODO: add backend thread to load data
         if (self.current_data is None) or (not self._has_next_batch_in_file()):
             if self.current_file_idx >= len(self.h5_files):
                 return False
