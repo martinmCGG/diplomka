@@ -51,13 +51,13 @@ RUN git clone https://github.com/kanezaki/rotationnet.git
 WORKDIR /rotationnet
 RUN bash get_modelnet_png.sh 
 
-RUN apt-get update && apt-get install -y --no-install-recommends dtrx
-
-#RUN wget http://www.cs.berkeley.edu/~rbg/r-cnn-release1-data.tgz  
-#RUN dtrx r-cnn-release1-data.tgz
+RUN apt-get update && apt-get install -y --no-install-recommends dtrx libdc1394-22-dev
 
 RUN /opt/caffe/caffe-rotationnet2/data/ilsvrc12/get_ilsvrc_aux.sh
 RUN mkdir logs
 COPY caffe_nets ./caffe_nets
 COPY *.prototxt ./Training/
+COPY *.py ./
+RUN mv classifier.py /opt/caffe/caffe-rotationnet2/python/caffe
+
 
