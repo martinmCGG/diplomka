@@ -13,15 +13,15 @@ def train(
         snapshot,  # solver snapshot to restore
         gpus,  # list of device ids
 ):
-    gpus=[2]
+    gpus=[0]
     caffe.set_device(gpus[0])
     caffe.set_mode_gpu()
     solver = caffe.get_solver(solver)
     if snapshot and len(snapshot) != 0:
         solver.restore(snapshot)
     solver.net.copy_from('./caffe_nets/ilsvrc13')
-    #solver.solve()
-    solver.step(10000)
+    solver.solve()
+    #solver.step(10000)
     '''print(solver.net.blobs)
     print(solver.test_nets[0].blobs)
     

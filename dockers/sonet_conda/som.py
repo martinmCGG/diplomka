@@ -15,7 +15,7 @@ import potential_field
 
 
 class SOM():
-    def __init__(self, rows=4, cols=4, dim=3, gpu_id=-1):
+    def __init__(self, rows=4, cols=4, dim=3, gpu_id=0):
 
         self.rows = rows
         self.cols = cols

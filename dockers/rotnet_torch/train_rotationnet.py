@@ -35,7 +35,7 @@ parser.add_argument('--epochs', default=100, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
-parser.add_argument('-b', '--batch-size', default=256, type=int,
+parser.add_argument('-b', '--batch-size', default=64, type=int,
                     metavar='N', help='mini-batch size (default: 256)')
 parser.add_argument('--lr', '--learning-rate', default=0.1, type=float,
                     metavar='LR', help='initial learning rate')
@@ -122,7 +122,7 @@ class FineTuneModel(nn.Module):
 def main():
     global args, best_prec1, nview, vcand
     args = parser.parse_args()
-
+    
     args.distributed = args.world_size > 1
 
     if args.case == '1':
@@ -168,6 +168,7 @@ def main():
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda()
+
 
     ##optimizer = torch.optim.SGD(model.parameters(), args.lr,
     optimizer = torch.optim.SGD(filter(lambda p: p.requires_grad, model.parameters()), # Only finetunable params

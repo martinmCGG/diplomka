@@ -6,7 +6,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", default=32, type=int, help="Resolution of the voxel grid")
-    parser.add_argument("-f", default= "D:\\workspace\\diplomka\\src\\3Dconversion\\test.npz", type=str, help="npz file to load")
+    parser.add_argument("-f", default= "D:\\workspace\\diplomka\\src\\3Dconversion\\modelnet40_rot_test.npz", type=str, help="npz file to load")
     parser.add_argument("-r", default = 24, type=int, help="Number of rotations of model along vertical axis")
     args = parser.parse_args()
 

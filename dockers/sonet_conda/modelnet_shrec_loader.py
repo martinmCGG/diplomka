@@ -17,28 +17,23 @@ import faiss
 from .augmentation import *
 
 
-# Read numpy array data and label from h5_filename
-def load_h5(h5_filename):
-    f = h5py.File(h5_filename)
-    data = f['data'][:]
-    label = f['label'][:]
-    return (data, label)
-
 
 def make_dataset(files_list, opt):
     dataset = []
     rows = round(math.sqrt(opt.node_num))
     cols = rows
-    for file in files_list:
-        with load(file) as data:
-            features = data['data']
-            labels = data['label']
-            som = data['som']
-            for i in range(features.shape[]):
-                dataset.append((features[i], labels[i], som[i]))
+    with open(files_list, 'r') as f:
+        for file in f:
+            
+            with h5py.File(file.strip()) as data:
+                features = data['data']
+                labels = data['label']
+                som = data['som']
+                
+                for i in range(features.shape[0]):
+                    dataset.append((features[i], labels[i], som[i]))
     return dataset
         
-    
 
 def make_dataset_modelnet40_10k(root, mode, opt):
     dataset = []
@@ -183,7 +178,7 @@ class FarthestSampler:
 
 
 class ModelNet_Shrec_Loader(data.Dataset):
-    def __init__(self, files_list, opt):
+    def __init__(self, files_list, mode, root, opt):
         super(ModelNet_Shrec_Loader, self).__init__()
         self.root = root
         self.opt = opt
@@ -203,14 +198,13 @@ class ModelNet_Shrec_Loader(data.Dataset):
     def __getitem__(self, index):
 
         features = self.dataset[index][0]
-        random_indexes = np.random.choice(data.shape[0], self.opt.input_pc_num, replace=False)
-        data = data[np.random.choice(data.shape[0], self.opt.input_pc_num, replace=False), :]
+        random_indexes = np.random.choice(features.shape[0], self.opt.input_pc_num, replace=False)
+        data = features[np.random.choice(features.shape[0], self.opt.input_pc_num, replace=False), :]
         
         pc_np = data[:, 0:3]  # Nx3
         surface_normal_np = data[:, 3:6]  # Nx3
         som_node_np = self.dataset[index][2]  # node_numx3
         class_id = self.dataset[index][1]
-
 
         # augmentation
         if self.mode == 'train':

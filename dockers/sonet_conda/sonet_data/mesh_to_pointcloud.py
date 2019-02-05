@@ -11,7 +11,7 @@ def traingle_area(v1, v2, v3):
 def normalize(vector):
     return vector / np.sum(vector)
 
-def mesh_to_point_cloud(points, triangles, n, normal=False):
+def mesh_to_point_cloud(points, triangles, n, normal=True):
     distribution = find_area_distribution(points, triangles)
     chosen = np.random.choice(range(len(triangles)),size=n, p=distribution)
     chosen_points = points[triangles[chosen]]
@@ -45,10 +45,9 @@ def file_to_pointcloud(filename, type, args):
         points, triangles, quads = read_obj_file(filename)
     elif type == 'modelnet':
         points, triangles, quads = read_off_file(filename)
-    if args.normal:
-        return mesh_to_point_cloud(points, triangles, args.n, normal=True)
-    else:
-        return mesh_to_point_cloud(points, triangles, args.n)
+
+    return mesh_to_point_cloud(points, triangles, args.n, normal=True)
+
     
 if __name__ == '__main__':
     import argparse
@@ -58,17 +57,14 @@ if __name__ == '__main__':
     parser.add_argument("-t", default = 1, type=int, help="Number of threads")
     parser.add_argument("-o", type=str, help="directory of the output files")
     parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
-    parser.add_argument("--normal",action='store_true', help="if normal information should be saved")
-    
+
     
     args = parser.parse_args()
     files = find_files(args.d, 'obj')
     for file in files:
         points, triangles, quads = read_obj_file(file)
-        if args.normal:
-            pointcloud = mesh_to_point_cloud(points, triangles, args.n, normal=True)
-        else:
-            pointcloud = mesh_to_point_cloud(points, triangles, args.n)
+        pointcloud = mesh_to_point_cloud(points, triangles, args.n, normal=True)
+
         
 
     
