@@ -1,4 +1,10 @@
+'''
+Created on 4. 10. 2018
+
+@author: miros
+'''
 import os
+
 
 def get_categories(dataset_dir):
     with open(os.path.join(dataset_dir, 'cat_names.txt'), 'r') as f:
@@ -25,8 +31,7 @@ def write_eval_file(dataset_dir,outfile, preds, labels, name):
 
 def make_table(out, dataset_dir='.', folder='.'):
     categories = get_categories(dataset_dir)
-    #files = [x for x in os.listdir(folder) if is_file(x,'txt')]
-    files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(PATH) for f in filenames if os.path.splitext(f)[1] == '.txt']
+    files = [x for x in os.listdir(folder) if is_file(x,'txt')]
     with open(out, 'w') as f:
         write_all(f,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
         write_row(f, ['Model/Cat_Acc'] + categories, separator = 'th')
@@ -131,16 +136,6 @@ def count_misses(file, categories):
                 misses[(truth, prediction)] +=1
     return misses, counts
 
-def find_most_confused(out, dataset_dir='.', folder='.'):
-    categories = get_categories(dataset_dir)
-    #files = [x for x in os.listdir(folder) if is_file(x,'txt')]    
-    files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(PATH) for f in filenames if os.path.splitext(f)[1] == '.txt']
-    for file in files:
-        misses, counts = count_misses(file, categories)
-        counts = [counts[cat] for cat in categories]
-        class_accs = get_class_acs(misses, counts, categories)
-        make_subtable(class_accs,out, file)
-    
 
 def main():
     import argparse
@@ -152,7 +147,6 @@ def main():
     args = parser.parse_args()
 
     make_table(args.o, dataset_dir = args.dataset, folder = args.folder)
-    
     
     
 if __name__ == '__main__':

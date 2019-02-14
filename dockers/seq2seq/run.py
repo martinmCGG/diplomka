@@ -6,14 +6,14 @@ from prepare_data import create_data
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data', default='/data/converted', help='dataset used to train and test')
-parser.add_argument('--train',action='store_true', help='train mode or test mode')
+parser.add_argument('--test',action='store_true', help='train mode or test mode')
 parser.add_argument('--weights', help='number of model to be finetuned or tested')
 args = parser.parse_args()
 
 NUM_CLASSES = 40
 VIEWS = 12
-BATCH_SIZE = 32
-TRAIN_FOR_EPOCH = 50
+BATCH_SIZE = 256
+TRAIN_FOR_EPOCH = 100
 SAVE_PERIOD = 5
 
 train_cmd = 'python train.py --n_hidden=128 --decoder_embedding_size=256 --use_lstm=False --keep_prob=0.5   --learning_rate=0.0002  --n_max_keep_model=200 '
@@ -39,8 +39,8 @@ train_cmd += '--train_feature_file={} --train_label_file={} --test_feature_file=
 
 train_cmd += '--save_seq_embeddingmvmodel_path={} --checkpoint_path={} --test_acc_file={}'.format(os.path.join(out, "mvmodel.ckpt"), os.path.join(out, "checkpoint"),outfile )
 
-if args.train: 
-    train_cmd += " --train=True "
+if args.test: 
+    train_cmd += " --test=True "
 if args.weights:
     train_cmd +=" --weights={} ".format(args.weights)
 

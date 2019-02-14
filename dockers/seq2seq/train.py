@@ -8,6 +8,7 @@ import csv
 from sys import argv
 import Evaluation_tools as et
 
+
 # data path parameter
 tf.flags.DEFINE_string('log_dir', '', 'file dir for saving features and labels')
 tf.flags.DEFINE_string('data', '', 'path to data')
@@ -235,7 +236,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("--train", default=None, type=bool, help="train or test")
+    parser.add_argument("--test", default=False, type=bool, help="train or test")
     parser.add_argument('--weights')
     
     parser.add_argument("--n_hidden", default=128, type=int, help="number of hidden neurons")
@@ -268,7 +269,7 @@ if __name__ == '__main__':
     FLAGS.log_dir = args.log_dir
     FLAGS.data = args.data
     FLAGS.weights = args.weights
-    FLAGS.train = args.train
+    FLAGS.train = not args.test
     
     tf.app.run(main,argv)
     

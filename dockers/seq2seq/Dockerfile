@@ -22,5 +22,11 @@ RUN apt update && apt install -y libsm6 libxext6
 RUN echo y | apt-get install libfontconfig1 libxrender1
 RUN cd mvcnn && ./prepare_pretrained_alexnet.sh
 
+RUN pip install scikit-image
+
+RUN git clone https://github.com/machrisaa/tensorflow-vgg.git
+RUN mv tensorflow-vgg vgg
+COPY vgg19.npy ./vgg
 
 COPY *.py ./
+RUN mv vgg19_trainable.py ./vgg
