@@ -76,39 +76,36 @@ def iterate_minibatches(*arrays, **kwargs):
 def get_probs(net, vertices, faces, nFaces, labels, **kwargs):
     prob_sum = np.zeros((len(nFaces)-1, kwargs['n_output']), dtype=np.float32)
     losses = []
-    accuracies = []
     for ens in xrange(kwargs['n_ens']):
         probability = np.zeros((len(nFaces)-1, kwargs['n_output']), dtype=np.float32)
         index = 0    
         for i, batch in enumerate(iterate_minibatches(vertices, faces, nFaces,labels, **kwargs)):
-            loss, probs, acc = net.prob_fun(batch[0], batch[1], batch[2], batch[3], batch[4], batch[5], batch[6], batch[7], batch[8], batch[9], batch[10], batch[11])
+            loss, probs = net.prob_fun(batch[0], batch[1], batch[2], batch[3], batch[4], batch[5], batch[6], batch[7], batch[8], batch[9], batch[10], batch[11])
             losses.append(loss)
-            accuracies.append(acc)
             size_of_batch = batch[-1].shape[0]
             probability[index:index+size_of_batch] += probs
             index += size_of_batch
             #probability[batch[-1]] += probs
         prob_sum += probability
 
-    return np.mean(losses), prob_sum / kwargs['n_ens'], np.mean(accuracies)
+    return np.mean(losses), prob_sum / kwargs['n_ens']
 
 
 def acc_fun(net, vertices, faces, nFaces, labels, **kwargs):
-    loss, probs, acc = get_probs(net, vertices, faces, nFaces, labels, **kwargs)
-    return loss, probs.argmax(axis=1), acc
+    loss, probs= get_probs(net, vertices, faces, nFaces, labels, **kwargs)
+    return loss, probs.argmax(axis=1)
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", default="/data/converted", type=str, help="Path to the dataset")
     parser.add_argument("--log_dir", default="logs", type=str, help="logging directory")
-    parser.add_argument("--max_epoch", type = int, default=100, help="Number of epochs to train for")
+    parser.add_argument("--max_epoch", type = int, default=50, help="Number of epochs to train for")
     parser.add_argument("--save_each", type = int, default=5, help="How often to save the model")
     parser.add_argument('--weights',default=None, type=int, help='Number of model to finetune or evaluate')
     parser.add_argument("--test", action='store_true')
     args = parser.parse_args()
     print(config)
-    
     print("Reading data...")
     path2data = os.path.join(args.data, 'data.h5')
     with h5.File(path2data, 'r') as hf:
@@ -131,8 +128,9 @@ if __name__ == "__main__":
         print("Loaded weights")
     
     if args.test:
+        print("Start testing")
         config['mode'] = 'test'
-        _, predictions = acc_fun(test_vertices, test_faces, test_nFaces, test_labels, **config) 
+        _, predictions = acc_fun(net,test_vertices, test_faces, test_nFaces, test_labels, **config) 
         acc = 100.*(predictions == test_labels).sum()/len(test_labels)
         
         print('Eval accuracy:  {}'.format(acc))
@@ -142,7 +140,7 @@ if __name__ == "__main__":
         et.make_matrix(args.data, eval_file, args.log_dir)
         
     else:
-        print("Starting training")
+        print("Start training")
         LOSS_LOGGER = Logger("kdnet_loss")
         ACC_LOGGER = Logger("kdnet_acc")
         start_epoch = 0
@@ -178,11 +176,6 @@ if __name__ == "__main__":
                     print('EPOCH {}, batch {}: loss {} acc {}'.format(epoch, i, loss, acc))
                     losses = []
                     accuracies = []
-            
-                          
-
-            
-
             
             ACC_LOGGER.save(args.log_dir)
             LOSS_LOGGER.save(args.log_dir)

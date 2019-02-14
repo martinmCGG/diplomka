@@ -24,5 +24,5 @@ config = {
     'n_output': 40,
     'l2': 1e-3,
     'lr': 1e-3,
-    'n_ens': 4 
+    'n_ens': 16
 }
