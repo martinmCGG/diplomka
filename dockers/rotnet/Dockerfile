@@ -35,11 +35,11 @@ RUN pip install futures
 
 ENV CLONE_TAG=master
 RUN echo y | apt-get install libhdf5-dev
-#RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/Alobal123/diplomka.git
+
 
 RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/kanezaki/caffe-rotationnet2.git
 COPY Makefile.config caffe-rotationnet2/
-#RUN cp diplomka/dockers/ROTNET/Makefile.config caffe-rotationnet2/Makefile.config
+COPY *.cpp /opt/caffe/caffe-rotationnet2/src/caffe/layers/
 RUN cd caffe-rotationnet2 && make -j 16 && make -j 16 pycaffe
 
 ENV PYCAFFE_ROOT $CAFFE_ROOT/caffe-rotationnet2/python
@@ -49,13 +49,19 @@ RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 WORKDIR /
 RUN git clone https://github.com/kanezaki/rotationnet.git
 WORKDIR /rotationnet
+
 RUN bash get_modelnet_png.sh 
 
 RUN apt-get update && apt-get install -y --no-install-recommends dtrx libdc1394-22-dev
+RUN pip install pandas matplotlib
 
+WORKDIR /opt/caffe/caffe-rotationnet2
 RUN /opt/caffe/caffe-rotationnet2/data/ilsvrc12/get_ilsvrc_aux.sh
+
+WORKDIR /rotationnet
 RUN mkdir logs
 COPY caffe_nets ./caffe_nets
+
 COPY *.prototxt ./Training/
 COPY *.py ./
 RUN mv classifier.py /opt/caffe/caffe-rotationnet2/python/caffe

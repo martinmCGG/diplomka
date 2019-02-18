@@ -6,10 +6,11 @@ layers {
   top: "label"
   image_data_param {
     source: "/data/converted/trainrotnet.txt"
-    batch_size: 400
+    batch_size: 240
     new_height: 256
     new_width: 256
     crop_size: 227
+    mean_file: "/opt/caffe/caffe-rotationnet2/data/ilsvrc12/imagenet_mean.binaryproto"
     mirror: false
     shuffle: false
     num_rotation: 12
@@ -300,7 +301,7 @@ layers {
   weight_decay: 1
   weight_decay: 0
   inner_product_param {
-    num_output: 820
+    num_output: 492
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -309,6 +310,26 @@ layers {
       type: "constant"
       value: 0
     }
+  }
+}
+layers {
+  bottom: "fc8_modelnet40v1"
+  top: "prob"
+  name: "prob"
+  type: MY_SOFTMAX
+  my_softmax_param {
+    stride: 41
+  }
+}
+layers {
+  bottom: "prob"
+  bottom: "label"
+  top: "my_accuracy"
+  name: "my_accuracy"
+  type: MY_ACCURACY
+  my_accuracy_param {
+    stride: 41
+    using_upright: true
   }
 }
 layers {
