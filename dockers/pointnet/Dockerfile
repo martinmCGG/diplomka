@@ -1,4 +1,4 @@
-FROM  tensorflow/tensorflow:latest-gpu
+FROM tensorflow/tensorflow:1.12.0-gpu
 
 WORKDIR /
 RUN apt-get update && apt-get install -y --no-install-recommends \

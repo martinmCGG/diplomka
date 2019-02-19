@@ -1,4 +1,4 @@
-FROM  tensorflow/tensorflow:latest-gpu
+FROM  tensorflow/tensorflow:1.12.0-gpu
 
 WORKDIR /
 
@@ -24,9 +24,10 @@ RUN cd tf_ops/sampling/ && sh tf_sampling_compile.sh
 COPY tf_grouping_compile.sh tf_ops/grouping/
 RUN cd tf_ops/grouping/ && sh tf_grouping_compile.sh
 
-RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
-RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
-RUN cd data && rm modelnet40_ply_hdf5_2048.zip
+#RUN cd data && wget 'https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip'
+#RUN cd data && unzip modelnet40_ply_hdf5_2048.zip
+#RUN cd data && rm modelnet40_ply_hdf5_2048.zip
+
 RUN mkdir logs
 COPY *.py ./
 RUN mv pointnet2_cls_ssg.py ./models

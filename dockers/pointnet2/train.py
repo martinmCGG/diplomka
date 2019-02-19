@@ -25,13 +25,13 @@ import modelnet_h5_dataset
 from Logger import Logger
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
+parser.add_argument('--gpu', type=int, default=3, help='GPU to use [default: GPU 0]')
 parser.add_argument('--model', default='pointnet2_cls_ssg', help='Model name [default: pointnet2_cls_ssg]')
 parser.add_argument('--log_dir', default='logs', help='Log dir [default: log]')
 parser.add_argument('--num_point', type=int, default=2048, help='Point Number [default: 2048]')
-parser.add_argument('--max_epoch', type=int, default=100, help='Epoch to run [default: 251]')
+parser.add_argument('--max_epoch', type=int, default=160, help='Epoch to run [default: 251]')
 parser.add_argument('--batch_size', type=int, default=32, help='Batch Size during training [default: 16]')
-parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial learning rate [default: 0.001]')
+parser.add_argument('--learning_rate', type=float, default=0.0001, help='Initial learning rate [default: 0.001]')
 parser.add_argument('--momentum', type=float, default=0.9, help='Initial learning rate [default: 0.9]')
 parser.add_argument('--optimizer', default='adam', help='adam or momentum [default: adam]')
 parser.add_argument('--decay_step', type=int, default=200000, help='Decay step for lr decay [default: 200000]')
@@ -176,7 +176,7 @@ def train():
         sess.run(init)
         start_epoch = 0   
         if WEIGHTS:
-            w = os.path.join(LOG_DIR, "model.ckpt-{}".format(WEIGHTS))
+            w = os.path.join(LOG_DIR, "model-{}.ckpt".format(WEIGHTS))
             saver.restore(sess, w)
             start_epoch = WEIGHTS + 1
             ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"pnet2_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"pnet2_acc_eval_accuracy.csv")), epoch=WEIGHTS)

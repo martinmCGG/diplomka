@@ -43,12 +43,12 @@ def evaluate(test_data, args):
                 accs.append(0)
             
             acc = np.mean(accs)
-            print(label, prediction)
+  
             print("EVALUATING - acc: {} ".format(acc))
 
     import Evaluation_tools as et
     eval_file = os.path.join(args.log_dir, 'vgg.txt')
-    et.write_eval_file(args.data, eval_file, predictions , test_labels , 'VGG')
+    et.write_eval_file(args.data, eval_file, predictions , labels , 'VGG')
     et.make_matrix(args.data, eval_file, args.log_dir)
 
 if __name__ == '__main__':

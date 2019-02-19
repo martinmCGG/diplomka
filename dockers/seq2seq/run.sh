@@ -9,7 +9,8 @@ docker run --runtime=nvidia --name seq2seq --rm -id -v "$out":/seq2seq/logs -v "
 #docker exec -it seq2seq sh -c "rm -rf logs/*"
 
 #docker exec -id seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python train_vgg.py --data /data/converted"
-docker exec -id seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python evaluate_vgg.py --data /data/converted --weights 2000"
+docker exec -it seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python evaluate_vgg.py --data /data/converted --weights 2000"
 #docker exec -id seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python train_vgg.py --data /data/converted --extract --weights 2000"
-#docker exec -id seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python run.py --data /data/converted"
+docker exec -it seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python run.py --data /data/converted"
 #docker exec -id seq2seq sh -c "export CUDA_VISIBLE_DEVICES=3 && python run.py --test --data /data/converted"
+
