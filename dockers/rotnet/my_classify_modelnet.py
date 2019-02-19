@@ -88,27 +88,20 @@ def main(argv):
     # Required arguments: input and output files.
     parser.add_argument(
         "--input_file",
-        default ="./Training/test_modelnet40_case2.txt",
-        help="Input image, directory, or npy."
+        default ="/data/converted/testrotnet.txt",
+        help="text file containg the image paths"
     )
     
     # Optional arguments.
     parser.add_argument(
         "--model_def",
-        default="./Training/rotationnet_modelnet40_case2_val.prototxt",
+        default="./Training/rotationnet_modelnet40_case1_solver.prototxt",
         help="Model definition file."
     )
-    parser.add_argument(
-        "--pretrained_model",
-        default="./logs/my_rotationnet_modelnet40_case2_iter_40000.caffemodel",
-        help="Trained model weights file."
-    )
-    parser.add_argument(
-        "--gpu",
-        action='store_true',
-        default = True,
-        help="Switch for gpu computation."
-    )
+    parser.add_argument('--weights', type=int, default=-1)
+    parser.add_argument('--views', type=int, default=12)
+    parser.add_argument('--log_dir', default='logs', type=str)    
+    
     parser.add_argument(
         "--center_only",
         action='store_true',
@@ -123,8 +116,8 @@ def main(argv):
     )
     parser.add_argument(
         "--mean_file",
-        default=os.path.join(pycaffe_dir,
-                             'caffe/imagenet/ilsvrc_2012_mean.npy'),
+        default=os.path.join(caffe_root,
+                             'data/ilsvrc12/imagenet_mean.binaryproto'),
         help="Data set image mean of H x W x K dimensions (np array). " +
              "Set to '' for no mean subtraction."
     )
@@ -141,38 +134,26 @@ def main(argv):
              "RGB -> BGR since BGR is the Caffe default by way of OpenCV."
 
     )
-    parser.add_argument(
-        "--ext",
-        default='png',
-        help="Image file extension to take as input when a directory " +
-             "is given as the input file."
-    )
-    args = parser.parse_args()
 
+    args = parser.parse_args()
+    
+    args.pretrained_model = os.path.join(args.log_dir, 'case1_iter_'+str(args.weights) + '.caffemodel')
+    
     image_dims = [int(s) for s in args.images_dim.split(',')]
     channel_swap = [int(s) for s in args.channel_swap.split(',')]
     
+    
     if args.mean_file:
-        mean = np.load(args.mean_file)
-        # Resize mean (which requires H x W x K input in range [0,1]).
-        in_shape = image_dims
-        m_min, m_max = mean.min(), mean.max()
-        normal_mean = (mean - m_min) / (m_max - m_min)
-        mean = caffe.io.resize_image(normal_mean.transpose((1,2,0)),
-                                     in_shape).transpose((2,0,1)) * (m_max - m_min) + m_min           
-    if args.gpu:
-        caffe.set_mode_gpu()
-        print("GPU mode")
-    else:
-        caffe.set_mode_cpu()
-        print("CPU mode")
+        mean = get_mean(args.mean_file)
+
+    caffe.set_mode_gpu()
         
     # Make classifier.
     classifier = caffe.Classifier(args.model_def, args.pretrained_model,
             image_dims=image_dims, mean=mean,
             input_scale=1.0, raw_scale=255.0, channel_swap=channel_swap)
 
-    
+
     listfiles, labels = read_lists(args.input_file)
 
     #dataset = Dataset(listfiles, labels, subtract_mean=False, V=20)
@@ -182,11 +163,10 @@ def main(argv):
     preds = []
     labels = [int(label) for label in labels]
     
-    
     total = len(listfiles)
     
-    batch = 64
-    views = 20
+    views = args.views
+    batch = 8 * views
     for i in range( len(listfiles) / (batch*views)):
 
         #im_files = [line.rstrip('\n') for line in open(listfiles[views*i+j])]
@@ -195,7 +175,7 @@ def main(argv):
         #labels.append(int(im_files[0]))
         #im_files = im_files[2:]
         inputs= [caffe.io.load_image(im_f) for im_f in im_files]
-        print("inputting")
+
         predictions = classifier.predict(inputs, not args.center_only)
         classified = classify(predictions)
         preds.append(classified)
@@ -212,6 +192,23 @@ def read_lists(list_of_lists_file):
     listfile_labels = np.loadtxt(list_of_lists_file, dtype=str).tolist()
     listfiles, labels  = zip(*[(l[0], int(l[1])) for l in listfile_labels])
     return listfiles, labels
+
+def get_mean(mean_file):
+    image_dims = [227,227]
+    channel_swap = [2,1,0]
+    blob = caffe.proto.caffe_pb2.BlobProto()
+    data = open(mean_file , 'rb' ).read()
+    blob.ParseFromString(data)
+    arr = np.array( caffe.io.blobproto_to_array(blob))
+    mean = arr[0]
+    # Resize mean (which requires H x W x K input in range [0,1]).
+    in_shape = image_dims
+    m_min, m_max = mean.min(), mean.max()
+    normal_mean = (mean - m_min) / (m_max - m_min)
+    mean = caffe.io.resize_image(normal_mean.transpose((1,2,0)),
+                                 in_shape).transpose((2,0,1)) * (m_max - m_min) + m_min  
+    return mean
+    
 
 def classify(prediction, alligned = True):
     
@@ -232,7 +229,7 @@ def classify(prediction, alligned = True):
     
     if alligned:
         for n in range(nsamp):
-            s = numpy.ones(clsnum*numR)
+            s = np.ones(clsnum*numR)
             for i in range(numR):
                 for j in range(clsnum):
                     for k in range(numR):

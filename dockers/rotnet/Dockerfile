@@ -50,7 +50,7 @@ WORKDIR /
 RUN git clone https://github.com/kanezaki/rotationnet.git
 WORKDIR /rotationnet
 
-RUN bash get_modelnet_png.sh 
+#RUN bash get_modelnet_png.sh 
 
 RUN apt-get update && apt-get install -y --no-install-recommends dtrx libdc1394-22-dev
 RUN pip install pandas matplotlib

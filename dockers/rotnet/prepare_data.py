@@ -31,7 +31,6 @@ def prepare_data(file,shuffle=False):
     
     with open(file.split('.')[0]+"rotnet.txt", 'w') as f:
         for line in final_files:  
-            print(line)
             f.write(line)
         
         
@@ -44,8 +43,8 @@ if __name__ == "__main__":
     
     parser.add_argument("--test", action='store_true')
     args = parser.parse_args()
-    
-    prepare_data(args.file, args.shuffle)
+
+    prepare_data(args.file, not args.test)
                 
     
     
