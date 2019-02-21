@@ -24,6 +24,6 @@ WORKDIR /mvcnn2
 RUN mkdir logs	
 
 COPY *.py ./
-RUN mv ImgDataset.py ./tools/
+RUN mv Trainer.py ./tools/ &&  mv ImgDataset.py ./tools/ && mv Model.py ./models && mv MVCNN.py ./models
 
 ENTRYPOINT /bin/bash 

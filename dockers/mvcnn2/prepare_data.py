@@ -28,7 +28,7 @@ if __name__ == '__main__':
         for d in ['test', 'train']:
             os.system('mkdir -m 777 {}'.format(os.path.join(args.o, cat, d)))
     
-    #copy(args, 'train')
+    copy(args, 'train')
     copy(args, 'test')
 
         

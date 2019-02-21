@@ -11,15 +11,22 @@ from models.MVCNN import MVCNN, SVCNN
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-name", "--name", type=str, help="Name of the experiment", default="MVCNN")
-parser.add_argument("-bs", "--batchSize", type=int, help="Batch size for the second stage", default=8)# it will be *12 images in each batch for mvcnn
+parser.add_argument("-log_dir", type=str, help="log dir", default='logs')
+parser.add_argument("-bs", "--batchSize", type=int, help="Batch size for the second stage", default=4)# it will be *12 images in each batch for mvcnn
 parser.add_argument("-num_models", type=int, help="number of models per class", default=1000)
+parser.add_argument("-save_epoch", type=int, help="save model period", default=5)
+parser.add_argument("-max_epoch", type=int, help="train for this many epochs", default=30)
 parser.add_argument("-lr", type=float, help="learning rate", default=5e-5)
 parser.add_argument("-weight_decay", type=float, help="weight decay", default=0.0)
 parser.add_argument("-no_pretraining", dest='no_pretraining', action='store_true')
 parser.add_argument("-cnn_name", "--cnn_name", type=str, help="cnn model name", default="vgg11")
 parser.add_argument("-num_views", type=int, help="number of views", default=12)
-parser.add_argument("-train_path", type=str, default="/out/*/train")
-parser.add_argument("-val_path", type=str, default="/out/*/test")
+
+parser.add_argument("-data", type=str, default="/out")
+
+parser.add_argument("--test", action='store_true')
+parser.add_argument('--weights', default=-1, type=int)
+
 parser.set_defaults(train=False)
 
 
@@ -30,11 +37,10 @@ def create_folder(log_dir):
     else:
         print('WARNING: summary folder already exists!! It will be overwritten!!')
         shutil.rmtree(log_dir)
-        os.mkdir(log_dir)
+        os.system("mkdir -m 777 {}".format(log_dir))
 
-if __name__ == '__main__':
-    args = parser.parse_args()
 
+def train(args):
     print('Starting...')
     pretraining = not args.no_pretraining
     log_dir = args.name
@@ -43,9 +49,9 @@ if __name__ == '__main__':
     json.dump(vars(args), config_f)
     config_f.close()
     
-    print('stage 1')
+    print('--------------stage 1--------------')
     # STAGE 1
-    log_dir = args.name+'_stage_1'
+    log_dir = os.path.join(args.log_dir,args.name+'_stage_1')
     create_folder(log_dir)
     cnet = SVCNN(args.name, nclasses=40, pretraining=pretraining, cnn_name=args.cnn_name)
 
@@ -53,37 +59,72 @@ if __name__ == '__main__':
     
     n_models_train = args.num_models*args.num_views
 
-
-    print(args.train_path)
-    train_dataset = SingleImgDataset(args.train_path, scale_aug=False, rot_aug=False, num_models=n_models_train, num_views=args.num_views)
+    train_path = os.path.join(args.data, "*/train")
+    train_dataset = SingleImgDataset(train_path, scale_aug=False, rot_aug=False, num_models=n_models_train, num_views=args.num_views)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=0)
     
-    
-    val_dataset = SingleImgDataset(args.val_path, scale_aug=False, rot_aug=False, test_mode=True)
+    val_path = os.path.join(args.data, "*/test")
+    val_dataset = SingleImgDataset(val_path, scale_aug=False, rot_aug=False, test_mode=True)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=0)
     
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))
     
-    trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), 'svcnn', log_dir, num_views=1)
-    trainer.train(30)
+    trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), 'svcnn', log_dir, num_views=1, save_period=args.save_epoch)
+    trainer.train(args.max_epoch)
 
     # STAGE 2
-    log_dir = args.name+'_stage_2'
+    print('--------------stage 2--------------')
+    log_dir = os.path.join(args.log_dir,args.name+'_stage_2')
     create_folder(log_dir)
     cnet_2 = MVCNN(args.name, cnet, nclasses=40, cnn_name=args.cnn_name, num_views=args.num_views)
     del cnet
 
     optimizer = optim.Adam(cnet_2.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.999))
     
-    train_dataset = MultiviewImgDataset(args.train_path, scale_aug=False, rot_aug=False, num_models=n_models_train, num_views=args.num_views)
+    train_dataset = MultiviewImgDataset(train_path, scale_aug=False, rot_aug=False, num_models=n_models_train, num_views=args.num_views)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batchSize, shuffle=False, num_workers=0)# shuffle needs to be false! it's done within the trainer
 
-    val_dataset = MultiviewImgDataset(args.val_path, scale_aug=False, rot_aug=False, num_views=args.num_views)
+    val_dataset = MultiviewImgDataset(val_path, scale_aug=False, rot_aug=False, num_views=args.num_views)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batchSize, shuffle=False, num_workers=0)
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))
-    trainer = ModelNetTrainer(cnet_2, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), 'mvcnn', log_dir, num_views=args.num_views)
-    trainer.train(30)
+    trainer = ModelNetTrainer(cnet_2, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), 'mvcnn', log_dir, num_views=args.num_views, save_period=args.save_epoch)
+    trainer.train(args.max_epoch)
+
+def test(args):
+    log_dir = os.path.join(args.log_dir, args.name+'_stage_2')
+    n_models_train = args.num_models*args.num_views
+    train_path = os.path.join(args.data, "*/train")    
+    val_path = os.path.join(args.data, "*/test")    
+    
+    #train_dataset = MultiviewImgDataset(train_path, scale_aug=False, rot_aug=False, num_models=n_models_train, num_views=args.num_views)
+    #train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batchSize, shuffle=False, num_workers=0)# shuffle needs to be false! it's done within the trainer
+    val_dataset = MultiviewImgDataset(val_path, scale_aug=False, rot_aug=False, num_views=args.num_views)
+    val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=args.batchSize, shuffle=False, num_workers=0)
+
+    pretraining = not args.no_pretraining
+    cnet = SVCNN(args.name, nclasses=40, cnn_name=args.cnn_name, pretraining=pretraining)
+    cnet_2 = MVCNN(args.name, cnet, nclasses=40, cnn_name=args.cnn_name, num_views=args.num_views)
+    cnet_2.model.load(log_dir, modelfile = "model-{}.pth".format(args.weights))
+    optimizer = optim.Adam(cnet_2.parameters(), lr=args.lr, weight_decay=args.weight_decay, betas=(0.9, 0.999))
+    
+    trainer = ModelNetTrainer(cnet_2, None, val_loader, optimizer, nn.CrossEntropyLoss(), 'mvcnn', log_dir, num_views=args.num_views)
+    
+    labels, predictions = trainer.update_validation_accuracy(args.weights, test=True)
+    import Evaluation_tools as et
+
+    eval_file = os.path.join(log_dir, 'mvcnn2.txt')
+    et.write_eval_file(args.data, eval_file, predictions, labels, 'MVCNN2')
+    et.make_matrix(args.data, eval_file, log_dir)
+    
+    
+if __name__ == '__main__':
+    args = parser.parse_args()
+    if args.test:
+        test(args)
+    else:
+        train(args)
+
 
 
