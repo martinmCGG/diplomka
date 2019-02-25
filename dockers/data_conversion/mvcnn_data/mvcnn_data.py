@@ -21,7 +21,7 @@ def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir
         formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov, dodecahedron)
         #print(formated_scene)
     else:
-        formated_scene = unformated_scene.format(output_file, geometry, angle, "1.5 0.2 0", fov, "0 1 0")
+        formated_scene = unformated_scene.format(output_file, geometry, angle, "1.6 0.8 0", fov, "0 1 0")
         
     with open("formated_scene{}.pbrt".format(id), 'w') as f:
         print(formated_scene, file=f)
@@ -149,13 +149,13 @@ if __name__ == '__main__':
     
     parser.add_argument("-v", default=12, type=int, help="Number of views to render")
     parser.add_argument("-t", default = 8, type=int, help="Number of threads")
-    parser.add_argument("-l",default ="/data/log.txt", type=str, help="logging file")
     
     parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:shapenet or modelnet")
     parser.add_argument("--dodecahedron",action='store_true', help="if this is added, views will be rendered from vertices of dodecahedron")
     parser.add_argument("--camera_rotations", default=1, type=int, help="How many times to rotate the camera for")
     
     args = parser.parse_args()
+    args.l = os.path.join(args.o, 'log.txt')
     with open(args.l, 'w') as f:
         print("STARTING CONVERSION", file = f)
     try:
@@ -173,7 +173,7 @@ if __name__ == '__main__':
             pool.close()
             pool.join()
             files = find_files(args.d, 'obj')
-            args.fov = 68
+            args.fov = 70
     except: 
         e = sys.exc_info()
         with open(args.l, 'a') as f:
@@ -185,7 +185,7 @@ if __name__ == '__main__':
         os.system("mkdir -m 777 {}".format(args.o))
 
         
-
+    
     save_for_mvcnn(args, files, categories)
     collect_files(files, split,categories, args)
     

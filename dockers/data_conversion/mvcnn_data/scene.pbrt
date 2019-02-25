@@ -23,7 +23,7 @@ WorldBegin
 AttributeBegin
 CoordSysTransform "camera"
 Translate 0 0 0
-LightSource "point" "rgb I" [ 1 1 1 ] "rgb scale" [1.1 1.1 1.1]
+LightSource "point" "rgb I" [ 1.5 1.5 1.5 ] "rgb scale" [2 2 2]
 #LightSource "distant" "rgb I" [ 1 1 1 ] "point from" [ 0 10 0 ] "point to" [ 0 0 0 ]
 #LightSource "infinite" "color L" [ .5 .5 .5 ] 
 AttributeEnd

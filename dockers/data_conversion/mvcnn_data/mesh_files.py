@@ -5,21 +5,13 @@ from pathlib import Path
 
 def find_files(directory,extension):
     print("Scanning for files...")
-    fname = os.path.join(directory,"all_{}_files.txt".format(extension))
+
     ext_files = []
-    if not os.path.isfile(fname):
-        for folder, subs, files in os.walk(directory):
-            for filename in files:
-                if filename.split('.')[-1] == extension:
-                    filename = os.path.join(folder, filename)
-                    ext_files.append(filename)
-        with open(fname, 'w') as f:
-            for file in ext_files:
-                print(file, file=f)
-    else:
-        with open(fname, 'r') as f:
-            for line in f:
-                ext_files.append(line.strip())
+    for folder, subs, files in os.walk(directory):
+        for filename in files:
+            if filename.split('.')[-1] == extension:
+                filename = os.path.join(folder, filename)
+                ext_files.append(filename)
     
     print("Found {} files".format(len(ext_files)))
     return sorted(ext_files)

@@ -41,15 +41,16 @@ if __name__ == '__main__':
     parser.add_argument("o", type=str, help="directory of the output files")
     
     parser.add_argument("-n", default=2048, type=int, help="Number of points to smaple")
-    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
+    parser.add_argument("-t", default = 16, type=int, help="Number of threads")
     parser.add_argument("-m", default = 10000, type=int, help="Max number of models to save to one file")
-    parser.add_argument("-l",default ="/data/log.txt", type=str, help="logging file")
+    parser.add_argument("-l",default ="/data/logpnet.txt", type=str, help="logging file")
     
     parser.add_argument("--dataset",default ="shapenet", type=str, help="Dataset to convert:currently supported")
-    parser.add_argument("--normal",action='store_true', help="if normal information should be saved")
-        
-    args = parser.parse_args()
+
     
+    args = parser.parse_args()
+    args.l = os.path.join(args.o, 'log.txt')
+    args.normal = False
     with open(args.l, 'w') as f:
         print("STARTING CONVERSION", file = f)
     try:

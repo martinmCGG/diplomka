@@ -9,8 +9,8 @@ def convert_to_grid(vertices, triangles, quads, grid_size):
         triangles = None
     if len(quads) == 0:
         quads = None
-    transform = vdb.createLinearTransform(voxelSize=(1.0/(grid_size-2)))
-    grid = vdb.FloatGrid.createLevelSetFromPolygons(vertices, triangles = triangles, quads = quads, transform=transform, halfWidth = 1)
+    transform = vdb.createLinearTransform(voxelSize=(1.0/(grid_size-14)))
+    grid = vdb.FloatGrid.createLevelSetFromPolygons(vertices, triangles = triangles, quads = quads, transform=transform, halfWidth = 0.6)
     
     outside = grid.background
     width = 2.0 * outside 

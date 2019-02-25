@@ -56,6 +56,7 @@ if __name__ == '__main__':
     parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert,currently supported:shapenet, modelnet")
 
     args = parser.parse_args()
+    args.l = os.path.join(args.o, 'log.txt')
     
     with open(args.l, 'w') as f:
         print("STARTING CONVERSION", file = f)

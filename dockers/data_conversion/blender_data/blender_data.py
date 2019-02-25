@@ -99,7 +99,7 @@ if __name__ == '__main__':
     parser.add_argument("-o", type=str, help="directory of the output files")
     
     parser.add_argument("-v", default=12, type=int, help="Number of views to render")
-    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
+    parser.add_argument("-t", default = 6, type=int, help="Number of threads")
     parser.add_argument("-l",default ="/data/log.txt", type=str, help="logging file")
     parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:shapenet or modelnet")
 
@@ -113,7 +113,9 @@ if __name__ == '__main__':
             categories, split = Shapenet.get_metadata(args.d)
             Shapenet.write_cat_names(args.d, args.o)
         elif args.dataset == "modelnet":
+            print('here')
             files = find_files(args.d, 'off')
+
             categories, split= Modelnet.get_metadata(args.d, files)
             Modelnet.write_cat_names(args.d, args.d)
             pool = Pool(processes=args.t)
