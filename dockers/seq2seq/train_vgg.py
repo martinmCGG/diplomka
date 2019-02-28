@@ -67,24 +67,21 @@ def evaluate(test_data, args):
     print("Building net")
                        
     net = vgg19_trainable.Vgg19(vgg19_npy_path=load_weights(args), trainable = True)
-    with tf.device('/cpu:0'):
+    with tf.device('/gpu:0'):
         sess = tf.Session()
         net.build()
         sess.run(tf.global_variables_initializer())
-        _evaluate(net,sess, test_data, args)
+        _evaluate(net, sess, test_data, args)
         
-def _evaluate(net, sess, test_data, args):
+def _evaluate(net, sess, test_data, args, epoch=0):
     print("starting evaluation")
     losses = []
     #labels = []
     predictions = []
     accs = []
-    iter = 0
     while True:
         batch_images, batch_labels, reset = test_data.next_batch(args.batch_size)
         if reset:
-            break
-        if not args.test and iter>10:
             break
         logits, loss = net.test(batch_images, batch_labels, sess)
         losses.append(loss)
@@ -101,8 +98,8 @@ def _evaluate(net, sess, test_data, args):
     if not args.test:
         loss = np.mean(losses) 
         acc = np.mean(accs)
-        LOSS_LOGGER.log(loss, 0, "eval_loss")
-        ACC_LOGGER.log(acc, 0, "eval_accuracy")
+        LOSS_LOGGER.log(loss, epoch, "eval_loss")
+        ACC_LOGGER.log(acc, epoch, "eval_accuracy")
     else:
         import Evaluation_tools as et
         eval_file = os.path.join(args.log_dir, 'vgg.txt')
@@ -110,14 +107,14 @@ def _evaluate(net, sess, test_data, args):
         et.make_matrix(args.data, eval_file, args.log_dir)
  
 def train(train_data, test_data, args):
-   
     print("Starting training")
-    with tf.device('/cpu:0'):
+    with tf.device('/gpu:0'):
         sess = tf.Session()
         if args.weights == -1:
-            it = 0
+            start_epoch=0
         else:
-            it = args.weights + 1
+            start_epoch = args.weights + 1
+            weights=args.weights
             ACC_LOGGER.load((os.path.join(args.log_dir,"vgg_acc_train_accuracy.csv"),os.path.join(args.log_dir,"vgg_acc_eval_accuracy.csv")), epoch=weights)
             LOSS_LOGGER.load((os.path.join(args.log_dir,"vgg_loss_train_loss.csv"), os.path.join(args.log_dir,'vgg_loss_eval_loss.csv')), epoch=weights)
         
@@ -127,52 +124,51 @@ def train(train_data, test_data, args):
         net.build()
         sess.run(tf.global_variables_initializer())
         
-        accs = []
-        losses = []
-        while True:
+        it_per_epoch =  train_data.size / args.batch_size
+        for epoch in range(start_epoch, args.max_epoch+start_epoch+1):
+            _evaluate(net, sess, test_data, args, epoch=epoch)
+            accs = []
+            losses = []
+            for it in range(it_per_epoch):     
             
-            if it%50 == 0:
-                net.save_npy(sess, os.path.join(args.log_dir,'./vgg_tuned_{}.npy'.format(it)))
-                _evaluate(net, sess, test_data, args)
-            if it == args.max_iter:
-                break
-            
-            
-            batch_images, batch_labels, reset = train_data.next_batch(args.batch_size)
-            _, loss, logits = net.train(batch_images, batch_labels, sess)
-            acc = np.sum(np.argmax(logits, axis=1) == batch_labels)/float(len(batch_labels))
-            accs.append(acc)
-            losses.append(loss)
-            
-            print("TRAINING it: {}  loss: {} acc: {} ".format(it, loss, acc))
-            
-            if it%10 == 0:
-                LOSS_LOGGER.log(np.mean(losses), 0, "train_loss")
-                ACC_LOGGER.log(np.mean(accs), 0, "train_accuracy")
+                batch_images, batch_labels, reset = train_data.next_batch(args.batch_size)
+                _, loss, logits = net.train(batch_images, batch_labels, sess)
+                acc = np.sum(np.argmax(logits, axis=1) == batch_labels)/float(len(batch_labels))
+                accs.append(acc)
+                losses.append(loss)
                 
-                ACC_LOGGER.save(args.log_dir)
-                LOSS_LOGGER.save(args.log_dir)
-                ACC_LOGGER.plot(dest=args.log_dir)
-                LOSS_LOGGER.plot(dest=args.log_dir)
+                if it%20 == 0:
+                    loss = np.mean(losses)
+                    acc = np.mean(accs)
+                    print("TRAINING epoch: {} it: {}  loss: {} acc: {} ".format(epoch,it, loss, acc))
+                    LOSS_LOGGER.log(loss, epoch, "train_loss")
+                    ACC_LOGGER.log(acc, epoch, "train_accuracy")
+                    
+                    ACC_LOGGER.save(args.log_dir)
+                    LOSS_LOGGER.save(args.log_dir)
+                    ACC_LOGGER.plot(dest=args.log_dir)
+                    LOSS_LOGGER.plot(dest=args.log_dir)
+                    
+            if epoch%args.save_period == 0:
+                net.save_npy(sess, os.path.join(args.log_dir,'./vgg_tuned_{}.npy'.format(epoch)))
+           
             
-
-            it += 1
 
 def extract_features(args, train_data, test_data):
     print("Building net...")
     net = vgg19_trainable.Vgg19(vgg19_npy_path=load_weights(args), trainable = True)   
     
-    with tf.device('/cpu:0'):
+    with tf.device('/gpu:0'):
         sess = tf.Session()
         net = vgg19_trainable.Vgg19(vgg19_npy_path=load_weights(args), trainable = True)  
         net.build()
         sess.run(tf.global_variables_initializer())
         out_dir = args.data
-        
+        print("extracting test...")
         test_features, test_labels = _extract_features(test_data, net, sess, args)
         np.save(os.path.join(out_dir,'test_features.npy'), test_features)
         np.save(os.path.join(out_dir,'test_labels.npy'), test_labels)
-        
+        print("extracting train...")        
         train_features, train_labels = _extract_features(train_data, net, sess, args)        
         np.save(os.path.join(out_dir,'train_features.npy'), train_features)
         np.save(os.path.join(out_dir,'train_labels.npy'), train_labels)
@@ -181,7 +177,6 @@ def _extract_features(dataset, net, sess, args):
     
     per_batch = args.batch_size/args.views
     batch_size = per_batch * args.views
-    print(batch_size)
     features = np.zeros([dataset.size/args.views, args.views, 4096])
     labels = np.zeros([dataset.size/args.views], dtype = np.int32)
     it = 0
@@ -196,7 +191,6 @@ def _extract_features(dataset, net, sess, args):
         offset = len(labs)
         feat = np.reshape(np.array(feat), (offset, args.views, 4096))
         index = per_batch*(it-1)
-        print(index, offset)
         features[index:index+offset] = feat
         offset = len(labs)
         labels[index:index+offset] = labs
@@ -208,17 +202,18 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', default='/data/converted', type=str)
-    parser.add_argument('--batch_size',type=int, default=200)
+    parser.add_argument('--batch_size',type=int, default=64)
     parser.add_argument('--num_cats',type=int, default=40)
     parser.add_argument('--test', action = 'store_true')
     parser.add_argument('--extract', action = 'store_true')    
     parser.add_argument('--weights', default=-1, type=int)
     parser.add_argument('--log_dir', default='logs', type=str)
     parser.add_argument('--views', default=12, type=int)
-    parser.add_argument('--max_iter', default=2000, type=int)    
+    parser.add_argument('--max_epoch', default=41, type=int) 
+    parser.add_argument('--save_period', default=10, type=int)       
     
     args = parser.parse_args()
-
+    
     if args.test:
         test_images, test_labels = read_lists(os.path.join(args.data,'test.txt'), views=args.views) 
         test_data = Dataset(test_images, test_labels, shuffle=False)

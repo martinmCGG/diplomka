@@ -22,7 +22,7 @@ RUN pip install --upgrade pip
 #RUN echo y | apt-get install libfontconfig1 libxrender1
 #RUN cd mvcnn && ./prepare_pretrained_alexnet.sh
 
-#RUN pip install scikit-image
+RUN pip install scikit-image
 
 RUN git clone https://github.com/machrisaa/tensorflow-vgg.git
 RUN mv tensorflow-vgg vgg

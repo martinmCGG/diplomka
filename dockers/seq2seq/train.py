@@ -6,7 +6,6 @@ from seq_rnn_model import SequenceRNNModel
 import model_data
 import csv
 from sys import argv
-import Evaluation_tools as et
 
 
 # data path parameter
@@ -22,8 +21,8 @@ tf.flags.DEFINE_string('test_acc_file', 'seq_acc.csv', 'test acc file')
 tf.flags.DEFINE_boolean("use_embedding", True, "whether use embedding")
 tf.flags.DEFINE_boolean("use_attention", True, "whether use attention")
 
-tf.flags.DEFINE_integer("training_epoches", 50, "total train epoches")
-tf.flags.DEFINE_integer("save_epoches", 5, "epoches can save")
+tf.flags.DEFINE_integer("training_epoches", 200, "total train epoches")
+tf.flags.DEFINE_integer("save_epoches", 20, "epoches can save")
 tf.flags.DEFINE_integer("n_views", 12, "number of views for each model")
 tf.flags.DEFINE_integer("n_input_fc", 4096, "size of input feature")
 tf.flags.DEFINE_integer("decoder_embedding_size", 256, "decoder embedding size")
@@ -195,6 +194,8 @@ def eval_alone(weights):
     
     predictions = [x-1 for x in predictions]  
     labels = [x-1 for x in labels]
+    
+    import Evaluation_tools as et
     eval_file = os.path.join(FLAGS.log_dir, 'seq2seq.txt')
     et.write_eval_file(FLAGS.data, eval_file, predictions , labels , 'SEQ2SEQ')
     et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
