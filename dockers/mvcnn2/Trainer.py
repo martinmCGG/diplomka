@@ -129,8 +129,7 @@ class ModelNetTrainer(object):
         all_target = []
         all_pred = []
 
-        for _, data in enumerate(self.val_loader, 0):
-
+        for k, data in enumerate(self.val_loader, 0):
             if self.model_name == 'mvcnn':
                 N,V,C,H,W = data[1].size()
                 in_data = Variable(data[1]).view(-1,C,H,W).cuda()
@@ -147,12 +146,15 @@ class ModelNetTrainer(object):
                 if not bool(results[i].cpu().data.numpy()):
                     wrong_class[target.cpu().data.numpy().astype('int')[i]] += 1
                 samples_class[target.cpu().data.numpy().astype('int')[i]] += 1
+
             correct_points = torch.sum(results.long())
 
             all_correct_points += correct_points
             all_points += results.size()[0]
             all_target += target.tolist()
             all_pred += pred.tolist()
+            print("accuracy so far ", float(all_correct_points.float() / all_points))
+           
 
         print ('Total # of test models: ', all_points)
         val_mean_class_acc = np.mean((samples_class-wrong_class)/samples_class)

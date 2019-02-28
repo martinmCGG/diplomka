@@ -2,7 +2,7 @@ from __future__ import print_function
 import os
 
 def copy(args, name):
-    d = os.path.join(args.d, 'converted')
+    d = args.d
     folders = [os.path.join(args.o, cat, name) for cat in cats]
     with open(os.path.join(d, name+'.txt'), 'r') as f:
         for line in f:
@@ -15,8 +15,8 @@ def copy(args, name):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", type=str, default='/out', help="root directory of dataset")
-    parser.add_argument("-o", type=str, default='/mvcnn2/logs/Modelnet40A_mvcnn2', help="directory of the output files")    
+    parser.add_argument("-d", type=str, default='/data', help="root directory of dataset")
+    parser.add_argument("-o", type=str, default='/out', help="directory of the output files")    
     args = parser.parse_args()
     
     with open(os.path.join(args.d, 'cat_names.txt'), 'r') as f:
