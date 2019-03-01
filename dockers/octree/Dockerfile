@@ -87,7 +87,9 @@ ENV PATH $CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
 RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
 RUN pip install --upgrade pip    
-RUN pip install pathlib matplotlib pandas
+RUN pip install pathlib matplotlib pandas lmdb
 WORKDIR /workspace
-
+RUN mkdir logs
+COPY examples ./
 COPY octree_data ./
+COPY *.py ./
