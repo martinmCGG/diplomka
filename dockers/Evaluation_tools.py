@@ -1,8 +1,4 @@
-'''
-Created on 4. 10. 2018
-
-@author: miros
-'''
+from __future__ import print_function
 import os
 
 
@@ -37,26 +33,26 @@ def make_table(out, dataset_dir='.', folder='.'):
         write_row(f, ['Model/Cat_Acc'] + categories, separator = 'th')
         
     for file in files:
-        misses, counts, _  = count_misses(file, categories)
+        misses, counts, name  = count_misses(file, categories)
         counts = [counts[cat] for cat in categories]
         class_accs = get_class_acs(misses, counts, categories)
-        make_subtable(class_accs,out, file)
+        make_subtable(class_accs, out, name)
         
     with open(out, 'a') as f:
         write_row(f, (len(categories)+1)*[' '], separator = 'td')
         write_row(f, ['Model', 'Accuraccy', 'Avg Class Acc'] + (len(categories)-1)*[' '], separator = 'th')
         
     for file in files:
-        misses, counts, _ = count_misses(file, categories)
+        misses, counts, name = count_misses(file, categories)
         counts = [counts[cat] for cat in categories]
         class_accs = get_class_acs(misses, counts, categories)
-        add_accuracies_to_table(misses, counts, categories, class_accs, out, file.split('.')[-2])
+        add_accuracies_to_table(misses, counts, categories, class_accs, out, name)
         
     with open(out,'a') as f:
         write_all(f,['</table>','</body>','</html>'])
        
 
-def add_accuracies_to_table(misses,counts, categories,class_accs,out, name):
+def add_accuracies_to_table(misses, counts, categories,class_accs,out, name):
 
     accuracy = round(count_accuracy(misses, counts, categories),2)
     avg_class_acc = round(sum(class_accs)/len(categories),2)
@@ -83,7 +79,7 @@ def get_class_acs(misses, counts, categories):
 def make_matrix(dataset_dir, file, outdir):
     categories = get_categories(dataset_dir)
     outfile = file.split('.')[0] + '.html'
-    misses, counts, _ = count_misses(file, categories)
+    misses, counts, name = count_misses(file, categories)
     
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
@@ -169,7 +165,6 @@ def get_bad(args):
     
     def print_one_file(name, misses, counts, class_accs, categories, file, top=10):
         
-    
         with open(file, 'a') as f:
             print(name, file=f)
             bad_cats = {}
@@ -226,7 +221,6 @@ def main():
     parser.add_argument("--dataset", default='.',help="Path dataset containg file cat_names.txt")
     
     args = parser.parse_args()
-    
     get_bad(args)
     make_table("./table.html", dataset_dir = args.dataset, folder = args.folder)
     
