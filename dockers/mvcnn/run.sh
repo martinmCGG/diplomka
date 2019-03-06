@@ -1,9 +1,21 @@
-docker build -t mvcnn .
-docker kill mvcnn
+##########################################################################################################
+# Set required variables
 
-dataset="/home/krabec/data/ModelNet40A_mvcnn_12"
-out="/home/krabec/dockers/mvcnn/out"
+name='mvcnn'
+dataset_path="/local/krabec/ModelNet40A_mvcnn_depth"
+out_path="/home/krabec/dockers/mvcnn/out/"
+GPU=0
+docker_hidden=t
 
-docker run --runtime=nvidia --rm -id --name mvcnn -v "$out":/mvcnn/logs -v "$dataset":/data mvcnn
-#docker exec -it mvcnn sh -c "python train.py"
-docker exec -it mvcnn sh -c "python test.py --weights 90"
+##########################################################################################################
+
+mkdir -r "$out_path"
+docker build -t "$name" .
+docker kill "$name"
+docker rm "$name"
+
+docker run --runtime=nvidia --rm -id --name "$name" -v "$out_path":/mvcnn/logs -v "$dataset_path":/data "$name"
+
+docker exec -i -"$docker_hidden" "$name" sh -c "export CUDA_VISIBLE_DEVICES=$GPU && python train.py"
+
+##########################################################################################################

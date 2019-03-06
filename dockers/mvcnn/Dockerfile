@@ -27,5 +27,6 @@ RUN echo y | apt-get install libfontconfig1 libxrender1
 RUN ./prepare_pretrained_alexnet.sh
 
 COPY *.py ./
+COPY *.ini ./
 
 ENTRYPOINT /bin/bash 
