@@ -81,7 +81,9 @@ def get_class_acs(misses, counts, categories):
 
 def make_matrix(dataset_dir, file, outdir):
     categories = get_categories(dataset_dir)
-    outfile = file.split('.')[0] + '.html'
+    outfile = os.path.basename(file).split('.')[0] + '.html'
+    outfile = os.path.join(os.path.dirname(file),outfile)
+    print(outfile)
     misses, counts = count_misses(file, categories)
     
     with open(outfile, 'w') as out:
@@ -145,7 +147,6 @@ def main():
     parser.add_argument("--dataset", help="Path to output file")
     
     args = parser.parse_args()
-
     make_table(args.o, datset_dir = args.dataset, folder = args.folder)
     
 if __name__ == '__main__':

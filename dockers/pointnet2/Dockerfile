@@ -31,5 +31,7 @@ RUN cd tf_ops/grouping/ && sh tf_grouping_compile.sh
 RUN mkdir logs
 COPY *.py ./
 RUN mv pointnet2_cls_ssg.py ./models
+COPY *.ini ./
 
 ENTRYPOINT /bin/bash 
+

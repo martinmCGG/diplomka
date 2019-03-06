@@ -1,14 +1,20 @@
-docker build -t pnet .
+##########################################################################################################
+# Set required variables
 
-docker kill pnet
-#dataset="/home/krabec/data/ModelNet40A_pnet2"
-dataset="/home/krabec/models/PNET2/data"
+name='pnet'
+dataset_path="/local/krabec/ModelNet40A_pnet"
+out_path="/home/krabec/dockers/pointnet/out/"
+GPU=2
+docker_hidden=d	
 
-out="/home/krabec/dockers/pointnet/out"
-docker run --runtime=nvidia --name pnet --rm -id -v "$out":/pointnet/logs -v "$dataset":/data pnet
+##########################################################################################################
 
-#docker exec -it pnet sh -c "rm -rf logs/*"
+mkdir -r "$out_path"
+docker build -t "$name" .
+docker kill "$name"
+docker rm "$name"
 
-#docker exec -it pnet sh -c "export CUDA_VISIBLE_DEVICES=1 && python train.py --data /data/converted"
-docker exec -it pnet sh -c "export CUDA_VISIBLE_DEVICES=1 && python evaluate.py --data /data/converted --weights 80"
+docker run --runtime=nvidia --rm -id --name "$name" -v "$out_path":/pointnet/logs -v "$dataset_path":/data "$name"
+docker exec -i -"$docker_hidden" "$name" sh -c "export CUDA_VISIBLE_DEVICES=$GPU && python train.py"
 
+##########################################################################################################

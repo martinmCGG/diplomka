@@ -21,4 +21,5 @@ RUN mkdir data
 
 COPY *.py ./
 RUN mv pointnet_cls.py ./models
+COPY *.ini ./
 RUN mkdir logs
