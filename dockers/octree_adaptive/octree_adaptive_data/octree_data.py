@@ -31,7 +31,7 @@ def convert_one_category(arguments):
     os.system("mkdir -m 777 {}".format(output_dir))
     
     scanner = DirectoryTreeScanner(view_num=args.rotations, flags=False, normalize=True)
-    scanner.scan_tree(input_base_folder=input_dir, output_base_folder=output_dir, num_threads=2)
+    scanner.scan_tree(input_base_folder=input_dir, output_base_folder=output_dir, num_threads=8)
     
     train_file = collect_files(output_dir, 'train')
     test_file = collect_files(output_dir, 'test')
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("d", type=str, help="root directory of dataset to be rendered")
     parser.add_argument("o", type=str, help="directory of the output files")
-    parser.add_argument("--rotations", default = 14, type=int, help="Number of threads")
+    parser.add_argument("--rotations", default = 1, type=int, help="Number of threads")
     parser.add_argument("-t", default = 10, type=int, help="Number of threads")
     parser.add_argument("--adaptive", action="store_true")
     parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:shapenet or modelnet")

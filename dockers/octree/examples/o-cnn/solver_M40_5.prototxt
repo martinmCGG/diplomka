@@ -2,7 +2,7 @@
 net: "./o-cnn/M40_5.prototxt"
 
 # run the forward pass for all test data to get the test loss
-test_iter: 925
+test_iter: 1000
 # Carry out testing every 5000 training iterations.
 test_interval: 100000000
 
@@ -20,10 +20,10 @@ stepsize: 40000  # about 10 epochs
 display: 100
 
 # The maximum number of iterations
-max_iter: 160000  # about 40 epochs
+max_iter: 320001  # about 40 epochs
 
 # snapshot intermediate results
-snapshot: 20000
+snapshot: 1000
 snapshot_prefix: "./logs/M40"
 
 # solver mode: CPU or GPU

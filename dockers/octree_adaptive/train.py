@@ -21,7 +21,7 @@ def eval(config, solver, epoch=0):
     test_count = get_dataset_size(config,'test')
 
     keys = solver.test_nets[0].blobs.keys()
-    batch_size = (solver.test_nets[0].blobs['label_octreedatabase_1_split_0'].data.shape[0])
+    batch_size = (solver.test_nets[0].blobs['label_data_1_split_0'].data.shape[0])    
     test_iters = test_count / batch_size
 
     for i in range(test_iters):
