@@ -55,6 +55,10 @@ class Options():
         self.parser.add_argument("--max_epoch", type = int, default=200, help="Number of epochs to train for")
         self.parser.add_argument("--save_each", type = int, default=20, help="How often to save the model")
 
+        self.parser.add_argument('--pretrain_lr_ratio',default=0.001, type=float)
+        
+        self.parser.add_argument('--weights',default=None, type=int, help='Number of model to finetune or evaluate')
+        self.parser.add_argument("--test", action='store_true')
         self.initialized = True
 
     def parse(self):

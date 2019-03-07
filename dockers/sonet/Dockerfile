@@ -38,5 +38,6 @@ COPY *.py ./
 COPY sonet_data ./sonet_data
 RUN sh sed_script.sh
 RUN mv networks.py ./models && mv *loader* ./data && mv som.py ./util && mv classifier.py ./models
+COPY *.ini ./
 
 ENTRYPOINT /bin/bash 

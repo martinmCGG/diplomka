@@ -198,8 +198,8 @@ class ModelNet_Shrec_Loader(data.Dataset):
     def __getitem__(self, index):
 
         features = self.dataset[index][0]
-        random_indexes = np.random.choice(features.shape[0], self.opt.input_pc_num, replace=False)
-        data = features[np.random.choice(features.shape[0], self.opt.input_pc_num, replace=False), :]
+        random_indexes = np.random.choice(features.shape[0], self.opt.num_points, replace=False)
+        data = features[np.random.choice(features.shape[0], self.opt.num_points, replace=False), :]
         
         pc_np = data[:, 0:3]  # Nx3
         surface_normal_np = data[:, 3:6]  # Nx3
@@ -268,7 +268,7 @@ if __name__=="__main__":
     class VirtualOpt():
         def __init__(self):
             self.load_all_data = False
-            self.input_pc_num = 5000
+            self.num_points = 5000
             self.batch_size = 8
             self.dataset = '10k'
             self.node_num = 64

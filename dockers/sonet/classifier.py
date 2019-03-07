@@ -15,16 +15,17 @@ from . import losses
 class Model():
     def __init__(self, opt):
         self.opt = opt
-
+        gpu_id = 0
+        self.device = torch.device("cuda:%d" % (gpu_id) if torch.cuda.is_available() else "cpu")
         self.encoder = networks.Encoder(opt)
         self.classifier = networks.Classifier(opt)
 
         # learning rate_control
         if self.opt.weights is not None:
-            self.old_lr_encoder = self.opt.lr * self.opt.pretrain_lr_ratio
+            self.old_lr_encoder = self.opt.learning_rate * self.opt.pretrain_lr_ratio
         else:
-            self.old_lr_encoder = self.opt.lr
-        self.old_lr_classifier = self.opt.lr
+            self.old_lr_encoder = self.opt.learning_rate
+        self.old_lr_classifier = self.opt.learning_rate
 
         self.optimizer_encoder = torch.optim.Adam(self.encoder.parameters(),
                                                   lr=self.old_lr_encoder,
@@ -36,14 +37,14 @@ class Model():
                                                      weight_decay=0)
 
         self.softmax_criteria = nn.CrossEntropyLoss()
-        if self.opt.gpu_id >= 0:
-            self.encoder = self.encoder.to(self.opt.device)
-            self.classifier = self.classifier.to(self.opt.device)
-            self.softmax_criteria = self.softmax_criteria.to(self.opt.device)
+        if gpu_id >= 0:
+            self.encoder = self.encoder.to(self.device)
+            self.classifier = self.classifier.to(self.device)
+            self.softmax_criteria = self.softmax_criteria.to(self.device)
 
         # place holder for GPU tensors
-        self.input_pc = torch.FloatTensor(self.opt.batch_size, 3, self.opt.input_pc_num).uniform_()
-        self.input_sn = torch.FloatTensor(self.opt.batch_size, 3, self.opt.input_pc_num).uniform_()
+        self.input_pc = torch.FloatTensor(self.opt.batch_size, 3, self.opt.num_points).uniform_()
+        self.input_sn = torch.FloatTensor(self.opt.batch_size, 3, self.opt.num_points).uniform_()
         self.input_label = torch.LongTensor(self.opt.batch_size).fill_(1)
         self.input_node = torch.FloatTensor(self.opt.batch_size, 3, self.opt.node_num)
         self.input_node_knn_I = torch.LongTensor(self.opt.batch_size, self.opt.node_num, self.opt.som_k)
@@ -52,14 +53,14 @@ class Model():
         self.test_loss = torch.tensor([0], dtype=torch.float32, requires_grad=False)
         self.test_accuracy = torch.tensor([0], dtype=torch.float32, requires_grad=False)
 
-        if self.opt.gpu_id >= -1:
-            self.input_pc = self.input_pc.to(self.opt.device)
-            self.input_sn = self.input_sn.to(self.opt.device)
-            self.input_label = self.input_label.to(self.opt.device)
-            self.input_node = self.input_node.to(self.opt.device)
-            self.input_node_knn_I = self.input_node_knn_I.to(self.opt.device)
-            self.test_loss = self.test_loss.to(self.opt.device)
-            # self.test_accuracy = self.test_accuracy.to(self.opt.device)
+        if gpu_id >= -1:
+            self.input_pc = self.input_pc.to(self.device)
+            self.input_sn = self.input_sn.to(self.device)
+            self.input_label = self.input_label.to(self.device)
+            self.input_node = self.input_node.to(self.device)
+            self.input_node_knn_I = self.input_node_knn_I.to(self.device)
+            self.test_loss = self.test_loss.to(self.device)
+            # self.test_accuracy = self.test_accuracy.to(device)
 
     def set_input(self, input_pc, input_sn, input_label, input_node, input_node_knn_I):
         self.input_pc.resize_(input_pc.size()).copy_(input_pc)
@@ -79,9 +80,9 @@ class Model():
         # random point dropout
         if self.opt.random_pc_dropout_lower_limit < 0.99:
             dropout_keep_ratio = random.uniform(self.opt.random_pc_dropout_lower_limit, 1.0)
-            resulting_pc_num = round(dropout_keep_ratio*self.opt.input_pc_num)
-            chosen_indices = np.random.choice(self.opt.input_pc_num, resulting_pc_num, replace=False)
-            chosen_indices_tensor = torch.from_numpy(chosen_indices).to(self.opt.device)
+            resulting_pc_num = round(dropout_keep_ratio*self.opt.num_points)
+            chosen_indices = np.random.choice(self.opt.num_points, resulting_pc_num, replace=False)
+            chosen_indices_tensor = torch.from_numpy(chosen_indices).to(self.device)
             self.pc = torch.index_select(self.pc, dim=2, index=chosen_indices_tensor)
             self.sn = torch.index_select(self.sn, dim=2, index=chosen_indices_tensor)
 
@@ -124,13 +125,11 @@ class Model():
             ('test_accuracy', self.test_accuracy.item())
         ])
 
-    def save_network(self, network, network_label, epoch_label, gpu_id):
-        save_filename = '%s_net_%s.pth' % (epoch_label, network_label)
-        save_path = os.path.join(self.opt.log_dir, save_filename)
+    def save_network(self, network, save_path, gpu_id):
         torch.save(network.cpu().state_dict(), save_path)
         if gpu_id>=0 and torch.cuda.is_available():
             # torch.cuda.device(gpu_id)
-            network.to(self.opt.device)
+            network.to(self.device)
 
     def update_learning_rate(self, ratio):
         lr_clip = 0.00001

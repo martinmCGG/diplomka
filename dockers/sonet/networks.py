@@ -101,10 +101,10 @@ class Encoder(nn.Module):
         # build som for clustering, node initalization is done in __init__
         rows = int(math.sqrt(self.opt.node_num))
         cols = rows
-        self.som_builder = som.BatchSOM(rows, cols, 3, self.opt.gpu_id, self.opt.batch_size)
+        self.som_builder = som.BatchSOM(rows, cols, 3, 0, self.opt.batch_size)
 
         # masked max
-        self.masked_max = operations.MaskedMax(self.opt.node_num, gpu_id=self.opt.gpu_id)
+        self.masked_max = operations.MaskedMax(self.opt.node_num, gpu_id=0)
 
         # padding
         self.zero_pad = torch.nn.ZeroPad2d(padding=1)
@@ -207,7 +207,7 @@ class Classifier(nn.Module):
                             momentum=opt.bn_momentum, bn_momentum_decay_step=opt.bn_momentum_decay_step, bn_momentum_decay=opt.bn_momentum_decay)
         self.fc2 = MyLinear(512, 256, activation=self.opt.activation, normalization=self.opt.normalization,
                             momentum=opt.bn_momentum, bn_momentum_decay_step=opt.bn_momentum_decay_step, bn_momentum_decay=opt.bn_momentum_decay)
-        self.fc3 = MyLinear(256, self.opt.classes, activation=None, normalization=None)
+        self.fc3 = MyLinear(256, self.opt.num_classes, activation=None, normalization=None)
 
         self.dropout1 = nn.Dropout(p=self.opt.dropout)
         self.dropout2 = nn.Dropout(p=self.opt.dropout)
@@ -251,7 +251,7 @@ class Segmenter(nn.Module):
         self.drop3 = nn.Dropout(p=self.opt.dropout)
         self.layer4 = EquivariantLayer(256, 128, activation=self.opt.activation, normalization=self.opt.normalization)
         self.drop4 = nn.Dropout(p=self.opt.dropout)
-        self.layer5 = EquivariantLayer(128, self.opt.classes, activation=None, normalization=None)
+        self.layer5 = EquivariantLayer(128, self.opt.num_classes, activation=None, normalization=None)
 
     def forward(self, x_decentered, x, centers, sn, label,
                 first_pn_out,
