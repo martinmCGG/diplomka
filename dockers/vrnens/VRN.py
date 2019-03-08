@@ -14,7 +14,7 @@ import lasagne.layers
 # 1. Use cuDNN.
 # 2. If that fails, replace all the DNN layers with another 3D conv layer.
 import lasagne.layers.dnn
-
+from config import get_config
 # I use a lot of aliases to help keep my code more compact;
 # consider changing these back to their full callouts if you like.
 from lasagne.layers import ElemwiseSumLayer as ESL
@@ -25,22 +25,23 @@ from lasagne.layers import batch_norm as BN
 
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 
-lr_schedule = { 0: 0.002,12:0.0002}
+config = get_config()
+lr_schedule = { 0: config.learning_rate,12:config.learning_rate/10}
 
-cfg = {'batch_size' : 24,
+cfg = {'batch_size' : config.batch_size,
        'learning_rate' : lr_schedule,
        'decay_rate' : 0,
-       'reg' : 0.001,
-       'momentum' : 0.9,
-       'dims' : (32, 32, 32),
+       'reg' : config.reg,
+       'momentum' : config.momentum,
+       'dims' : (config.dim, config.dim, config.dim),
        'n_channels' : 1,
-       'n_classes' : 40,
+       'n_classes' : config.num_classes,
        'batches_per_chunk': 20,
-       'max_epochs' : 10,
+       'max_epochs' : config.max_epoch,
        'max_jitter_ij' : 2,
        'max_jitter_k' : 2,
-       'n_rotations' : 24,
-       'checkpoint_every_nth' : 1,
+       'n_rotations' : config.num_rotations,
+       'checkpoint_every_nth' : config.save_period,
        }
        
 # Convenience function for creating inception blocks.  

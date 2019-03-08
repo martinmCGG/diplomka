@@ -1,10 +1,22 @@
-docker build -t vrnens .
-docker kill vrnens
-docker rm vrnens
+##########################################################################################################
+# Set required variables
 
-dataset="/home/krabec/data/ModelNet40_vrnens"
-out="/home/krabec/dockers/vrnens/out"
+name='vrnens2'
+dataset_path="/local/krabec/ModelNet40A_vrnens"
+out_path="/home/krabec/dockers/vrnens2/out/"
+GPU=1
+docker_hidden=t
 
-docker run --runtime=nvidia --rm -id --name vrnens -v "$out":/vrnens/Discriminative/logs -v "$dataset":/data vrnens
-docker exec -id vrnens sh -c "python train.py VRN.py /data/converted"
-#docker exec -it vrnens sh -c "python test_ensemble.py VRN.py /data/converted --weights 2"
+##########################################################################################################
+
+mkdir -r "$out_path"
+docker build -t "$name" .
+docker kill "$name"
+docker rm "$name"
+
+docker run --runtime=nvidia --rm -id --name "$name" -v "$out_path":/vrnens/Discriminative/logs -v "$dataset_path":/data "$name"
+
+docker exec -i -"$docker_hidden" "$name" sh -c "export CUDA_VISIBLE_DEVICES=$GPU && python train.py"
+
+##########################################################################################################
+

@@ -68,7 +68,7 @@ RUN git clone https://github.com/dimatura/voxnet.git
 WORKDIR vrnens
 COPY *.py Discriminative/
 RUN mv Discriminative/layers.py /voxnet/voxnet
-
 WORKDIR /vrnens/Discriminative
+COPY *.ini ./
 RUN mkdir logs
 ENTRYPOINT /bin/bash 
