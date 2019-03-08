@@ -13,7 +13,7 @@ args = parser.parse_args()
 NUM_CLASSES = 40
 VIEWS = 12
 BATCH_SIZE = 256
-TRAIN_FOR_EPOCH = 300
+TRAIN_FOR_EPOCH = 1000
 SAVE_PERIOD = 20
 
 train_cmd = 'python train.py --n_hidden=128 --decoder_embedding_size=256 --use_lstm=False --keep_prob=0.5   --learning_rate=0.0002  --n_max_keep_model=200 '

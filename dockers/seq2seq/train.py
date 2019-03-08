@@ -5,139 +5,89 @@ from Logger import Logger
 from seq_rnn_model import SequenceRNNModel
 import model_data
 import csv
-from sys import argv
+from config import get_config
 
+config = get_config()
 
-# data path parameter
-tf.flags.DEFINE_string('log_dir', '', 'file dir for saving features and labels')
-tf.flags.DEFINE_string('data', '', 'path to data')
-tf.flags.DEFINE_string('weights', '', 'number of model to finetune or test')
-
-
-tf.flags.DEFINE_string('checkpoint_path', './logs', 'trained model checkpoint')
-tf.flags.DEFINE_string('test_acc_file', 'seq_acc.csv', 'test acc file')
-
-# model parameter
-tf.flags.DEFINE_boolean("use_embedding", True, "whether use embedding")
-tf.flags.DEFINE_boolean("use_attention", True, "whether use attention")
-
-tf.flags.DEFINE_integer("training_epoches", 200, "total train epoches")
-tf.flags.DEFINE_integer("save_epoches", 20, "epoches can save")
-tf.flags.DEFINE_integer("n_views", 12, "number of views for each model")
-tf.flags.DEFINE_integer("n_input_fc", 4096, "size of input feature")
-tf.flags.DEFINE_integer("decoder_embedding_size", 256, "decoder embedding size")
-tf.flags.DEFINE_integer("n_classes", 40, "total number of classes to be classified")
-tf.flags.DEFINE_integer("n_hidden", 128, "hidden of rnn cell")
-tf.flags.DEFINE_float("keep_prob", 1.0, "kepp prob of rnn cell")
-tf.flags.DEFINE_boolean("use_lstm", False, "use lstm or gru cell")
-
-# attention parameter
-tf.flags.DEFINE_integer("num_heads", 1, "Number of attention heads that read from attention_states")
-
-# training parameter
-tf.flags.DEFINE_boolean('train', True, 'train mode')
-tf.flags.DEFINE_integer("batch_size", 32, "training batch size")
-tf.flags.DEFINE_float("learning_rate", 0.0001, "learning rate")
-tf.flags.DEFINE_integer("n_max_keep_model", 1000, "max number to save model")
-
-FLAGS = tf.flags.FLAGS
-
-def main(argv):
-    if FLAGS.train:
-        train(FLAGS.weights)
-    else:
-        eval_alone(FLAGS.weights)
-
-
-def train(weights):
-    LOG_DIR = FLAGS.log_dir
-    data =  model_data.read_data(FLAGS.data, n_views=FLAGS.n_views)
+def train():
+    data =  model_data.read_data(config.data, config)
     test_data = data.test
-    seq_rnn_model = SequenceRNNModel(FLAGS.n_input_fc, FLAGS.n_views, FLAGS.n_hidden, FLAGS.decoder_embedding_size, FLAGS.n_classes+1, FLAGS.n_hidden,
-                                     learning_rate=FLAGS.learning_rate,
-                                     keep_prob=FLAGS.keep_prob,
-                                     batch_size=FLAGS.batch_size,
+    seq_rnn_model = SequenceRNNModel(config.n_input_fc, config.num_views, config.n_hidden, config.decoder_embedding_size, config.num_classes+1, config.n_hidden,
+                                     learning_rate=config.learning_rate,
+                                     keep_prob=config.keep_prob,
+                                     batch_size=config.batch_size,
                                      is_training=True,
-                                     use_lstm=FLAGS.use_lstm,
-                                     use_attention=FLAGS.use_attention,
-                                     use_embedding=FLAGS.use_embedding,
-                                     num_heads=FLAGS.num_heads)
-                                     #init_decoder_embedding=model_data.read_class_yes_embedding(FLAGS.log_dir))
+                                     use_lstm=config.use_lstm,
+                                     use_attention=config.use_attention,
+                                     use_embedding=config.use_embedding,
+                                     num_heads=config.num_heads)
+                                     #init_decoder_embedding=model_data.read_class_yes_embedding(config.log_dir))
                                      
-    seq_rnn_model_test = SequenceRNNModel(FLAGS.n_input_fc, FLAGS.n_views, FLAGS.n_hidden, FLAGS.decoder_embedding_size, FLAGS.n_classes+1, FLAGS.n_hidden,
+    seq_rnn_model_test = SequenceRNNModel(config.n_input_fc, config.num_views, config.n_hidden, config.decoder_embedding_size, config.num_classes+1, config.n_hidden,
                                  batch_size=test_data.size(),
                                  is_training=False,
-                                 use_lstm=FLAGS.use_lstm,
-                                 use_attention=FLAGS.use_attention,
-                                 use_embedding=FLAGS.use_embedding,
-                                 num_heads=FLAGS.num_heads)
+                                 use_lstm=config.use_lstm,
+                                 use_attention=config.use_attention,
+                                 use_embedding=config.use_embedding,
+                                 num_heads=config.num_heads)
 
     seq_rnn_model_test.build_model("eval")
     
-    config = tf.ConfigProto()
+    tf_config = tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    tf_config.gpu_options.per_process_gpu_memory_fraction = 0.5
     
-    config.gpu_options.allow_growth = True
-    config.gpu_options.per_process_gpu_memory_fraction = 0.5
-    
-    
-    #if not os.path.exists(get_modelpath()):
-    #    os.makedirs(get_modelpath())
-    with tf.Session(config=config) as sess:
+    with tf.Session(config=tf_config) as sess:
         seq_rnn_model.build_model("train")
-        saver = tf.train.Saver(max_to_keep=FLAGS.n_max_keep_model)
+        saver = tf.train.Saver()
         init = tf.global_variables_initializer()
         sess.run(init)
-        startepoch = 0
-        
-        if weights:
-            weights = int(weights)
-            w = os.path.join(args.log_dir, "model.ckpt-{}".format(weights))
-            saver.restore(sess, w)
-            startepoch = weights + 1
-            ACC_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_acc_train_accuracy.csv"),os.path.join(FLAGS.log_dir,"seq2seq_acc_eval_accuracy.csv")), epoch=weights)
-            LOSS_LOGGER.load((os.path.join(FLAGS.log_dir,"seq2seq_loss_train_loss.csv"), os.path.join(FLAGS.log_dir,'seq2seq_loss_eval_loss.csv')), epoch=weights)
-            
-        epoch = startepoch
+        start_epoch = 0
+        WEIGHTS = config.weights
+        if WEIGHTS!=-1:
+            ld = config.log_dir
+            start_epoch = WEIGHTS + 1
+            saver.restore(sess, get_modelpath(WEIGHTS))
+            ACC_LOGGER.load((os.path.join(ld,"{}_acc_train_accuracy.csv".format(config.name)),
+                             os.path.join(ld,"{}_acc_eval_accuracy.csv".format(config.name))), epoch = WEIGHTS)
+            LOSS_LOGGER.load((os.path.join(ld,"{}_loss_train_loss.csv".format(config.name)),
+                               os.path.join(ld,'{}_loss_eval_loss.csv'.format(config.name))), epoch = WEIGHTS)
         
         accs = []
         losses = []
-        while epoch <= FLAGS.training_epoches + startepoch:
+        for epoch in xrange(start_epoch, config.max_epoch + start_epoch + 1):
             batch = 1
-            
-            while batch * FLAGS.batch_size <= data.train.size():
-                batch_encoder_inputs, batch_decoder_inputs = data.train.next_batch(FLAGS.batch_size)
+            while batch * config.batch_size <= data.train.size():
+                batch_encoder_inputs, batch_decoder_inputs = data.train.next_batch(config.batch_size)
                 target_labels = get_target_labels(batch_decoder_inputs)
-                batch_encoder_inputs = batch_encoder_inputs.reshape((FLAGS.batch_size, FLAGS.n_views, FLAGS.n_input_fc))
-                batch_encoder_inputs, batch_decoder_inputs, batch_target_weights = seq_rnn_model.get_batch(batch_encoder_inputs, batch_decoder_inputs, batch_size=FLAGS.batch_size)
+                batch_encoder_inputs = batch_encoder_inputs.reshape((config.batch_size, config.num_views, config.n_input_fc))
+                batch_encoder_inputs, batch_decoder_inputs, batch_target_weights = seq_rnn_model.get_batch(batch_encoder_inputs, batch_decoder_inputs, batch_size=config.batch_size)
                 loss, logits = seq_rnn_model.step(sess, batch_encoder_inputs, batch_decoder_inputs, batch_target_weights,forward_only=False)
                 predict_labels = seq_rnn_model.predict(logits)
                 acc = accuracy(predict_labels, target_labels)
                 accs.append(acc)
                 losses.append(loss)
                 
-                if batch%10 == 0:
+                if batch%20 == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accs)
                     LOSS_LOGGER.log(loss, epoch, "train_loss")
                     ACC_LOGGER.log(acc, epoch, "train_accuracy")
-                    print("epoch %d batch %d: loss=%f" %(epoch, batch, loss))
+                    print("epoch %d batch %d: loss=%f acc=%f" %(epoch, batch, loss, acc))
                     accs = []
                     losses = []
                 batch += 1
-            # if epoch % display_epoch == 0:
-            #     print("epoch %d:display" %(epoch))
-            if epoch % FLAGS.save_epoches == 0 and epoch>0:
+
+            if epoch % config.save_period == 0:
                 saver.save(sess, get_modelpath(epoch))
-            #     # do test using test dataset
             
             weights = seq_rnn_model.get_weights(sess)
             eval_during_training(weights, seq_rnn_model_test, epoch)
-            epoch += 1
     
-            ACC_LOGGER.save(LOG_DIR)
-            LOSS_LOGGER.save(LOG_DIR)
-            ACC_LOGGER.plot(dest=LOG_DIR)
-            LOSS_LOGGER.plot(dest=LOG_DIR)
+            ACC_LOGGER.save(config.log_dir)
+            LOSS_LOGGER.save(config.log_dir)
+            ACC_LOGGER.plot(dest=config.log_dir)
+            LOSS_LOGGER.plot(dest=config.log_dir)
 
 
 def _test(data, seq_rnn_model, sess):
@@ -145,7 +95,7 @@ def _test(data, seq_rnn_model, sess):
     test_encoder_inputs, test_decoder_inputs = data.next_batch(data.size(), shuffle=False)
     target_labels = get_target_labels(test_decoder_inputs)
     
-    test_encoder_inputs = test_encoder_inputs.reshape((-1, FLAGS.n_views, FLAGS.n_input_fc))
+    test_encoder_inputs = test_encoder_inputs.reshape((-1, config.num_views, config.n_input_fc))
     test_encoder_inputs, test_decoder_inputs, test_target_weights = seq_rnn_model.get_batch(test_encoder_inputs,
                                                                                             test_decoder_inputs,batch_size=data.size())
     
@@ -157,11 +107,11 @@ def _test(data, seq_rnn_model, sess):
     return acc, loss, predict_labels, target_labels
 
 def eval_during_training(weights, model, epoch):
-    data = model_data.read_data(FLAGS.data, n_views=FLAGS.n_views, read_train=False)
+    data = model_data.read_data(config.data, config, read_train=False)
     data = data.test
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    with tf.Session(config=config) as sess:
+    tf_config = tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    with tf.Session(config=tf_config) as sess:
         init = tf.global_variables_initializer()
         sess.run(init)
         model.assign_weights(sess, weights, "eval")
@@ -171,24 +121,22 @@ def eval_during_training(weights, model, epoch):
     ACC_LOGGER.log(acc[0],epoch, "eval_accuracy")
     
     
-def eval_alone(weights):
-    data = model_data.read_data(FLAGS.data, n_views=FLAGS.n_views, read_train=False)
+def eval_alone():
+    data = model_data.read_data(config.data, config, read_train=False)
     data = data.test
-    seq_rnn_model = SequenceRNNModel(FLAGS.n_input_fc, FLAGS.n_views, FLAGS.n_hidden, FLAGS.decoder_embedding_size, FLAGS.n_classes+1, FLAGS.n_hidden,
+    seq_rnn_model = SequenceRNNModel(config.n_input_fc, config.num_views, config.n_hidden, config.decoder_embedding_size, config.num_classes+1, config.n_hidden,
                                      batch_size=data.size(),
                                      is_training=False,
-                                     use_lstm=FLAGS.use_lstm,
-                                     use_attention=FLAGS.use_attention,
-                                     use_embedding=FLAGS.use_embedding, num_heads=FLAGS.num_heads)
+                                     use_lstm=config.use_lstm,
+                                     use_attention=config.use_attention,
+                                     use_embedding=config.use_embedding, num_heads=config.num_heads)
     seq_rnn_model.build_model("train")
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    with tf.Session(config=config) as sess:
+    tf_config = tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    with tf.Session(config=tf_config) as sess:
     #config.gpu_options.per_process_gpu_memory_fraction = 0.3
         saver = tf.train.Saver()
-        weights = int(weights)
-        w = os.path.join(FLAGS.log_dir, "model.ckpt-{}".format(weights))
-        saver.restore(sess, w)    
+        saver.restore(sess, get_modelpath(config.weights))
         acc, loss, predictions, labels = _test(data, seq_rnn_model, sess)
     print("model:%s, acc_instance=%f, acc_class=%f" % ("Model", acc[0], acc[1]))
     
@@ -196,9 +144,9 @@ def eval_alone(weights):
     labels = [x-1 for x in labels]
     
     import Evaluation_tools as et
-    eval_file = os.path.join(FLAGS.log_dir, 'seq2seq.txt')
-    et.write_eval_file(FLAGS.data, eval_file, predictions , labels , 'SEQ2SEQ')
-    et.make_matrix(FLAGS.data, eval_file, FLAGS.log_dir)
+    eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
+    et.write_eval_file(config.data, eval_file, predictions, labels, config.name)
+    et.make_matrix(config.data, eval_file, config.log_dir)    
         
 
 def get_target_labels(seq_labels):
@@ -222,7 +170,6 @@ def accuracy(predict, target, mode="average_class"):
             predict_at_class = predict[np.argwhere(target == class_id).reshape([-1])]
             acc_classes.append(np.mean(np.equal(predict_at_class, class_id)))
             acc_classes_map[class_id] = acc_classes[-1]
-        #print("class accuracy:", acc_classes_map)
         with open("class_acc.csv", 'w') as f:
             w = csv.writer(f)
             for k in acc_classes_map:
@@ -230,49 +177,19 @@ def accuracy(predict, target, mode="average_class"):
         return  [np.mean(np.equal(predict, target)), np.mean(np.array(acc_classes))]
 
 def get_modelpath(epoch):
-    return os.path.join(FLAGS.log_dir, "model.ckpt-{}".format(epoch))
+    return os.path.join(config.log_dir, config.snapshot_prefix + str(epoch))
+
+def main(argv):
+    
+    if config.test:
+        eval_alone()
+    else:
+        train()
 
 if __name__ == '__main__':
-
-    import argparse
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument("--test", default=False, type=bool, help="train or test")
-    parser.add_argument('--weights')
-    
-    parser.add_argument("--n_hidden", default=128, type=int, help="number of hidden neurons")
-    parser.add_argument("--decoder_embedding_size", default=256, type=int, help="")
-    parser.add_argument("--n_views", default=20, type=int, help="number of views") 
-    parser.add_argument("--use_lstm", default=False, type=bool, help="use gru or lstm")
-    parser.add_argument("--keep_prob", default=0.5, type=float, help="droupout rate") 
-    parser.add_argument("--training_epoches", default=100, type=int, help="number of epochs to train")
-    parser.add_argument('--save_epoches', default=10,type=int)
-    parser.add_argument("--learning_rate", default=0.0002, type=float, help="learning rate") 
-    parser.add_argument("--batch_size", default=32, type=int, help="number of epochs to train")
-    parser.add_argument('--n_max_keep_model', default=50, type=int)
-
-    parser.add_argument('--n_classes', type=int)
-    parser.add_argument('--train_feature_file')
-    parser.add_argument('--train_label_file')
-    parser.add_argument('--test_feature_file')
-    parser.add_argument('--test_label_file')
-    parser.add_argument('--save_seq_embeddingmvmodel_path')
-    parser.add_argument('--checkpoint_path')
-    parser.add_argument('--test_acc_file')
-    
-    parser.add_argument('--data', default='/data/converted', type=str)
-    parser.add_argument('--log_dir',default='logs', type=str)
-    args = parser.parse_args()
-    
-    LOSS_LOGGER = Logger("seq2seq_loss")
-    ACC_LOGGER = Logger("seq2seq_acc")
-
-    FLAGS.log_dir = args.log_dir
-    FLAGS.data = args.data
-    FLAGS.weights = args.weights
-    FLAGS.train = not args.test
-    
-    tf.app.run(main,argv)
+    LOSS_LOGGER = Logger("{}_loss".format(config.name))
+    ACC_LOGGER = Logger("{}_acc".format(config.name))
+    tf.app.run(main)
     
 
 

@@ -6,12 +6,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	wget \
 	git 
 	
-RUN git clone https://github.com/mingyangShang/SeqViews2SeqLabels && mv SeqViews2SeqLabels seq2seq
-WORKDIR /seq2seq
 
 RUN pip install --upgrade pip
-
 RUN pip install scikit-image
 
+RUN git clone https://github.com/machrisaa/tensorflow-vgg.git
+RUN mv tensorflow-vgg vgg
+WORKDIR vgg
+COPY vgg19.npy ./
 COPY *.py ./
 COPY *.ini ./
