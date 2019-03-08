@@ -1,17 +1,22 @@
-#!/bin/bash
+##########################################################################################################
+# Set required variables
+name='rotnet'
+dataset_path="/local/krabec/ModelNet40A_mvcnn_pbrt"
+out_path="/home/krabec/dockers/rotnet/out/"
+GPU=0
+docker_hidden=t
 
-docker kill cafferotnet
-docker rm cafferotnet
-docker build -t cafferotnet .
+##########################################################################################################
 
+mkdir -r "$out_path"
+docker build -t "$name" .
+docker kill "$name"
+docker rm "$name"
 
-dataset="/home/krabec/data/ModelNet40A_mvcnn_12"
-out="/home/krabec/dockers/rotnet/out"
+docker run --runtime=nvidia --rm -id --name "$name" -v "$out_path":/rotationnet/logs -v "$dataset_path":/data "$name"
+docker exec -i -"$docker_hidden" "$name" sh -c "export CUDA_VISIBLE_DEVICES=$GPU && python train.py"
 
-docker run --runtime=nvidia --rm -id --name cafferotnet -v "$out":/rotationnet/logs -v "$dataset":/data cafferotnet:latest sh
-docker exec -it cafferotnet bash -c "python prepare_data.py /data/converted/train.txt" 
-docker exec -it cafferotnet bash -c "python prepare_data.py /data/converted/test.txt --test" 
+##########################################################################################################
 
-#docker exec -it cafferotnet bash -c "export CUDA_VISIBLE_DEVICES=0 && python train.py --solver Training/rotationnet_modelnet40_case1_solver.prototxt 2>&1 | tee logs/log.txt"
-docker exec -it cafferotnet bash -c "export CUDA_VISIBLE_DEVICES=0 && python train.py --solver Training/rotationnet_modelnet40_case1_solver.prototxt"
-#docker exec -it cafferotnet bash -c "export CUDA_VISIBLE_DEVICES=0 && python train.py  --solver Training/rotationnet_modelnet40_case1_solver.prototxt --weights 500"
+#docker exec -it cafferotnet bash -c "python prepare_data.py /data/train.txt" 
+#docker exec -it cafferotnet bash -c "python prepare_data.py /data/test.txt --test" 

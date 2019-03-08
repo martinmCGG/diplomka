@@ -10,5 +10,5 @@ display: 50
 max_iter: 40000
 momentum: 0.9
 weight_decay: 0.0005
-snapshot: 2000
+snapshot: 10
 snapshot_prefix: "logs/case1"
