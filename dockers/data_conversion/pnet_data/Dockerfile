@@ -11,4 +11,5 @@ RUN apt-get update -yq && apt-get install -yq \
     
 RUN pip3 install h5py
     
-COPY *.py /
+COPY *.py ./
+COPY *.ini ./

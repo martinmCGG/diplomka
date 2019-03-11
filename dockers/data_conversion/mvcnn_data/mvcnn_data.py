@@ -6,7 +6,7 @@ import Modelnet
 from multiprocessing import Process, Pool, Lock
 from pathlib import Path
 from mesh_files import *
-
+from config import get_config, add_to_config
 
 def get_name_of_image_file(output_dir, file_id, angle, camera_angle):
     return os.path.join(output_dir , file_id, file_id + "_{:.2f}_{:.2f}.png".format(angle, camera_angle))
@@ -19,7 +19,6 @@ def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir
     
     if dodecahedron:
         formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov, dodecahedron)
-        #print(formated_scene)
     else:
         formated_scene = unformated_scene.format(output_file, geometry, angle, "1.6 0.8 0", fov, "0 1 0")
         
@@ -60,58 +59,57 @@ def render_model(obj_file, id, file_id, views, camera_rotations, output_dir, cat
                 print(get_name_of_image_file(output_dir, file_id, angle, camera_angle), file=f)
        
 
-def files_to_images(files, id, args, categories, lock):
-    views = args.v
-    output_dir = args.o
-    camera_rotations = args.camera_rotations
-    log("Starting thread {} on {} files.".format(id, len(files)),lock, args.l)
+def files_to_images(files, id, config, categories, lock):
+    views = config.num_views
+    output_dir = config.output
+    camera_rotations = config.camera_rotations
+    log("Starting thread {} on {} files.".format(id, len(files)),lock, config.log_file)
     for i in range(len(files)):
         file = files[i]
-        log("Thread {} is {:.2f}% done.".format(id,float(i)/len(files)*100), lock, args.l)
+        log("Thread {} is {:.2f}% done.".format(id,float(i)/len(files)*100), lock, config.log_file)
         try:
-            file_id = get_file_id(file, args.dataset)
-            render_model(file, id, file_id, views, camera_rotations, output_dir, categories[file_id],args.fov,dodecahedron=args.dodecahedron)
+            file_id = get_file_id(file, config.dataset_type)
+            render_model(file, id, file_id, views, camera_rotations, output_dir, categories[file_id],config.fov,dodecahedron=config.dodecahedron)
         except:
             e = sys.exc_info()[0]
-            log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), lock, args.l)
-            log("Exception: {}".format(e), lock, args.l)
-    log("Ending thread {}.".format(id), lock, args.l)
+            log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), lock, config.log_file)
+            log("Exception: {}".format(e), lock, config.log_file)
+    log("Ending thread {}.".format(id), lock, config.log_file)
     
     
 
-def save_for_mvcnn(args, files, categories):
-    size = len(files) // args.t
+def save_for_mvcnn(config, files, categories):
+    size = len(files) // config.num_threads
     pool = []
     lock = Lock()
-    if args.dodecahedron:
-        args.dodecahedron = compute_dodecahedron_vertices()
-    else:
-        args.dodecahedron = False
-    log("Starting {} threads on {} files.".format(args.t, len(files)),lock, args.l)
+    if config.dodecahedron:
+        config.dodecahedron = compute_dodecahedron_vertices()
+    
     if len(files) > 20:
-        for i in range(args.t-1):
-            p = Process(target=files_to_images, args=(files[i*size:(i+1)*size], i, args, categories, lock))
+        log("Starting {} threads on {} files.".format(config.num_threads, len(files)),lock, config.log_file)
+        for i in range(config.num_threads-1):
+            p = Process(target=files_to_images, config=(files[i*size:(i+1)*size], i, config, categories, lock))
             p.start()
             pool.append(p)
-        p = Process(target=files_to_images, args=(files[(args.t-1)*size:], args.t-1, args, categories, lock))
+        p = Process(target=files_to_images, config=(files[(config.num_threads-1)*size:], config.num_threads-1, config, categories, lock))
         p.start()
         pool.append(p)
         for p in pool:
             p.join()
     else:
-        files_to_images(files, 0, args, categories, lock)
-    log("Ending...",lock, args.l)
+        files_to_images(files, 0, config, categories, lock)
+    log("Ending...",lock, config.log_file)
 
-def collect_files(files, split, cats, args):
+def collect_files(files, split, cats, config):
     print("COLLECTING")
     datasets = ['train', 'test', 'val']
     for dataset in range(len(datasets)):
-        with open ('{}/{}.txt'.format(args.o, datasets[dataset]), 'w') as f:
+        with open ('{}/{}.txt'.format(config.output, datasets[dataset]), 'w') as f:
             for file in files:
-                file_id = get_file_id(file, args.dataset)
+                file_id = get_file_id(file, config.dataset_type)
                 cat = categories[file_id]
                 if (file_id not in split and dataset=='train') or  split[file_id] == dataset:
-                    print("{} {}".format(get_name_of_txt_file(args.o, file_id), cat), file = f)
+                    print("{} {}".format(get_name_of_txt_file(config.output, file_id), cat), file = f)
 
 def get_file_id(file, dataset):
     if dataset == "shapenet":
@@ -142,51 +140,36 @@ def compute_dodecahedron_vertices():
     return vertices
                
 if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("d", type=str, help="root directory of dataset to be rendered")
-    parser.add_argument("o", type=str, help="directory of the output files")
     
-    parser.add_argument("-v", default=12, type=int, help="Number of views to render")
-    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
-    
-    parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:shapenet or modelnet")
-    parser.add_argument("--dodecahedron",action='store_true', help="if this is added, views will be rendered from vertices of dodecahedron")
-    parser.add_argument("--camera_rotations", default=1, type=int, help="How many times to rotate the camera for")
-    
-    args = parser.parse_args()
-    args.l = os.path.join(args.o, 'log.txt')
-    with open(args.l, 'w') as f:
+    config = get_config()
+    with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
     try:
-        if args.dataset == "shapenet":
-            files = find_files(args.d, 'obj')
-            categories, split = Shapenet.get_metadata(args.d)
-            Shapenet.write_cat_names(args.d, args.o)
-            args.fov = 35
-        elif args.dataset == "modelnet":
-            files = find_files(args.d, 'off')
-            categories, split= Modelnet.get_metadata(args.d, files)
-            Modelnet.write_cat_names(args.d, args.d)
-            pool = Pool(processes=args.t)
+        if config.dataset_type == "shapenet":
+            files = find_files(config.data, 'obj')
+            categories, split = Shapenet.get_metadata(config.data)
+            Shapenet.write_cat_names(config.data, config.output)
+            config = add_to_config(config,'fov', 35)
+        elif config.dataset_type == "modelnet":
+            files = find_files(config.data, 'off')
+            categories, split= Modelnet.get_metadata(config.data, files)
+            Modelnet.write_cat_names(config.data, config.data)
+            pool = Pool(processes=config.num_threads)
             pool.map(off2obj, files)
             pool.close()
             pool.join()
-            files = find_files(args.d, 'obj')
-            args.fov = 70
+            files = find_files(config.data, 'obj')
+            config = add_to_config(config,'fov', 70)
     except: 
         e = sys.exc_info()
-        with open(args.l, 'a') as f:
+        with open(config.log_file, 'a') as f:
             print("Exception occured while reading files.", file=f)
             print("Exception {}".format(e), file=f)
         sys.exit(1)
     
-    if not os.path.isdir(args.o):
-        os.system("mkdir -m 777 {}".format(args.o))
-
-        
-    
-    save_for_mvcnn(args, files, categories)
-    collect_files(files, split,categories, args)
+    save_for_mvcnn(config, files, categories)
+    collect_files(files, split,categories, config)
+    if config.dataset_type and config.remove_obj:
+        os.system('find {} -name *.obj -delete'.format(config.data))
     
     

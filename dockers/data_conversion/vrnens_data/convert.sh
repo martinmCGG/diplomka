@@ -1,12 +1,24 @@
-docker build -t openvdb .
+##########################################################################################################
+# Set required variables
 
-#Path to the dataset
-dataset="/home/krabec/data/ModelNet40A"
-output_dir="/home/krabec/data/ModelNet40A_vrnens"
-#Type of the dataset. Currently must be one of (modelnet, shapenet)
-dataset_type="modelnet"
+#name="ModelNet40A_vrnens"
+name="Small_converted"
+#dataset="/home/krabec/data/ModelNet40A"
+dataset="/local/krabec/Small"
+output_dir="/local/krabec"
+docker_hidden=t
 
-#To see other options run python script with -h option and change docker run parameter to -d to -it.
-docker run --rm -it -v "$dataset":/dataset -v "$output_dir":/data openvdb \
-sh -c "python vrnens_data.py /dataset /data --dataset $dataset_type"
+##########################################################################################################
 
+image_name="openvdb"
+
+output_dir="$output_dir/$name"
+mkdir $output_dir
+docker build -t "$image_name" .
+docker kill "$image_name"
+docker rm "$image_name"
+
+docker run --rm -id --name "$image_name" -v "$dataset":/dataset -v "$output_dir":/data "$image_name"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "python vrnens_data.py"
+
+##########################################################################################################

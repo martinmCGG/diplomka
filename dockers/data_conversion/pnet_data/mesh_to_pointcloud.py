@@ -31,7 +31,6 @@ def mesh_to_point_cloud(points, triangles, n, normal=False):
     else:
         return np.array(xs + ys + zs)
 
-
 def find_area_distribution(points, triangles):   
     distribution = np.zeros((len(triangles)))
     for t in range(len(triangles)):
@@ -46,29 +45,11 @@ def file_to_pointcloud(filename, type, args):
     elif type == 'modelnet':
         points, triangles, quads = read_off_file(filename)
     if args.normal:
-        return mesh_to_point_cloud(points, triangles, args.n, normal=True)
+        return mesh_to_point_cloud(points, triangles, args.num_points, normal=True)
     else:
-        return mesh_to_point_cloud(points, triangles, args.n)
-    
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-n", default=2048, type=int, help="Number of points to smaple")
-    parser.add_argument("-d", type=str, help="root directory of .obj files to be voxelizes")
-    parser.add_argument("-t", default = 1, type=int, help="Number of threads")
-    parser.add_argument("-o", type=str, help="directory of the output files")
-    parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
-    parser.add_argument("--normal",action='store_true', help="if normal information should be saved")
-    
-    
-    args = parser.parse_args()
-    files = find_files(args.d, 'obj')
-    for file in files:
-        points, triangles, quads = read_obj_file(file)
-        if args.normal:
-            pointcloud = mesh_to_point_cloud(points, triangles, args.n, normal=True)
-        else:
-            pointcloud = mesh_to_point_cloud(points, triangles, args.n)
+
+        return mesh_to_point_cloud(points, triangles, args.num_points)
+
         
 
     

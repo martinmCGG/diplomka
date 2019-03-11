@@ -103,4 +103,5 @@ ENV PYTHONPATH=$PYTHONPATH:/usr/local/openvdb/python/lib/python2.7/
 RUN pip install pathlib
 
 WORKDIR /
-COPY *.py /
+COPY *.py ./
+COPY *.ini ./

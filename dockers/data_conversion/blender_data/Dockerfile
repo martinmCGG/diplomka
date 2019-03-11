@@ -28,7 +28,9 @@ RUN mkdir /usr/local/blender && \
 RUN mkdir /blender_scripts
 WORKDIR /blender_scripts
 RUN touch __init__.py
-
-COPY *.py ./
-COPY *.blend ./
 ENV PATH="/usr/local/blender/blender:${PATH}"
+
+COPY *.blend ./
+COPY *.py ./
+COPY *.ini ./
+

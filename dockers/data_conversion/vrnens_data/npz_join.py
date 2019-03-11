@@ -3,7 +3,6 @@ import re
 import os
 import numpy as np
 import h5py
-#python npz_join.py -d /home/krabec/Data/ShapeNetPoints/ -o /home/krabec/Data/ShapeNet/data.h5 -f h5 -re ".*val.*.h5"
 
 def find_regex_files(regex, directory):
     return [os.path.join(directory,file) for file in os.listdir(directory) if re.match(regex, file)]

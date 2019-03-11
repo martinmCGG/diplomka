@@ -19,9 +19,9 @@ def delete_cube():
     objs.remove(objs["Cube"], True)
 
 
-def render_one_model(model_path, file_id, output_dir, nviews=12, resolution=224):
-    
-    bpy.ops.import_scene.obj(filepath=model_path, filter_glob="*.obj")
+def render_one_model(model_path, file_id, output_dir, dataset_type='modelnet', nviews=12, resolution=224):
+        
+    bpy.ops.import_scene.obj(filepath=model_path, filter_glob='*.obj')
 
     #Set resolution
     scene = bpy.data.scenes["Scene"]

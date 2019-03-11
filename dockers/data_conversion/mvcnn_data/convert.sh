@@ -1,12 +1,24 @@
-docker build -t pbrt_w .
+##########################################################################################################
+# Set required variables
 
-#Path to the dataset
-dataset="/home/krabec/data/ModelNet40A"
-output_dir="/home/krabec/data/ModelNet40A_pbrt"
-#Type of the dataset. Currently must be one of (modelnet, shapenet)
-dataset_type="modelnet"
+#name="ModelNet40A_mvcnn_pbrt"
+name="Small_converted"
+#dataset="/home/krabec/data/ModelNet40A"
+dataset="/local/krabec/Small"
+output_dir="/local/krabec"
+docker_hidden=t
 
-#To see other options run python script with -h option and change docker run parameter to -d to -it.
-docker run --rm -id -v "$dataset":/dataset -v "$output_dir":/data pbrt_w \
-sh -c "python3 mvcnn_data.py /dataset /data -v 12  --dataset $dataset_type"
+##########################################################################################################
 
+image_name="pbrt"
+
+output_dir="$output_dir/$name"
+mkdir -m 777 $output_dir
+docker build -t "$image_name" .
+docker kill "$image_name"
+docker rm "$image_name"
+
+docker run --rm -id --name "$image_name" -v "$dataset":/dataset -v "$output_dir":/data "$image_name"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 mvcnn_data.py"
+
+##########################################################################################################

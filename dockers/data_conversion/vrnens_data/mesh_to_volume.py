@@ -44,14 +44,15 @@ def voxels_to_nparray(grid, grid_size):
 
 def mesh_to_voxel_array(filename, dataset, args):
     array = []
+
     if dataset == 'shapenet':
         vertices, triangles, quads = read_obj_file(filename)
     elif dataset == 'modelnet':
         vertices, triangles, quads = read_off_file(filename)
-    for _ in range(args.r):
+    for _ in range(args.num_rotations):
         vertices = vertices.dot(args.matrix)
-        grid = convert_to_grid(vertices, triangles, quads, args.vr)
-        array.append(voxels_to_nparray(grid, args.vr))
+        grid = convert_to_grid(vertices, triangles, quads, args.num_voxels)
+        array.append(voxels_to_nparray(grid, args.num_voxels))
     return array
 
 
