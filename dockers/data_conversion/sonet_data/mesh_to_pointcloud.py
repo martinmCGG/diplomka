@@ -11,7 +11,7 @@ def traingle_area(v1, v2, v3):
 def normalize(vector):
     return vector / np.sum(vector)
 
-def mesh_to_point_cloud(points, triangles, n, normal=True):
+def mesh_to_point_cloud(points, triangles, n, normal=False):
     distribution = find_area_distribution(points, triangles)
     chosen = np.random.choice(range(len(triangles)),size=n, p=distribution)
     chosen_points = points[triangles[chosen]]
@@ -31,7 +31,6 @@ def mesh_to_point_cloud(points, triangles, n, normal=True):
     else:
         return np.array(xs + ys + zs)
 
-
 def find_area_distribution(points, triangles):   
     distribution = np.zeros((len(triangles)))
     for t in range(len(triangles)):
@@ -41,29 +40,12 @@ def find_area_distribution(points, triangles):
     return normalize(distribution)
 
 def file_to_pointcloud(filename, type, args):
+
     if type == 'shapenet':
         points, triangles, quads = read_obj_file(filename)
     elif type == 'modelnet':
         points, triangles, quads = read_off_file(filename)
-
-    return mesh_to_point_cloud(points, triangles, args.n, normal=True)
-
-    
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-n", default=2048, type=int, help="Number of points to smaple")
-    parser.add_argument("-d", type=str, help="root directory of .obj files to be voxelizes")
-    parser.add_argument("-t", default = 1, type=int, help="Number of threads")
-    parser.add_argument("-o", type=str, help="directory of the output files")
-    parser.add_argument("-l",default ="log.txt", type=str, help="logging file")
-
-    
-    args = parser.parse_args()
-    files = find_files(args.d, 'obj')
-    for file in files:
-        points, triangles, quads = read_obj_file(file)
-        pointcloud = mesh_to_point_cloud(points, triangles, args.n, normal=True)
+    return mesh_to_point_cloud(points, triangles, args.num_points, normal=True)
 
         
 

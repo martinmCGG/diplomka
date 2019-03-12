@@ -5,21 +5,13 @@ from pathlib import Path
 
 def find_files(directory,extension):
     print("Scanning for files...")
-    fname = os.path.join(directory,"all_{}_files.txt".format(extension))
+
     ext_files = []
-    if True:#not os.path.isfile(fname):
-        for folder, subs, files in os.walk(directory):
-            for filename in files:
-                if filename.split('.')[-1] == extension:
-                    filename = os.path.join(folder, filename)
-                    ext_files.append(filename)
-        with open(fname, 'w') as f:
-            for file in ext_files:
-                print(file, file=f)
-    else:
-        with open(fname, 'r') as f:
-            for line in f:
-                ext_files.append(line.strip())
+    for folder, subs, files in os.walk(directory):
+        for filename in files:
+            if filename.split('.')[-1] == extension:
+                filename = os.path.join(folder, filename)
+                ext_files.append(filename)
     
     print("Found {} files".format(len(ext_files)))
     return sorted(ext_files)
@@ -56,7 +48,8 @@ def read_off_file(filename):
            line = f.readline() 
         else:
             line = line[3:]
-
+        if len(line)==1:
+            line = f.readline() 
         n_vertices, n_faces, _ = [int(x) for x in line.split()]
         for _ in range(n_vertices):
             line = f.readline()
@@ -69,6 +62,7 @@ def read_off_file(filename):
             elif splited[0] == "4":
                 quads.append([int(x) for x in splited[1:5]])
     vertices = rescale_to_unit_sphere(centralize(np.array(vertices)))
+
     return vertices, np.array(triangles), np.array(quads)
     
 
@@ -82,8 +76,9 @@ def off2obj(file):
     vertices, triangles, quads = read_off_file(file)
     obj_file_name = os.path.join(os.path.split(file)[0] , Path(file).stem + ".obj")
     with open(obj_file_name, 'w') as f:
+        
         for xyz in vertices:
-            f.write('v %g %g %g\n' % tuple(xyz))
+            f.write('v {:6f} {:6f} {:6f}\n'.format(xyz[0],xyz[2],xyz[1]))
         f.write('\n')
         for ijk in triangles:
             f.write('f %d %d %d\n' % (ijk[0]+1, ijk[1]+1, ijk[2]+1))

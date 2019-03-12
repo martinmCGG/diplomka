@@ -17,26 +17,24 @@ from random import shuffle
 from mesh_files import find_files
 from mesh_to_pointcloud import file_to_pointcloud
 from MultiProcesor import MultiProcesor
-
+from config import get_config
 
 GPU = 0
 
 import sys
-os.system('CUDA_VISIBLE_DEVICES={}'.format(GPU))
 sys.path.append('/sonet/util')
 from som import *
 
-# ['data'], ['label'] h5py format trainfiles.txt and testfiles.txt
 
 DATASETS = ['train', 'test', 'val']
 
-def save_for_sonet(args, files, categories, split):
-    procesor = MultiProcesor(files, args.t, args.l, categories, split, args.m, args.dataset, file_to_pointcloud, write_for_sonet)
-    procesor.run(args)
+def save_for_sonet(config, files, categories, split):
+    procesor = MultiProcesor(files, config.num_threads, config.log_file, categories, split, config.dataset_type, file_to_pointcloud, write_for_sonet)
+    procesor.run(config)
     
 
-def write_for_sonet(buffer, buffer_cats, dataset, id, n, args):
-    h5f = h5py.File(os.path.join(args.o,"{}_{}_{}.h5".format(dataset,id,n)), 'w')
+def write_for_sonet(buffer, buffer_cats, dataset, id, config):
+    h5f = h5py.File(os.path.join(config.output,"{}_{}.h5".format(dataset,id)), 'w')
     features = np.array(buffer)
     targets = np.array(buffer_cats)
     h5f.create_dataset('data', data=features)
@@ -47,7 +45,6 @@ def write_for_sonet(buffer, buffer_cats, dataset, id, n, args):
 def collect_files(dest):
     files = os.listdir(dest)
     files = [file for file in files if file.split('.')[-1] == 'h5']
-    
     for dataset in DATASETS:
         with open (os.path.join(dest,"{}_files.txt").format(dataset), 'w') as f:
             for file in files:
@@ -59,7 +56,6 @@ def add_soms(dest):
     for dataset in DATASETS:
         with open (os.path.join(dest,"{}_files.txt").format(dataset), 'r') as f:
             for line in f:
-                print("Somatazing file: ".format(line.strip()))
                 h5file = h5py.File(line.strip(), 'r')
                 data = h5file['data'][:]
                 labels = h5file['label'][:]
@@ -67,7 +63,6 @@ def add_soms(dest):
                 for dato in data:
                     soms.append(som_one_cloud(dato, som_builder))
                 h5file.close()
-                
                 h5file = h5py.File(line.strip(), 'w')    
                 h5file.create_dataset('data', data=data)
                 h5file.create_dataset('label', data=labels)
@@ -86,48 +81,34 @@ def som_one_cloud(data, som_builder):
     return som_node_np
     
     
-    
 if __name__ == '__main__':
-    import argparse
+    
+    config = get_config()
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("d", type=str, help="root directory of dataset to be sampled")
-    parser.add_argument("o", type=str, help="directory of the output files")
-    
-    parser.add_argument("-n", default=2048, type=int, help="Number of points to smaple")
-    parser.add_argument("-t", default = 8, type=int, help="Number of threads")
-    parser.add_argument("-m", default = 10000, type=int, help="Max number of models to save to one file")
-    parser.add_argument("-l",default ="/data/log.txt", type=str, help="logging file")
-    
-    parser.add_argument("--dataset",default ="modelnet", type=str, help="Dataset to convert:currently supported")
-
-        
-    args = parser.parse_args()
-    
-    with open(args.l, 'w') as f:
+    with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
     try:
-        if args.dataset == "shapenet":
-            files = find_files(args.d, 'obj')
-            categories, split = Shapenet.get_metadata(args.d)
-            Shapenet.write_cat_names(args.d, args.o)
-        elif args.dataset == "modelnet":
-            files = find_files(args.d, 'off')
-            categories, split= Modelnet.get_metadata(args.d, files)
-            Modelnet.write_cat_names(args.d, args.d)
+        if config.dataset_type == "shapenet":
+            files = find_files(config.data, 'obj')
+            categories, split = Shapenet.get_metadata(config.data)
+            Shapenet.write_cat_names(config.data, config.output)
+        elif config.dataset_type == "modelnet":
+            files = find_files(config.data, 'off')
+            categories, split= Modelnet.get_metadata(config.data, files)
+            Modelnet.write_cat_names(config.data, config.output)
     except:
         e = sys.exc_info()
-        with open(args.l, 'a') as f:
+        with open(config.log_file, 'a') as f:
             print("Exception occured while reading files.", file=f)
             print("Exception {}".format(e), file=f)
         sys.exit(1)
     
-    if not os.path.isdir(args.  o):
-        os.system("mkdir -m 777 {}".format(args.o))
+    if not os.path.isdir(config.output):
+        os.system("mkdir -m 777 {}".format(config.output))
     print("cuda is available",torch.cuda.is_available())
-    #shuffle(files)
-    #save_for_sonet(args, files, categories, split)
-    #collect_files(args.o)
+    shuffle(files)
+    save_for_sonet(config, files, categories, split)
+    collect_files(config.output)
     print("Starting soma")
-    add_soms(args.o)
+    add_soms(config.output)
     

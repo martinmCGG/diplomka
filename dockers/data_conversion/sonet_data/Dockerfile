@@ -36,7 +36,7 @@ RUN touch models/"__init__.py" && touch data/"__init__.py" && touch util/"__init
 COPY *.sh ./
 COPY *.py ./
 RUN sh sed_script.sh
-RUN mv networks.py ./models && mv *loader* ./data && mv som.py ./util && mv classifier.py ./models
+RUN mv som.py ./util
 COPY *.ini ./
 
 ENTRYPOINT /bin/bash 

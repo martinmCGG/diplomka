@@ -124,9 +124,9 @@ def test(model, config, best_accuracy=0, epoch=None):
         predictions = [x.item() for x in predictions]
         labels = [x.item() for x in labels]
         import Evaluation_tools as et
-        eval_file = os.path.join(config.log_dir, 'sonet.txt')
-        et.write_eval_file(config.data, eval_file, predictions , labels , 'SONET')
-        et.make_matrix(config.data, eval_file, config.log_dir)
+        eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
+        et.write_eval_file(config.data, eval_file, predictions, labels, config.name)
+        et.make_matrix(config.data, eval_file, config.log_dir)    
     else:
         if model.test_accuracy.item() > best_accuracy:
             best_accuracy = model.test_accuracy.item()
