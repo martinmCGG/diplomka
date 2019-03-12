@@ -4,8 +4,8 @@
 name='octree_adaptive'
 dataset_path="/local/krabec/ModelNet40A_octree_a"
 out_path="/home/krabec/dockers/octree_adaptive/out/"
-GPU=0
-docker_hidden=t
+GPU=1
+docker_hidden=d
 
 ##########################################################################################################
 

@@ -91,7 +91,6 @@ RUN pip install pathlib matplotlib pandas lmdb
 WORKDIR /workspace
 RUN mkdir logs
 COPY examples ./
-COPY octree_data ./
 COPY *.py ./
 COPY *.ini ./
 

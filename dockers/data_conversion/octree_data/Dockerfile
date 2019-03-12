@@ -90,6 +90,6 @@ RUN pip install --upgrade pip
 RUN pip install pathlib matplotlib pandas lmdb
 WORKDIR /workspace
 RUN mkdir logs
-COPY examples ./
 COPY *.py ./
 COPY *.ini ./
+

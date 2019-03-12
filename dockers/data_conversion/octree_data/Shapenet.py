@@ -58,3 +58,5 @@ def get_metadata(shapenet_root_dir):
     return categories, split
 
 
+    
+

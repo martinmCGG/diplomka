@@ -2,6 +2,7 @@ from __future__ import print_function
 from multiprocessing import Process, Lock
 import sys, os
 
+
 class MultiProcesor:
     def __init__(self, files, n_threads, log_file, categories, split, dataset, proccess_function, write_function):
         self.files = files
