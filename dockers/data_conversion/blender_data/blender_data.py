@@ -102,7 +102,7 @@ if __name__ == '__main__':
         elif config.dataset_type == "modelnet":
             files = find_files(config.data, 'off')
             categories, split= Modelnet.get_metadata(config.data, files)
-            Modelnet.write_cat_names(config.data, config.data)
+            Modelnet.write_cat_names(config.data, config.output)
             pool = Pool(processes=config.num_threads)
             pool.map(off2obj, files)
             pool.close()

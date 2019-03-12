@@ -86,18 +86,13 @@ if __name__ == '__main__':
             input_categories = sorted([os.path.join(config.data,cat) for cat in os.listdir(config.data) if os.path.isdir(os.path.join(config.data,cat))])
             output_categories = sorted([os.path.join(config.output,cat) for cat in cat_names]) 
             Shapenet.write_cat_names(config.data, config.output)
-            i = 0
-            for key in categories.keys():
-                i+=1
-                print(key, categories[key])
-                if i==10:
-                    break
+
         elif config.dataset_type == "modelnet":
             #files = find_files(config.data, 'off')
             #categories, split= Modelnet.get_metadata(config.data, files)
             split = None
             cat_names = Modelnet.get_cat_names(config.data)
-            Modelnet.write_cat_names(config.data, config.data)
+            Modelnet.write_cat_names(config.data, config.output)
             input_categories = sorted([os.path.join(config.data,cat) for cat in cat_names])
             output_categories = sorted([os.path.join(config.output,cat) for cat in cat_names])       
     except: 
