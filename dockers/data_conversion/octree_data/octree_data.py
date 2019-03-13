@@ -3,11 +3,10 @@ import os
 import sys
 import Shapenet
 import Modelnet
-from multiprocessing import Process, Pool, Lock
+from multiprocessing import Pool
 from pathlib import Path
 from mesh_files import *
 import re
-from multiprocessing import Pool
 from ocnn.virtualscanner import VirtualScanner
 from ocnn.virtualscanner import DirectoryTreeScanner
 from config import get_config
@@ -42,7 +41,7 @@ def convert_one_category(arguments):
     os.system("mkdir -m 777 {}".format(output_dir))
     
     scanner = DirectoryTreeScanner(view_num=num_rotations, flags=False, normalize=True)
-    scanner.scan_tree(input_base_folder=input_dir, output_base_folder=output_dir, num_threads=2)
+    scanner.scan_tree(input_base_folder=input_dir, output_base_folder=output_dir, num_threads=1)
     
     train_file = collect_files(output_dir, 'train', dataset_type, split = split)
     test_file = collect_files(output_dir, 'test', dataset_type, split = split)
