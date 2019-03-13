@@ -1,0 +1,14 @@
+0
+12
+/data/converted/airplane_0627/airplane_0627_0.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_30.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_60.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_90.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_120.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_150.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_180.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_210.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_240.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_270.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_300.00_0.00.png
+/data/converted/airplane_0627/airplane_0627_330.00_0.00.png

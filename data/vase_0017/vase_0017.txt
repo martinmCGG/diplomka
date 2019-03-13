@@ -1,0 +1,14 @@
+37
+12
+/data/converted/vase_0017/vase_0017_0.00_0.00.png
+/data/converted/vase_0017/vase_0017_30.00_0.00.png
+/data/converted/vase_0017/vase_0017_60.00_0.00.png
+/data/converted/vase_0017/vase_0017_90.00_0.00.png
+/data/converted/vase_0017/vase_0017_120.00_0.00.png
+/data/converted/vase_0017/vase_0017_150.00_0.00.png
+/data/converted/vase_0017/vase_0017_180.00_0.00.png
+/data/converted/vase_0017/vase_0017_210.00_0.00.png
+/data/converted/vase_0017/vase_0017_240.00_0.00.png
+/data/converted/vase_0017/vase_0017_270.00_0.00.png
+/data/converted/vase_0017/vase_0017_300.00_0.00.png
+/data/converted/vase_0017/vase_0017_330.00_0.00.png

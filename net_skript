@@ -1,9 +1,0 @@
-#!/bin/bash
-cd /home/krabec
-filename="$1"
-while read -r line
-do
-    name="$line"
-    echo "Starting $name ..."
-    python3 diplomka/src/dataset/convnet.py --folder ./suncg $line 
-done < "$filename"
