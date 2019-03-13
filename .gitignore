@@ -1,6 +1,5 @@
 *.pyc
-*.v2
-*.npz
-*.h5
-*.png
-./data
+*.project
+*.pydevproject
+Manual.html.bak
+data
