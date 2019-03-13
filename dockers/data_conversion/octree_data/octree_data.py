@@ -82,7 +82,6 @@ if __name__ == '__main__':
             #files = find_files(config.data, 'obj')
             categories, split = Shapenet.get_metadata(config.data)
             cat_names = Shapenet.get_cat_names(config.data)
-            print(cat_names)
             input_categories = sorted([os.path.join(config.data,cat) for cat in os.listdir(config.data) if os.path.isdir(os.path.join(config.data,cat))])
             output_categories = sorted([os.path.join(config.output,cat) for cat in cat_names]) 
             Shapenet.write_cat_names(config.data, config.output)

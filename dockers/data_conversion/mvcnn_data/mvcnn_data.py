@@ -18,7 +18,7 @@ def get_name_of_image_file(output_dir, file_id, angle, camera_angle):
     return os.path.join(output_dir , file_id, file_id + "_{:.2f}_{:.2f}.png".format(angle, camera_angle))
     
 def get_name_of_txt_file(output_dir,cat, dataset, file_id):
-    return os.path.join(output_dir ,cat,dataset, file_id, file_id + ".txt")
+    return os.path.join(output_dir , cat, dataset, file_id, file_id + ".txt")
 
 def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir, id, file_id, fov, dodecahedron = False):
     output_file = get_name_of_image_file(output_dir, file_id, angle, camera_angle)
@@ -76,7 +76,7 @@ def files_to_images(files, id, config, categories, split, lock):
         try:
             file_id = get_file_id(file, config.dataset_type)
             output_dir = os.path.join(config.output, config.cat_names[categories[file_id]], coding[split[file_id]])
-            render_model(file, id, file_id, views, camera_rotations, output_dir, categories[file_id],config.fov,dodecahedron=config.dodecahedron)
+            render_model(file, id, file_id, views, camera_rotations, output_dir, categories[file_id], config.fov,dodecahedron=config.dodecahedron)
         except:
             e = sys.exc_info()[0]
             log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), lock, config.log_file)
@@ -120,7 +120,7 @@ def collect_files(files, split, cats, config):
                 file_id = get_file_id(file, config.dataset_type)
                 cat = categories[file_id]
                 if (file_id not in split and dataset=='train') or  coding[split[file_id]] == dataset:
-                    print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[split[file_id]] ,dataset , file_id), cat), file = f)
+                    print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat], dataset , file_id), cat), file = f)
 
 def get_file_id(file, dataset):
     if dataset == "shapenet":

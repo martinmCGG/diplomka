@@ -29,25 +29,20 @@
         independent Docker image and all its dependencies are installed when
         building the image.</span></p>
     <h2><span style="  color: black;">Datasets Setup</span></h2>
-    <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
-
+    <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
         style="color: black;">The code is made to work with ModelNet40 and
         ShapeNetCore datasets. The easiest way to run it with custom dataset is
         to restructure your data to copy the structure of one of these datasets.
         <span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><br></span></span></p>
     <ul>
       <li>
-        <h3 dir="ltr" style=" line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
-
-            style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">ModelNet40</span></span><span
-
+        <h3 dir="ltr" style=" line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
+            style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">ModelNet40</span></span><span
             style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"></span><br>
           </span></h3>
         <ul>
-          <li><span style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Get the dataset <a
-
-href="http://modelnet.cs.princeton.edu/">here</a>. For experiments we used manually aligned version which can be downloaded <a
-
+          <li><span style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Get the dataset <a
+href="http://modelnet.cs.princeton.edu/">here</a>. For experiments we used manually aligned version which can be downloaded <a
 href="https://github.com/lmb-freiburg/orion">here</a>.</span></span></li>
         </ul>
       </li>
@@ -59,18 +54,27 @@ href="https://github.com/lmb-freiburg/orion">here</a>.</span></span></li>
     <ul>
       <li>ShapeNetCore</li>
       <ul>
-        <li><span style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Get the dataset <a
-
+        <li><span style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Get the dataset <a
 href="https://www.shapenet.org/download/shapenetcore">here</a>. You need to register and wait for confirmation email.</span></span></li>
         <li><span style=" color: black;"><span style=" font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Unpack the downloaded archive.</span></span></li>
-        <li><span style="  color: black;"><span style="  font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Download official dataset split <a
-
+        <li><span style="  color: black;"><span style="  font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Download official dataset split <a
 href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a> and copy it to the root directory of the dataset.</span></span></li>
       </ul>
     </ul>
- <h2>Abstract</h2>
-    <p><span style="  color: black;"><br>
-      </span></p>
+    <h2>General Setup</h2>
+    <p>You can download all the code <a href="https://github.com/Alobal123/diplomka">here</a>.</p>
+    <p>Each network is implemented as a separate Docker image. To learn more
+      about Docker, images and containers visit <a href="https://docs.docker.com/get-started/">this
+        page</a>.</p>
+    <p>The code is structured as follows:</p>
+    <p>Each neural network is contained in one folder in <i>/dockers</i> in my
+      github repository. None of the networks accepts mesh files as their input
+      directly, so some data conversion is required. All data conversion is
+      implemented in docker with same structure as neural networks themselves.
+      Code for data conversion is in <i>/dockers/data_conversion</i>.</p>
+    <p><br>
+    </p>
+    <p> </p>
     <p><span style="  color: black;"><br>
       </span></p>
     <p><br>

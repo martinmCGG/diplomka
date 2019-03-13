@@ -43,12 +43,14 @@ def read_off_file(filename):
     triangles = []
     quads = []
     with open(filename, 'r') as f:
+        
         line = f.readline().strip()
+
         if line=='OFF':
            line = f.readline() 
         else:
             line = line[3:]
-        if len(line)==1:
+        if not line.strip():
             line = f.readline() 
         n_vertices, n_faces, _ = [int(x) for x in line.split()]
         for _ in range(n_vertices):
