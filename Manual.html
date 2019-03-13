@@ -82,69 +82,227 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
       the docker container and executes the neural network or data conversion.
       You will need to setup a couple of variables here:</p>
     <ul>
-      <li><i>name </i>- will be used as a name of the docker image and docker
-        container. You can leave this at default value unless it is in conflict
-        with some already consisting image or you want to run more instances of
-        this image at once. With data conversion scripts the name is the name of
-        the converted dataset and directory of the same name will be created.
-        The name of the image can be changed by changing variable <i>image_name</i>.</li>
-      <li><i>dataset_path</i> -&nbsp; should contain path to the root directory
-        to the dataset on your filesystem.</li>
-      <li><i>out_path</i> - should contain path to the directory where training
-        logs and network weights will be saved. The directory will be created if
-        it does not exist.</li>
-      <li><i>GPU</i> - index of GPU which will be visible to docker container.
-        Have to be a single integer. We currently do not support multiple GPUs.</li>
-      <li><i>docker_hidden</i> - Must be one of <i>t</i> or <i>d</i>. With <i>t
-        </i>the container will be run in interactive mode, meaning it will run
-        in your console. With <i>d</i> it will in detached mode i.e. in the
-        background. For more information check docker documentation <a href="https://docs.docker.com/engine/reference/run/">here</a>.</li>
+      <li><code><i>name </i></code>- will be used as a name of the docker image
+        and docker container. You can leave this at default value unless it is
+        in conflict with some already consisting image or you want to run more
+        instances of this image at once. With data conversion scripts the name
+        is the name of the converted dataset and directory of the same name will
+        be created. The name of the image can be changed by changing variable <i>image_name</i>.</li>
+      <li><code><i>dataset_path</i></code> -&nbsp; should contain path to the
+        root directory to the dataset on your filesystem.</li>
+      <li><code><i>out_path</i> </code>- should contain path to the directory
+        where training logs and network weights will be saved. The directory
+        will be created if it does not exist.</li>
+      <li><code><i>GPU</i></code> - index of GPU which will be visible to docker
+        container. Have to be a single integer. We currently do not support
+        multiple GPUs.</li>
+      <li><code><i>docker_hidden</i> </code>- Must be one of <code><i>t</i></code>
+        or <code><i>d</i></code>. With<code> </code><i><code>t</code> </i>the
+        container will be run in interactive mode, meaning it will run in your
+        console. With <code><i>d</i></code> it will in detached mode i.e. in
+        the background. For more information check docker documentation <a href="https://docs.docker.com/engine/reference/run/">here</a>.</li>
     </ul>
     <p><b>config.ini</b> contains most of the relevant parameters of the network
       or data conversion. The file is split to sections where each section is
       started by [SECTION] statement. Then on each line a parameter in format <i>key
         = value</i>. You can find explanation of network parameters in later
       sections. </p>
+    <p>Parameters for data conversion:</p>
     <ul>
-      <li><i>name</i> - will be used as the name of the experiment used in log
-        files.</li>
-      <li><i>data </i>- path to the dataset inside the container. Does not have
-        to be changed.</li>
-      <li><i>log_dir </i>- path to the directory inside the container where
-        logs and weights will be saved. Does not have to be changed.</li>
-      <li><i>num_classes</i> - number of classes in the dataset. </li>
-      <li><i>batch_size - </i>size of the batch for training and testing neural
-        networks.</li>
-      <li><i>weights - </i>if you want to test or finetune already trained
-        network, this should be the number of this model. If you want to train
-        from scratch, this should be -1. </li>
-      <li><i>snapshot_prefix - </i>name of the file where weights will be
-        saved. Number of training epoch when these weights are saved will be
-        added to this.</li>
+      <li><i><code>data</code> </i>- path to the dataset inside the container.
+        Does not have to be changed.</li>
+      <li><i><code>output </code></i>- path to the directory inside the
+        container where converted dataset will be saved. Does not have to be
+        changed.</li>
+      <li><code>log_file - </code>path and name of the file where progress of
+        the data conversion will be written.</li>
+      <li><code>num_threads - </code>maximum number of threads to use.</li>
+      <li><code>dataset_type</code> -&nbsp; which dataset is converting. Must be
+        one of <code>modelnet</code> or <code>shapenet </code>currently.</li>
+    </ul>
+    <p></p>
+    <p>Parameters for neural networks:</p>
+    <ul>
+      <li><code><i>name</i></code> - will be used as the name of the experiment
+        used in log files.</li>
+      <li><i><code>data</code> </i>- path to the dataset inside the container.
+        Does not have to be changed.</li>
+      <li><i><code>log_dir</code> </i>- path to the directory inside the
+        container where logs and weights will be saved. Does not have to be
+        changed.</li>
+      <li><i><code>num_classes</code></i> - number of classes in the dataset. </li>
+      <li><i><code>batch_size</code> - </i>size of the batch for training and
+        testing neural networks.</li>
+      <li><i><code>weights</code> - </i>if you want to test or finetune already
+        trained network, this should be the number of this model. If you want to
+        train from scratch, this should be -1. </li>
+      <li><i><code>snapshot_prefix</code> - </i>name of the file where weights
+        will be saved. Number of training epoch when these weights are saved
+        will be added to this.</li>
     </ul>
     <ul>
-      <li><i>max_epoch - </i>number of epochs to train for. One epoch means one
-        pass through the training part of the dataset. </li>
-      <li><i>save_period - </i>the trained network will be saved every epoch
-        divisible by save_period.&nbsp;</li>
+      <li><i><code>max_epoch</code> - </i>number of epochs to train for. One
+        epoch means one pass through the training part of the dataset. </li>
+      <li><i><code>save_period</code> - </i>the trained network will be saved
+        every epoch divisible by save_period.&nbsp;</li>
     </ul>
     <ul>
-      <li><i>test - </i>if you want to only test already trained network, set
-        this to True. <i>weights </i>parameter has to have a valid value
-        bigger than -1. Should be False for training.</li>
+      <li><i><code>test</code> - </i>if you want to only test already trained
+        network, set this to True. <i><code>weights</code> </i>parameter has
+        to have a valid value bigger than -1. Should be <code>False</code> for
+        training.</li>
     </ul>
     <ul>
     </ul>
+    <h2> Data conversion</h2>
+    <p>To convert your dataset change you need to set the parameters described
+      above and then simply run script <i>run.sh </i>in your console. This
+      will convert the dataset to various formats directly readable by the
+      neural networks. Although the conversion is implemented in multi-threaded
+      fashion it still can be quite time consuming on big datasets </p>
+    <h2>Neural Networks</h2>
+    <p>Each of the neural networks is implemented in python but in different
+      framework. That is why we used the docker infrastructure. We try to
+      present some unified framework to easily test and train the networks
+      without changing the code. This section will briefly introduce used
+      networks and some of their most important parameters. </p>
+    <h3>VRNENS</h3>
+    <p>Paper:&nbsp; <a href="https://arxiv.org/pdf/1608.04236.pdf">Generative
+        and Discriminative Voxel Modeling with Convolutional Neural Networks</a><br>
+      Original Code: <a href="https://github.com/ajbrock/Generative-and-Discriminative-Voxel-Modeling">https://github.com/ajbrock/Generative-and-Discriminative-Voxel-Modeling</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      Docker: <i>dockers/vrnens</i><br>
+      Data: <i>dockers/data_conversion/vrnens_data</i><br>
+      Framework: Theano with Lasagne</p>
+    <h3>OCTREE</h3>
+    <p>Paper:&nbsp; <a href="https://wang-ps.github.io/O-CNN_files/CNN3D.pdf">O-CNN:
+        Octree-based Convolutional Neural Networks</a><br>
+      Original Code: <a href="https://github.com/Microsoft/O-CNN">https://github.com/Microsoft/O-CNN</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      Docker: <i>dockers/octree</i><br>
+      Data: <i>dockers/data_conversion/octree_data</i><br>
+      Framework: Caffe</p>
+    <h3>OCTREE ADAPTIVE<br>
+    </h3>
+    <p>Paper:&nbsp; <a href="https://wang-ps.github.io/AO-CNN_files/AOCNN.pdf">Adaptive
+        O-CNN: A Patch-based Deep Representation of 3D Shapes</a><br>
+      Original Code: <a href="https://github.com/Microsoft/O-CNN">https://github.com/Microsoft/O-CNN</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      Docker: <i>dockers/octree_adaptive</i><br>
+      Data: <i>dockers/data_conversion/octree_data</i><br>
+      Framework: Caffe</p>
+    <h3>VGG</h3>
+    <p>Paper:&nbsp; <a href="https://arxiv.org/pdf/1409.1556.pdf">Very Deep
+        Convolutional Networks for Large-Scale Image Recognition</a><br>
+      Original Code: <a href="https://github.com/machrisaa/tensorflow-vgg">https://github.com/machrisaa/tensorflow-vgg</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      Docker: <i>dockers/vgg</i><br>
+      Data: <i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
+      Framework: Tensorflow</p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <h3>MVCNN</h3>
+    <p>Paper:&nbsp; <a href="https://arxiv.org/pdf/1706.02413.pdf">Multi-view
+        Convolutional Neural Networks for 3D Shape Recognition</a><br>
+      Original Code: <a href="https://github.com/WeiTang114/MVCNN-TensorFlow">https://github.com/WeiTang114/MVCNN-TensorFlow</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      Docker: <i>dockers/mvcnn</i><br>
+      Data: <i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
+      Framework: Tensorflow</p>
+    <h3>MVCNN2</h3>
+    <p><b>Paper:</b>&nbsp; <a href="http://people.cs.umass.edu/%7Ejcsu/papers/shape_recog/shape_recog.pdf">A
+        Deeper Look at 3D Shape Classifiers</a><br>
+      <b>Original Code:</b> <a href="https://github.com/jongchyisu/mvcnn_pytorch">https://github.com/jongchyisu/mvcnn_pytorch</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker:</b> <i>dockers/mvcnn2</i><br>
+      <b>Data:</b> <i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
+      <b>Framework:</b> PyTorch</p>
+    <h3>ROTATIONNET</h3>
+    <p><b>Paper:</b><span style="color: #3333ff;"><a href="https://arxiv.org/abs/1603.06208">Joint
+          Object Categorization and Pose Estimation Using Multiviews from
+          Unsupervised Viewpoints</a></span><br>
+      <b>Original Code:</b> <a href="https://github.com/kanezaki/rotationnet">https://github.com/kanezaki/rotationnet</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker:</b> <i>dockers/rotnet</i><br>
+      <b>Data: </b><i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
+      <b>Framework: </b>Caffe</p>
+    <h3>SEQ2SEQ</h3>
+    <p><b>Paper: </b><a href="https://www.cs.umd.edu/%7Ezwicker/publications/SeqView2SeqLabels-TIP18.pdf">SeqViews2SeqLabels:
+        Learning 3D Global Features via Aggregating Sequential Views by RNN with
+        Attention</a><br>
+      <b>Original Code:</b> <a href="https://github.com/mingyangShang/SeqViews2SeqLabels">https://github.com/mingyangShang/SeqViews2SeqLabels</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker: </b><i>dockers/seq2seq</i><br>
+      <b>Data: </b><i>vgg_features (explained below)</i><br>
+      <b>Framework:</b> Tensorflow</p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <p></p>
+    <h3>POINTNET</h3>
+    <p><b>Paper: </b><a href="https://arxiv.org/abs/1612.00593">PointNet: Deep
+        Learning on Point Sets for 3D Classification and Segmentation</a><br>
+      <b>Original Code:</b> <a href="https://github.com/charlesq34/pointnet">https://github.com/charlesq34/pointnet</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker:</b> <i>dockers/pointnet</i><br>
+      <b>Data:</b> <i>dockers/data_conversion/pnet_data</i><br>
+      <b>Framework:</b> Tensorflow</p>
+    <h3>POINTNET++
+    </h3>
+    <p><b>Paper:&nbsp;</b> <a href="https://arxiv.org/pdf/1706.02413.pdf">PointNet++:
+        Deep Hierarchical Feature Learning on Point Sets in a Metric Space</a><br>
+      <b>Original Code:</b> <a href="https://github.com/charlesq34/pointnet2">https://github.com/charlesq34/pointnet2</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker:</b> <i>dockers/pointnet2</i><br>
+      <b>Data: </b><i>dockers/data_conversion/pnet_data</i><br>
+      <b>Framework: </b>Tensorflow</p>
+    <h3>SONET</h3>
+    <p><b>Paper: </b><a href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Li_SO-Net_Self-Organizing_Network_CVPR_2018_paper.pdf">SO-Net:
+        Self-Organizing Network for Point Cloud Analysis</a><br>
+      <b>Original Code:</b> <a href="https://github.com/lijx10/SO-Net">https://github.com/lijx10/SO-Net</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker:</b> <i>dockers/sonet</i><br>
+      <b>Data:</b> <i>dockers/data_conversion/sonet_data</i><br>
+      <b>Framework:</b> Pytorch</p>
+    <h3>KDNET</h3>
+    <p><b>Paper: </b><a href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Li_SO-Net_Self-Organizing_Network_CVPR_2018_paper.pdf">SO-Net:
+        Self-Organizing Network for Point Cloud Analysis</a><br>
+      <b>Original Code:</b> <a href="https://github.com/lijx10/SO-Net">https://github.com/lijx10/SO-Net</a><b
+        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
+          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
+style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
+      <b>Docker:</b> <i>dockers/sonet</i><br>
+      <b>Data:</b> <i>dockers/data_conversion/pnet_data</i><br>
+      <b>Framework:</b> Pytorch</p>
+    <p></p>
     <p><br>
     </p>
-    <p><br>
-    </p>
-    <p><br>
-    </p>
-    <p><br>
-    </p>
-    <p><br>
-    </p>
+    <p></p>
+    <p></p>
+    <p></p>
     <p><br>
     </p>
     <p><br>
@@ -152,11 +310,5 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
     <p><br>
     </p>
     <p> </p>
-    <p><span style="  color: black;"><br>
-      </span></p>
-    <p><br>
-      <span style="  color: black;"></span></p>
-    <p><br>
-    </p>
   </body>
 </html>
