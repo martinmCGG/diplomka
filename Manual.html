@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Manual</title>
+  </head>
+  <body>
+    <h1>Manual to 3D Classification Survey</h1>
+    <p><br>
+    </p>
+    <h2>Abstract</h2>
+    <p><i>I compiled set of publicly available neural networks for
+        classification of 3D models. I made the code work with ModelNet40 and
+        ShapeNetCore datasets which are also available online. This is a manual
+        explaining how to run the code and train or test all networks.</i></p>
+    <h2>Requirements</h2>
+    <p>To run the code you will need a computer with Linux operating system and
+      NVIDIA GPU.</p>
+    <p>You will need to install:</p>
+    <ul>
+      <li>NVIDIA drivers (<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation">Installation
+          guide here</a>)</li>
+      <li>Docker version 1.12 or higher (<a href="https://docs.docker.com/install/">Installation
+          guide here</a><span style="color: black;">)</span></li>
+      <li><span style=" color: black;">NVIDIA Container Runtime for Docker (<a href="https://github.com/NVIDIA/nvidia-docker">Installation
+            guide here</a>)</span></li>
+    </ul>
+    <p><span style="  color: black;">And that is all! Each neural network is an
+        independent Docker image and all its dependencies are installed when
+        building the image.</span></p>
+    <h2><span style="  color: black;">Datasets Setup</span></h2>
+    <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
+
+        style="color: black;">The code is made to work with ModelNet40 and
+        ShapeNetCore datasets. The easiest way to run it with custom dataset is
+        to restructure your data to copy the structure of one of these datasets.
+        <span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><br></span></span></p>
+    <ul>
+      <li>
+        <h3 dir="ltr" style=" line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
+
+            style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">ModelNet40</span></span><span
+
+            style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"></span><br>
+          </span></h3>
+        <ul>
+          <li><span style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Get the dataset <a
+
+href="http://modelnet.cs.princeton.edu/">here</a>. For experiments we used manually aligned version which can be downloaded <a
+
+href="https://github.com/lmb-freiburg/orion">here</a>.</span></span></li>
+        </ul>
+      </li>
+      <ul>
+        <li><span style=" color: black;"><span style=" font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Unpack the downloaded archive and you are ready to go!<br></span></span></li>
+      </ul>
+    </ul>
+    <span style=" color: black;"><span style=" font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"></span></span>
+    <ul>
+      <li>ShapeNetCore</li>
+      <ul>
+        <li><span style="color: black;"><span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Get the dataset <a
+
+href="https://www.shapenet.org/download/shapenetcore">here</a>. You need to register and wait for confirmation email.</span></span></li>
+        <li><span style=" color: black;"><span style=" font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Unpack the downloaded archive.</span></span></li>
+        <li><span style="  color: black;"><span style="  font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Download official dataset split <a
+
+href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a> and copy it to the root directory of the dataset.</span></span></li>
+      </ul>
+    </ul>
+ <h2>Abstract</h2>
+    <p><span style="  color: black;"><br>
+      </span></p>
+    <p><span style="  color: black;"><br>
+      </span></p>
+    <p><br>
+      <span style="  color: black;"></span></p>
+    <p><br>
+    </p>
+  </body>
+</html>
