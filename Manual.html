@@ -324,8 +324,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
       points used is specified by <code>num_points </code>parameter. During
       testing you can use voting across several views to get better results,
       number of rotations is controlled by <code>num_votes</code> parameter.</p>
-    <h3>POINTNET++
-    </h3>
+    <h3>POINTNET++ </h3>
     <p><b>Paper:&nbsp;</b> <a href="https://arxiv.org/pdf/1706.02413.pdf">PointNet++:
         Deep Hierarchical Feature Learning on Point Sets in a Metric Space</a><br>
       <b>Original Code:</b> <a href="https://github.com/charlesq34/pointnet2">https://github.com/charlesq34/pointnet2</a><b
@@ -364,8 +363,12 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
       <b>Data:</b> <i>dockers/data_conversion/</i><i><i>kdnet</i>_data</i><br>
       <b>Framework:</b> Pytorch</p>
     <p></p>
-    <p><b>Details: <br>
-      </b></p>
+    <p><b>Details: </b>This network constructs its input which is kd-trees on
+      the fly. But you still need to prepare mesh data to some more convenient
+      format. You can find several parameters to set in <i>config.ini </i>such
+      as depth of the network which also determines number of used points (2 to
+      the power of depth of the network). You can also explore different data
+      augmentation under the section of the same name.</p>
     <p></p>
     <p></p>
     <p></p>
