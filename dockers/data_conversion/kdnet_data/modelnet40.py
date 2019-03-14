@@ -5,7 +5,7 @@ import numpy as np
 import h5py as h5
 
 
-def prepare(path2data, path2save):
+def prepare(path2data, path2save, log_file):
     train_nFaces = np.zeros((1,), dtype=np.int32)
     train_faces = np.empty((0, 3), dtype=np.int32)
     train_vertices = np.empty((0, 3), dtype=np.float32)
@@ -33,16 +33,17 @@ def prepare(path2data, path2save):
         cl_test_filenames= [x for x in cl_test_filenames if x.split('.')[-1] == 'off']
         
         for j, shapefile in enumerate(cl_train_filenames):
-            print(shapefile)
+            print(shapefile, file=log_file)
             with open(path2data + '/' + cl + '/train/' + shapefile, 'rb') as fobj:
                 for k, line in enumerate(fobj):
-  
-                    if k == 0 and line.strip() != 'OFF':
-                        numVertices, numFaces, numEdges = map(np.int32, line[3:].split())
-                        break
-                    if k == 1:
+                    try:
+                        if k == 0 and line.strip() != 'OFF':
+                            numVertices, numFaces, numEdges = map(np.int32, line[3:].split())
+                            break
                         numVertices, numFaces, numEdges = map(np.int32, line.split())
                         break
+                    except:
+                        pass
 
                 vrtcs = np.empty((numVertices, 3), dtype=np.float32)
                 for k, line in enumerate(fobj):
@@ -63,14 +64,16 @@ def prepare(path2data, path2save):
 
         for j, shapefile in enumerate(cl_test_filenames):
             with open(path2data + '/' + cl + '/test/' + shapefile, 'rb') as fobj:
-                print(shapefile)
+                print(shapefile, file=log_file)
                 for k, line in enumerate(fobj):
-                    if k == 0 and line.strip() != 'OFF':
-                        numVertices, numFaces, numEdges = map(np.int32, line[3:].split())
-                        break
-                    if k == 1:
+                    try:
+                        if k == 0 and line.strip() != 'OFF':
+                            numVertices, numFaces, numEdges = map(np.int32, line[3:].split())
+                            break
                         numVertices, numFaces, numEdges = map(np.int32, line.split())
                         break
+                    except:
+                        pass
 
                 vrtcs = np.empty((numVertices, 3), dtype=np.float32)
                 for k, line in enumerate(fobj):
@@ -81,7 +84,7 @@ def prepare(path2data, path2save):
                 fcs = np.empty((numFaces, 3), dtype=np.int32)
                 for k, line in enumerate(fobj):
                     fcs[k] = map(np.int32, line.split())[1:]
-                    if k == numFaces - 1:
+                    if k == numFaces - 1:   
                         break
 
             test_nFaces = np.hstack((test_nFaces, numFaces + test_nFaces[-1]))
@@ -91,7 +94,7 @@ def prepare(path2data, path2save):
         
         print('{} - processed'.format(cl))
 
-    with h5.File(path2save + '/modelnet40.h5', 'w') as hf:
+    with h5.File(path2save + '/data.h5', 'w') as hf:
         hf.create_dataset('train_nFaces', data=train_nFaces)
         hf.create_dataset('train_faces', data=train_faces)
         hf.create_dataset('train_vertices', data=train_vertices)
@@ -102,8 +105,5 @@ def prepare(path2data, path2save):
         hf.create_dataset('test_labels', data=test_labels)
 
     print('\nData is processed and saved to ' + path2save + '/data.h5')
-    print('\nclass2label = {')
-    for i, cl in enumerate(sorted(class2label.keys())):
-        print('    "{}": {}'.format(cl, class2label[cl]) + (',' if i+1 < len(class2label) else ''))
-    print('}')
+    
     
