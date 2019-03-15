@@ -51,8 +51,10 @@ def collect_files(dest):
                 if file.split('_')[0] == dataset:
                     print(os.path.join(dest,file),file=f)    
     
-def add_soms(dest):
-    som_builder = SOM(8, 8, 3, GPU)
+def add_soms(config):
+    dest = config.output
+    size = int(math.sqrt(config.node_num))
+    som_builder = SOM(size, size, 3, GPU)
     for dataset in DATASETS:
         with open (os.path.join(dest,"{}_files.txt").format(dataset), 'r') as f:
             for line in f:

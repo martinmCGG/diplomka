@@ -6,7 +6,7 @@ name="ShapeNet_kdnet"
 #dataset_path="/local/krabec/ModelNet40A"
 dataset_path="/home/krabec/data/ShapeNet"
 output_dir="/local/krabec"
-docker_hidden=d
+docker_hidden=t
 
 ##########################################################################################################
 

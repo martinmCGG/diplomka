@@ -9,7 +9,7 @@ def find_files(directory,extension):
     ext_files = []
     for folder, subs, files in os.walk(directory):
         for filename in files:
-            if filename.split('.')[-1] == extension:
+            if filename.split('.')[-1] == extension:                
                 filename = os.path.join(folder, filename)
                 ext_files.append(filename)
     

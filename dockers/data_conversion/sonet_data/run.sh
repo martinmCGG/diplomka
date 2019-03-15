@@ -6,6 +6,7 @@ name="Small_converted"
 #dataset_path="/home/krabec/data/ModelNet40A"
 dataset_path="/local/krabec/Small"
 output_dir="/local/krabec"
+GPU=2
 docker_hidden=t
 
 ##########################################################################################################
@@ -19,6 +20,6 @@ docker kill "$image_name"
 docker rm "$image_name"
 
 docker run --runtime=nvidia --rm -id --name "$image_name" -v "$dataset_path":/dataset -v "$output_dir":/data "$image_name"
-docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 sonet_data.py"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "export CUDA_VISIBLE_DEVICES=$GPU && python3 sonet_data.py"
 
 ##########################################################################################################

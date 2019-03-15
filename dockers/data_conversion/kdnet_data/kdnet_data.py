@@ -11,5 +11,4 @@ if __name__ == "__main__":
     else:
         print("Unsupported dataset")
         sys.exit(1)
-    with open (config.log_file,'w') as f:
-        prepare(config.data, config.output, f)
+    prepare(config)
