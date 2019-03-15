@@ -7,7 +7,7 @@ import numpy as np
 import os
 from Logger import Logger
 from config import get_config, prepare_solver_file
-
+from prepare_data import prepare_data
 
 def get_dataset_size(config, name):
     file = os.path.join(config.data, '{}.txt'.format(name))
@@ -80,7 +80,7 @@ def train(config, solver):
             losses.append(loss)
             accs.append(acc)
             
-            if it%200 == 0:
+            if it % max(config.train_log_frq/config.batch_size,1) == 0:
                 LOSS_LOGGER.log(np.mean(losses), epoch, "train_loss")
                 ACC_LOGGER.log(np.mean(accs), epoch, "train_accuracy")
                 ACC_LOGGER.save(config.log_dir)
@@ -97,6 +97,10 @@ def train(config, solver):
 if __name__ == '__main__':
     
     config = get_config()
+    
+    prepare_data(os.path.join(config.data, 'train.txt'), views=config.num_views, shuffle=True)
+    prepare_data(os.path.join(config.data, 'test.txt'), views=config.num_views, shuffle=False)
+    
     caffe.set_device(0)
     caffe.set_mode_gpu()
     data_size = get_dataset_size(config, 'trainrotnet')

@@ -162,7 +162,7 @@ if __name__ == "__main__":
                 losses.append(train_err_batch)
                 accuracies.append(train_acc_batch)
 
-                if i % 50 == 0:
+                if i % max(config.train_log_frq/config.batch_size,1) == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accuracies)
                     LOSS_LOGGER.log(loss, epoch, "train_loss")

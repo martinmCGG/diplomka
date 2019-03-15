@@ -12,27 +12,24 @@ from Logger import Logger
 
 class ModelNetTrainer(object):
 
-    def __init__(self, model, train_loader, val_loader, optimizer, loss_fn, \
-                 model_name, log_dir, num_views=12, save_period=1):
+    def __init__(self, model, train_loader, val_loader, optimizer, loss_fn, config, log_dir, num_views=1):
 
         self.optimizer = optimizer
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.loss_fn = loss_fn
-        self.model_name = model_name
+        self.model_name = config.name
         self.log_dir = log_dir
         self.num_views = num_views
-        self.save_period = save_period
         self.model.cuda()
 
-        self.LOSS_LOGGER = Logger("mvcnn2_loss")
-        self.ACC_LOGGER = Logger("mvcnn2_acc")
-
-    def train(self, n_epochs):
+        self.LOSS_LOGGER = Logger("{}_loss".format(config.name))
+        self.ACC_LOGGER = Logger("{}_acc".format(config.name))
+    def train(self, config):
 
         self.model.train()
-        for epoch in range(n_epochs):
+        for epoch in range(config.max_epoch+1):
             # permute data for mvcnn
             rand_idx = np.random.permutation(int(len(self.train_loader.dataset.filepaths)/self.num_views))
             filepaths_new = []
@@ -49,7 +46,7 @@ class ModelNetTrainer(object):
             losses = []
             accs = []
             for i, data in enumerate(self.train_loader):
-                if self.model_name == 'mvcnn':
+                if self.num_views > 1:
                     N,V,C,H,W = data[1].size()
                     in_data = Variable(data[1]).view(-1,C,H,W).cuda()
                 else:
@@ -73,7 +70,7 @@ class ModelNetTrainer(object):
                 loss.backward()
                 self.optimizer.step()
                 
-                if i%50==0:
+                if i % max(config.train_log_frq/config.batch_size,1) == 0:
                     acc = np.mean(accs)
                     loss = np.mean(losses)
                     self.LOSS_LOGGER.log(loss, epoch, "train_loss")
@@ -94,27 +91,19 @@ class ModelNetTrainer(object):
             self.ACC_LOGGER.plot(dest=self.log_dir)
             self.LOSS_LOGGER.plot(dest=self.log_dir)        
 
-            # save best model
-            if epoch%self.save_period == 0:
+            # save model
+            if epoch%config.save_period == 0:
                 best_acc = val_overall_acc
-                self.model.save(self.log_dir, epoch)
+                self.model.save(os.path.join(self.log_dir, config.snapshot_prefix + str(epoch)))
  
             # adjust learning rate manually
             if epoch > 0 and (epoch+1) % 10 == 0:
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] = param_group['lr']*0.5
 
-        # export scalar data to JSON for external processing
-        #self.writer.export_scalars_to_json(self.log_dir+"/all_scalars.json")
-        #self.writer.close()
-
     def update_validation_accuracy(self, epoch, test=False):
         all_correct_points = 0
         all_points = 0
-
-        # in_data = None
-        # out_data = None
-        # target = None
 
         wrong_class = np.zeros(40)
         samples_class = np.zeros(40)
@@ -130,7 +119,7 @@ class ModelNetTrainer(object):
         all_pred = []
 
         for k, data in enumerate(self.val_loader, 0):
-            if self.model_name == 'mvcnn':
+            if self.num_views > 1:
                 N,V,C,H,W = data[1].size()
                 in_data = Variable(data[1]).view(-1,C,H,W).cuda()
             else:#'svcnn'
@@ -153,13 +142,12 @@ class ModelNetTrainer(object):
             all_points += results.size()[0]
             all_target += target.tolist()
             all_pred += pred.tolist()
-            print("accuracy so far ", float(all_correct_points.float() / all_points))
-           
+            print("accuracy so far ", float(all_correct_points) / all_points)
 
         print ('Total # of test models: ', all_points)
         val_mean_class_acc = np.mean((samples_class-wrong_class)/samples_class)
-        acc = all_correct_points.float() / all_points
-        val_overall_acc = acc.cpu().data.numpy()
+        acc = float(all_correct_points) / all_points
+        val_overall_acc = acc#acc.cpu().data.numpy()
         loss = all_loss / len(self.val_loader)
 
         print ('val mean class acc. : ', val_mean_class_acc)

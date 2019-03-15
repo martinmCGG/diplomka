@@ -107,7 +107,16 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
       started by [SECTION] statement. Then on each line a parameter in format <i>key
         = value</i>. You can find explanation of network parameters in later
       sections. </p>
-    <p>Parameters for data conversion:</p>
+    <p></p>
+    <ul>
+    </ul>
+    <h2> Data conversion</h2>
+    <p>To convert your dataset change you need to set the parameters described
+      above and then simply run script <i>run.sh </i>in your console. This
+      will convert the dataset to various formats directly readable by the
+      neural networks. Although the conversion is implemented in multi-threaded
+      fashion it still can be quite time consuming on big datasets </p>
+    <p>Parameters for data conversion: </p>
     <ul>
       <li><i><code>data</code> </i>- path to the dataset inside the container.
         Does not have to be changed.</li>
@@ -120,8 +129,13 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
       <li><code>dataset_type</code> -&nbsp; which dataset is converting. Must be
         one of <code>modelnet</code> or <code>shapenet </code>currently.</li>
     </ul>
-    <p></p>
-    <p>Parameters for neural networks:</p>
+    <h2>Neural Networks</h2>
+    <p>Each of the neural networks is implemented in python but in different
+      framework. That is why we used the docker infrastructure. We try to
+      present some unified framework to easily test and train the networks
+      without changing the code. This section will briefly introduce used
+      networks and some of their most important parameters. </p>
+    <p>Parameters common to all neural networks: </p>
     <ul>
       <li><code><i>name</i></code> - will be used as the name of the experiment
         used in log files.</li>
@@ -144,28 +158,16 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
       <li><i><code>max_epoch</code> - </i>number of epochs to train for. One
         epoch means one pass through the training part of the dataset. </li>
       <li><i><code>save_period</code> - </i>the trained network will be saved
-        every epoch divisible by save_period.&nbsp;</li>
+        every epoch divisible by save_period. </li>
+      <li><code>train_log_frq</code> - frequency of logging during training. It
+        is roughly number of examples seen by network.</li>
     </ul>
     <ul>
-      <li><i><code>test</code> - </i>if you want to only test already trained
+      <li> <i><code>test</code> - </i>if you want to only test already trained
         network, set this to True. <i><code>weights</code> </i>parameter has
         to have a valid value bigger than -1. Should be <code>False</code> for
-        training.</li>
+        training. </li>
     </ul>
-    <ul>
-    </ul>
-    <h2> Data conversion</h2>
-    <p>To convert your dataset change you need to set the parameters described
-      above and then simply run script <i>run.sh </i>in your console. This
-      will convert the dataset to various formats directly readable by the
-      neural networks. Although the conversion is implemented in multi-threaded
-      fashion it still can be quite time consuming on big datasets </p>
-    <h2>Neural Networks</h2>
-    <p>Each of the neural networks is implemented in python but in different
-      framework. That is why we used the docker infrastructure. We try to
-      present some unified framework to easily test and train the networks
-      without changing the code. This section will briefly introduce used
-      networks and some of their most important parameters. </p>
     <h3>VRNENS</h3>
     <p><b>Paper:&nbsp;</b> <a href="https://arxiv.org/pdf/1608.04236.pdf">Generative
         and Discriminative Voxel Modeling with Convolutional Neural Networks</a><br>

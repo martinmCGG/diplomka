@@ -16,8 +16,6 @@ parentdir = os.path.dirname(currentdir)
 sys.path.append(parentdir)
 import model
 
-FLAGS = tf.app.flags.FLAGS
-
 def train(dataset_train, dataset_test, caffemodel=''):
     print ('train() called')
     V = config.num_views
@@ -69,8 +67,7 @@ def train(dataset_train, dataset_test, caffemodel=''):
                 ld = config.log_dir
                 startepoch = weights + 1
                 ckptfile = os.path.join(ld,config.snapshot_prefix+str(weights))
-                ACC_LOGGER.load((os.path.join(ld,"{}_acc_train_accuracy.csv".format(config.name)),os.path.join(ld,"{}_acc_eval_accuracy.csv".format(config.name))), epoch = weights)
-                LOSS_LOGGER.load((os.path.join(ld,"{}_loss_train_loss.csv".format(config.name)), os.path.join(ld,'{}_loss_eval_loss.csv'.format(config.name))), epoch = weights)   
+
                 saver.restore(sess, ckptfile)
                 print ('restore variables done')
     
@@ -108,8 +105,8 @@ def train(dataset_train, dataset_test, caffemodel=''):
                     
                     assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
     
-                    log_period = 20
-                    if step % log_period == 0:
+
+                    if step % max(config.train_log_frq/config.batch_size,1) == 0:
                         print ('epoch %d step %d, loss=%.2f' %(epoch, step, loss_value,))
                         
                         acc = total_correct / float(total_seen)
@@ -121,7 +118,6 @@ def train(dataset_train, dataset_test, caffemodel=''):
                         total_correct = 0
                         total_loss = 0
                         
-    
                 if epoch % config.save_period == 0:
                     checkpoint_path = os.path.join(config.log_dir, config.snapshot_prefix+str(epoch))
                     saver.save(sess, checkpoint_path)
@@ -166,7 +162,6 @@ def test(dataset, config):
     import Evaluation_tools as et
     eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
     et.write_eval_file(config.data, eval_file, predictions, labels, config.name)
-    print(config.log_dir)
     et.make_matrix(config.data, eval_file, config.log_dir)    
 
 def _test(dataset, config, sess, placeholders):

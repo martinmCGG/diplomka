@@ -56,7 +56,7 @@ def train(model, config):
             losses.append(errors['train_loss'])
             accs.append(errors['train_accuracy'])
             
-            if i % 100 == 0:
+            if i % max(config.train_log_frq/config.batch_size,1) == 0:
                 acc = np.mean(accs)
                 loss = np.mean(losses) 
                 LOSS_LOGGER.log(loss, epoch, "train_loss")

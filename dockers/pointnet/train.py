@@ -114,8 +114,10 @@ def train(config):
             ckptfile = os.path.join(ld,config.snapshot_prefix+str(WEIGHTS))
             saver.restore(sess, ckptfile)
             start_epoch = WEIGHTS + 1
-            ACC_LOGGER.load((os.path.join(ld,"{}_acc_train_accuracy.csv".format(config.name)),os.path.join(ld,"{}_acc_eval_accuracy.csv".format(config.name))), epoch = WEIGHTS)
-            LOSS_LOGGER.load((os.path.join(ld,"{}_loss_train_loss.csv".format(config.name)), os.path.join(ld,'{}_loss_eval_loss.csv'.format(config.name))), epoch = WEIGHTS)
+            ACC_LOGGER.load((os.path.join(ld,"{}_acc_train_accuracy.csv".format(config.name)),
+                             os.path.join(ld,"{}_acc_eval_accuracy.csv".format(config.name))), epoch = WEIGHTS)
+            LOSS_LOGGER.load((os.path.join(ld,"{}_loss_train_loss.csv".format(config.name)),
+                               os.path.join(ld,'{}_loss_eval_loss.csv'.format(config.name))), epoch = WEIGHTS)
           
             
         ops = {'pointclouds_pl': pointclouds_pl,
@@ -181,13 +183,13 @@ def train_one_epoch(config, sess, ops,epoch):
             total_correct += correct
             total_seen += config.batch_size
             loss_sum += loss_val
-            
-        acc = total_correct / float(total_seen)
-        loss = loss_sum / float(num_batches)
-        log_string('mean loss: %f' % loss)
-        LOSS_LOGGER.log(loss, epoch, "train_loss")
-        log_string('accuracy: %f' % acc)
-        ACC_LOGGER.log(acc, epoch, "train_accuracy")
+            if batch_idx % max(config.train_log_frq/config.batch_size,1) == 0:            
+                acc = total_correct / float(total_seen)
+                loss = loss_sum / float(num_batches)
+                log_string('mean loss: %f' % loss)
+                LOSS_LOGGER.log(loss, epoch, "train_loss")
+                log_string('accuracy: %f' % acc)
+                ACC_LOGGER.log(acc, epoch, "train_accuracy")
         
 def eval_one_epoch(config, sess, ops, epoch=0):
     is_training = False

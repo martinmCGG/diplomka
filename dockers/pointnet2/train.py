@@ -193,7 +193,7 @@ def train_one_epoch(config,sess, ops, epoch=0):
         loss_sum += loss_val
         
         
-        if (batch_idx+1)%20 == 0:
+        if batch_idx % max(config.train_log_frq/config.batch_size,1) == 0:
             log_string(' ---- batch: %03d ----' % (batch_idx+1))
             log_string('mean loss: %f' % (loss_sum / 200))
             LOSS_LOGGER.log((loss_sum / 200), epoch, "train_loss")

@@ -67,5 +67,10 @@ def prepare_solver_file(ini_file = 'config.ini', data_size=0):
 def epoch_to_iters(epochs, batch_size, data_size):
     return epochs * data_size / batch_size
 
+if __name__ == "__main__":
+    cfg = config('config.ini')
+    solver = cfg.get_named_tuple().solver
+    print(solver)
+    cfg.prepare_caffe_files(solver)
     
     

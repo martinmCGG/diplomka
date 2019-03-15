@@ -86,7 +86,7 @@ def train(config, solver):
             losses.append(loss)
             accs.append(acc)
             
-            if it%200 == 0:
+            if it % max(config.train_log_frq/config.batch_size,1) == 0:
                 LOSS_LOGGER.log(np.mean(losses), epoch, "train_loss")
                 ACC_LOGGER.log(np.mean(accs), epoch, "train_accuracy")
                 ACC_LOGGER.save(config.log_dir)

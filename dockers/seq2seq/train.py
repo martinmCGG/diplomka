@@ -68,7 +68,7 @@ def train():
                 accs.append(acc)
                 losses.append(loss)
                 
-                if batch%20 == 0:
+                if batch % max(config.train_log_frq/config.batch_size,1) == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accs)
                     LOSS_LOGGER.log(loss, epoch, "train_loss")

@@ -287,7 +287,7 @@ def train(config):
                 
                 # Update iteration counter
                 itr += 1
-                if itr % 50 == 0:
+                if it % max(config.train_log_frq/config.batch_size,1) == 0:
                     [closs,c_acc] = [float(np.mean(lvs)),1.0-float(np.mean(accs))]
                     ACC_LOGGER.log(c_acc,epoch,"train_accuracy")
                     LOSS_LOGGER.log(closs,epoch,"train_loss")  
