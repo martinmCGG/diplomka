@@ -9,10 +9,11 @@
     <p><br>
     </p>
     <h2>Abstract</h2>
-    <p><i>I compiled set of publicly available neural networks for
-        classification of 3D models. I made the code work with ModelNet40 and
+    <p><i>We compiled set of publicly available neural networks for
+        classification of 3D models. The code works with ModelNet40 and
         ShapeNetCore datasets which are also available online. This is a manual
-        explaining how to run the code and train or test all networks.</i></p>
+        explaining how to convert datasets, train and test these networks. <br>
+      </i></p>
     <h2>Requirements</h2>
     <p>To run the code you will need a computer with Linux operating system and
       NVIDIA GPU.</p>
@@ -32,8 +33,8 @@
     <p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
         style="color: black;">The code is made to work with ModelNet40 and
         ShapeNetCore datasets. The easiest way to run it with custom dataset is
-        to restructure your data to copy the structure of one of these datasets.
-        <span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><br></span></span></p>
+        to restructure your data so it copies the structure of one of these
+        datasets. <span style="font-size: 11pt; color: black; background-color: transparent; font-weight: 400; font-style: normal; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><br></span></span></p>
     <ul>
       <li>
         <h3 dir="ltr" style=" line-height:1.38;margin-top:0pt;margin-bottom:0pt;"><span
@@ -62,37 +63,37 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
       </ul>
     </ul>
     <h2>General Setup</h2>
-    <p>You can download all the code <a href="https://github.com/Alobal123/diplomka">here</a>.</p>
+    <p>You can download all the code from Github <a href="https://github.com/Alobal123/diplomka">here</a>.</p>
     <p>Each network is implemented as a separate Docker image. To learn more
       about Docker, images and containers visit <a href="https://docs.docker.com/get-started/">this
         page</a>.</p>
-    <p>Each neural network is contained in one directory in <i>/dockers</i> in
-      my github repository. None of the networks accepts mesh files as their
-      input directly, so some data conversion is required. All data conversion
-      is implemented in docker with same structure as neural networks
-      themselves. Code for data conversion is in <i>/dockers/data_conversion</i>.</p>
-    <p>Each directory contains two files <b>config.ini</b> and <b>run.sh</b>
+    <p>Each neural network is contained in one directory in <i>/dockers</i>.
+      None of the networks accepts mesh files as their input directly, so some
+      data conversion is required. All data conversion is implemented in docker
+      with same structure as neural networks themselves. Code for data
+      conversion is located in <i>/dockers/data_conversion</i>.</p>
+    <p>Each directory contains two important files - <b>config.ini</b> and <b>run.sh</b>,
       which you will need to open and edit. Another important file is <b>Dockerfile</b>
-      which is contains the definition of the docker image and is used to build
-      it. Other files contain the code which differ from the original network
-      implementation. Original network code is downloaded automatically when
-      building the image and you can find the download link inside the
-      Dockerfile.</p>
+      which contains the definition of the docker image. Remaining files contain
+      the code which differ from the original network implementation. Original
+      network code is downloaded automatically when building the image and you
+      can find the download link below.</p>
     <p><b>run.sh </b>is a runnable script which builds the docker image, runs
       the docker container and executes the neural network or data conversion.
       You will need to setup a couple of variables here:</p>
     <ul>
       <li><code><i>name </i></code>- will be used as a name of the docker image
         and docker container. You can leave this at default value unless it is
-        in conflict with some already consisting image or you want to run more
+        in conflict with some already existing image or you want to run more
         instances of this image at once. With data conversion scripts the name
         is the name of the converted dataset and directory of the same name will
-        be created. The name of the image can be changed by changing variable <i>image_name</i>.</li>
-      <li><code><i>dataset_path</i></code> -&nbsp; should contain path to the
-        root directory to the dataset on your filesystem.</li>
-      <li><code><i>out_path</i> </code>- should contain path to the directory
-        where training logs and network weights will be saved. The directory
-        will be created if it does not exist.</li>
+        be created. The name of the image can be changed by changing variable <i>image_name
+          </i>in this case.</li>
+      <li><code><i>dataset_path</i></code> -&nbsp; contains path to the root
+        directory to the dataset on your filesystem.</li>
+      <li><code><i>out_path</i> </code>- contains path to the directory where
+        training logs and network weights will be saved. This directory will be
+        created automatically.</li>
       <li><code><i>GPU</i></code> - index of GPU which will be visible to docker
         container. Have to be a single integer. We currently do not support
         multiple GPUs.</li>
@@ -168,209 +169,9 @@ href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv">here</a>
         to have a valid value bigger than -1. Should be <code>False</code> for
         training. </li>
     </ul>
-    <h3>VRNENS</h3>
-    <p><b>Paper:&nbsp;</b> <a href="https://arxiv.org/pdf/1608.04236.pdf">Generative
-        and Discriminative Voxel Modeling with Convolutional Neural Networks</a><br>
-      <b>Original Code:</b> <a href="https://github.com/ajbrock/Generative-and-Discriminative-Voxel-Modeling">https://github.com/ajbrock/Generative-and-Discriminative-Voxel-Modeling</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker: </b><i>dockers/vrnens</i><br>
-      <b>Data: </b><i>dockers/data_conversion/vrnens_data</i><br>
-      <b>Framework:</b> Theano with Lasagne</p>
-    <p><b>Details: </b>This network takes voxel grid as an input compressed in
-      <i>.npz </i>format. Size of the voxel grid is set in <code>dim </code>parameter.
-      Network uses more than one rotation of the 3D model, you can change the
-      number of rotations by setting <code>num_rotations </code>parameter.
-      This network is very big and slow and even compilation of the model takes
-      up fifteen minutes.</p>
-    <h3>OCTREE</h3>
-    <p><b>Paper:&nbsp;</b> <a href="https://wang-ps.github.io/O-CNN_files/CNN3D.pdf">O-CNN:
-        Octree-based Convolutional Neural Networks</a><br>
-      <b>Original Code: </b><a href="https://github.com/Microsoft/O-CNN">https://github.com/Microsoft/O-CNN</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/octree</i><br>
-      <b>Data: </b><i>dockers/data_conversion/octree_data</i><br>
-      <b>Framework:</b> Caffe</p>
-    <p><b>Details: </b>This network is implemented in Caffe framework, which
-      works differently then other frameworks. The network is defined in a <i>.prototxt</i>
-      file and the training procedure is defined in similiar file and is called
-      <i>solver</i>. In order to have the same parameters as other networks we
-      have to do some tricks. The above mentioned files are located in <i>examples</i>
-      directory and the parameters in <i>config.ini</i> are automatically
-      copied into these files if they are named the same. <br>
-      The <code><i>solver</i></code> and <i><code>net</code> </i>parameters
-      have to contain the paths to solver and net definition file respectively
-      and <b>has to be enclosed in quotation marks</b>. Similarly the <code>snapshot_prefix</code>
-      has to contain full path and has to be enclosed in quotation marks as
-      well.<br>
-      Some of the parameters are in special section [ITER_PARAMETERS] containing
-      parameters that are measured in epochs. Parameters in this section will be
-      automatically converted to iterations which caffe uses. This will not
-      affect you, only weights of trained networks will be saved with number of
-      iterations instead of number of epochs.</p>
-    <h3>OCTREE ADAPTIVE<br>
-    </h3>
-    <p><b>Paper:</b> <a href="https://wang-ps.github.io/AO-CNN_files/AOCNN.pdf">Adaptive
-        O-CNN: A Patch-based Deep Representation of 3D Shapes</a><br>
-      <b>Original Code: </b><a href="https://github.com/Microsoft/O-CNN">https://github.com/Microsoft/O-CNN</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker: </b><i>dockers/octree_adaptive</i><br>
-      <b>Data: </b><i>dockers/data_conversion/octree_data (with <code>adaptive=True</code>)</i><br>
-      <b>Framework:</b> Caffe</p>
-    <p><b>Details: </b>Functions the same as original octree network described
-      above.</p>
-    <h3>VGG</h3>
-    <p><b>Paper: </b><a href="https://arxiv.org/pdf/1409.1556.pdf">Very Deep
-        Convolutional Networks for Large-Scale Image Recognition</a><br>
-      <b>Original Code:</b> <a href="https://github.com/machrisaa/tensorflow-vgg">https://github.com/machrisaa/tensorflow-vgg</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker: </b><i>dockers/vgg</i><br>
-      <b>Data:</b> <i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
-      <b>Framework:</b> Tensorflow</p>
-    <p><b>Details: </b>This is an implementation of classic VGG network which
-      we modified to vote across multiple views to classify 3D models. Before
-      running the network download pretrained <a href="https://mega.nz/#%21xZ8glS6J%21MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs">here</a>
-      and copy it to dockers/vgg. As with all following networks using multiple
-      images views you can set the number of used views in parameter <code>num_views</code>.</p>
-    <p>VGG is also used to extract features for SEQ2SEQ network. If you want to
-      do this set <code>weights </code>parameter to number of version of
-      trained VGG you want to use and <code>extract</code> to <code>True</code>.
-      The features will be saved to the root directory of dataset and ready to
-      use by SEQ2SEQ network.</p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <h3>MVCNN</h3>
-    <p><b>Paper:</b>&nbsp; <a href="https://arxiv.org/pdf/1706.02413.pdf">Multi-view
-        Convolutional Neural Networks for 3D Shape Recognition</a><br>
-      <b>Original Code:</b> <a href="https://github.com/WeiTang114/MVCNN-TensorFlow">https://github.com/WeiTang114/MVCNN-TensorFlow</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker: </b><i>dockers/mvcnn</i><br>
-      <b>Data: </b><i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
-      <b>Framework:</b> Tensorflow</p>
-    <p><b>Details: </b>Uses pretrained AlexNet which is prepared automatically.
-      If you want to use different weight, you have to copy them to docker
-      container and change parameter <code>pretrained_network_file</code>.</p>
-    <h3>MVCNN2</h3>
-    <p><b>Paper:</b>&nbsp; <a href="http://people.cs.umass.edu/%7Ejcsu/papers/shape_recog/shape_recog.pdf">A
-        Deeper Look at 3D Shape Classifiers</a><br>
-      <b>Original Code:</b> <a href="https://github.com/jongchyisu/mvcnn_pytorch">https://github.com/jongchyisu/mvcnn_pytorch</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/mvcnn2</i><br>
-      <b>Data:</b> <i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
-      <b>Framework:</b> PyTorch</p>
-    <p><b>Details: </b>This network trains in two phases and requires two
-      different batch sizes to be used, so it has two separate parameters for
-      this. You can choose one of several pretrained networks to use by setting
-      <code>cnn_name</code> parameter. Or you can try training from scratch by
-      setting <code>no_pretraining=True.</code></p>
-    <h3>ROTATIONNET</h3>
-    <p><b>Paper: </b><span style="color: #3333ff;"><a href="https://arxiv.org/abs/1603.06208">Joint
-          Object Categorization and Pose Estimation Using Multiviews from
-          Unsupervised Viewpoints</a></span><br>
-      <b>Original Code:</b> <a href="https://github.com/kanezaki/rotationnet">https://github.com/kanezaki/rotationnet</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/rotnet</i><br>
-      <b>Data: </b><i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
-      <b>Framework: </b>Caffe</p>
-    <p><b>Details: </b>Rotation Net is implemented in caffe therefore all
-      issues mentioned in octree section apply. Only there are two separate
-      network file definitions one for training and one for testing.</p>
-    <h3>SEQ2SEQ</h3>
-    <p><b>Paper: </b><a href="https://www.cs.umd.edu/%7Ezwicker/publications/SeqView2SeqLabels-TIP18.pdf">SeqViews2SeqLabels:
-        Learning 3D Global Features via Aggregating Sequential Views by RNN with
-        Attention</a><br>
-      <b>Original Code:</b> <a href="https://github.com/mingyangShang/SeqViews2SeqLabels">https://github.com/mingyangShang/SeqViews2SeqLabels</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker: </b><i>dockers/seq2seq</i><br>
-      <b>Data: </b><i>vgg_features (explained below)</i><br>
-      <b>Framework:</b> Tensorflow</p>
-    <p><b>Details: </b>This network gets feature vectors extracted by
-      pretrained image classification network as its input. You can get these
-      features by training and using above described VGG network.&nbsp; The
-      dimensionality of the feature space is controlled by <code>n_input_fc </code>parameter,
-      VGG vector has 4096 dimensions by default. Paths to <i>.npy</i> files
-      containing extracted features inside the docker container are controlled
-      by <code>train_feature_file, train_label_file </code>and analogous for
-      test dataset.</p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <p></p>
-    <h3>POINTNET</h3>
-    <p><b>Paper: </b><a href="https://arxiv.org/abs/1612.00593">PointNet: Deep
-        Learning on Point Sets for 3D Classification and Segmentation</a><br>
-      <b>Original Code:</b> <a href="https://github.com/charlesq34/pointnet">https://github.com/charlesq34/pointnet</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/pointnet</i><br>
-      <b>Data:</b> <i>dockers/data_conversion/pnet_data</i><br>
-      <b>Framework:</b> Tensorflow</p>
-    <p><b>Details: </b>This network gets point cloud as its input. Number of
-      points used is specified by <code>num_points </code>parameter. During
-      testing you can use voting across several views to get better results,
-      number of rotations is controlled by <code>num_votes</code> parameter.</p>
-    <h3>POINTNET++ </h3>
-    <p><b>Paper:&nbsp;</b> <a href="https://arxiv.org/pdf/1706.02413.pdf">PointNet++:
-        Deep Hierarchical Feature Learning on Point Sets in a Metric Space</a><br>
-      <b>Original Code:</b> <a href="https://github.com/charlesq34/pointnet2">https://github.com/charlesq34/pointnet2</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/pointnet2</i><br>
-      <b>Data: </b><i>dockers/data_conversion/pnet_data</i><br>
-      <b>Framework: </b>Tensorflow</p>
-    <p><b>Details: </b>Same as the original pointnet described above.</p>
-    <h3>SONET</h3>
-    <p><b>Paper: </b><a href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Li_SO-Net_Self-Organizing_Network_CVPR_2018_paper.pdf">SO-Net:
-        Self-Organizing Network for Point Cloud Analysis</a><br>
-      <b>Original Code:</b> <a href="https://github.com/lijx10/SO-Net">https://github.com/lijx10/SO-Net</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/sonet</i><br>
-      <b>Data:</b> <i>dockers/data_conversion/sonet_data</i><br>
-      <b>Framework:</b> Pytorch</p>
-    <p><b>Details: </b>Similarly to pointnet this network gets specific number
-      of points as its inputvspecified by <code>num_points </code>parameter.
-      In addition to points it uses a self organizing network to get better
-      representation of these points. This is computed by <i>sonet_data</i>
-      docker. The <i>config.ini </i>file contains great number of parameters,
-      for their explanation check original paper and original code.</p>
-    <h3>KDNET</h3>
-    <p><b>Paper: </b><a href="http://openaccess.thecvf.com/content_ICCV_2017/papers/Klokov_Escape_From_Cells_ICCV_2017_paper.pdf">Escape
-        from Cells: Deep Kd-Networks for the Recognition of 3D Point Cloud
-        Models</a><br>
-      <b>Original Code:</b> <a href="https://github.com/fxia22/kdnet.pytorch">https://github.com/fxia22/kdnet.pytorch</a><b
-        style="font-weight:normal;" id="docs-internal-guid-5e621724-7fff-c38a-a742-c32e06a5e51a"><a
-          href="https://github.com/charlesq34/pointnet" style="text-decoration:none;"><span
-style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
-      <b>Docker:</b> <i>dockers/kdnet</i><br>
-      <b>Data:</b> <i>dockers/data_conversion/</i><i><i>kdnet</i>_data</i><br>
-      <b>Framework:</b> Pytorch</p>
-    <p></p>
-    <p><b>Details: </b>This network constructs its input which is kd-trees on
-      the fly. But you still need to prepare mesh data to some more convenient
-      format. You can find several parameters to set in <i>config.ini </i>such
-      as depth of the network which also determines number of used points (2 to
-      the power of depth of the network). You can also explore different data
-      augmentation under the section of the same name.</p>
+    <p>For more details about individual networks, continue <a href="networks.html"
+        target="_blank">here</a>.</p>
+    <h2>Logging and Evaluation</h2>
     <p></p>
     <p></p>
     <p></p>
