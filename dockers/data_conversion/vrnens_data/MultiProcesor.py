@@ -29,7 +29,7 @@ class MultiProcesor:
             p.join()
       
     def run_conversion(self, files, id, args):
-        datasets = ["train","test", "val"]
+        datasets = ["train","test"]
         self.log("Starting thread {} on {} files.".format(id, len(files)))
         buffer = [[] for _ in range(len(datasets))]
         buffer_cats = [[] for _ in range(len(datasets))]
@@ -41,7 +41,7 @@ class MultiProcesor:
                 self.log("Thread {} is {}% done.".format(id,float(i)/len(files)*100))
             try:
                 file_id = get_file_id(filename, self.dataset)
-                split_index = self.split[file_id]
+                split_index = get_split(self.split, file_id)
                 buffer[split_index].append(self.proccess_function(filename, self.dataset, args))  
                 splitss[split_index]+=1
                 buffer_cats[split_index].append(self.categories[file_id])   
@@ -64,6 +64,12 @@ class MultiProcesor:
         with open(self.log_file, 'a') as f:
             print(message, file = f)
         self.lock.release()
+
+def get_split(split, key):
+    if key in split:
+        return split[key]
+    else:
+        return 0
 
 def get_file_id(file, dataset):
     if dataset == "shapenet":

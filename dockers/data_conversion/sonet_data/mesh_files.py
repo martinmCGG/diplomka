@@ -20,7 +20,7 @@ def read_obj_file(filename):
     vertices = []
     triangles = []
     quads = []
-    with open(filename, 'r') as f:
+    with open(filename, 'r', encoding='UTF-8') as f:
         for line in f:
             splited = line.split()
             if splited and splited[0] == 'f':
@@ -32,7 +32,6 @@ def read_obj_file(filename):
                     triangles.append(point)
                 elif size==4:
                     quads.append(point)
-            
             elif splited and splited[0] == 'v':
                 vertices.append([float(splited[1]), float(splited[3]),float(splited[2])])
     vertices = rescale_to_unit_sphere(centralize(np.array(vertices)))
@@ -43,12 +42,14 @@ def read_off_file(filename):
     triangles = []
     quads = []
     with open(filename, 'r') as f:
+        
         line = f.readline().strip()
+
         if line=='OFF':
            line = f.readline() 
         else:
             line = line[3:]
-        if len(line)==1:
+        if not line.strip():
             line = f.readline() 
         n_vertices, n_faces, _ = [int(x) for x in line.split()]
         for _ in range(n_vertices):
@@ -76,7 +77,6 @@ def off2obj(file):
     vertices, triangles, quads = read_off_file(file)
     obj_file_name = os.path.join(os.path.split(file)[0] , Path(file).stem + ".obj")
     with open(obj_file_name, 'w') as f:
-        
         for xyz in vertices:
             f.write('v {:6f} {:6f} {:6f}\n'.format(xyz[0],xyz[2],xyz[1]))
         f.write('\n')

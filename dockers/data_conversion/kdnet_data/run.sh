@@ -1,10 +1,8 @@
 ##########################################################################################################
 # Set required variables
 
-name="ShapeNet_kdnet"
-#name="Small_converted"
-#dataset_path="/local/krabec/ModelNet40A"
-dataset_path="/home/krabec/data/ShapeNet"
+name="ModelNet40A_kdnet"
+dataset_path="/local/krabec/ModelNet40A"
 output_dir="/local/krabec"
 docker_hidden=t
 

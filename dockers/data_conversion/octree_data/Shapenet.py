@@ -10,7 +10,7 @@ def parse_shapenet_split(csv_file):
     coding = {
         'train':0,
         'test':1,
-        'val':2
+        'val':1
         }
     with open(csv_file, 'r') as f:
         f.readline()

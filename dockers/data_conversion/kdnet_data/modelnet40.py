@@ -5,7 +5,9 @@ import numpy as np
 import h5py as h5
 
 
-def prepare(path2data, path2save, log_file):
+def prepare(config):
+    path2data = config.data
+    path2save = config.output
     train_nFaces = np.zeros((1,), dtype=np.int32)
     train_faces = np.empty((0, 3), dtype=np.int32)
     train_vertices = np.empty((0, 3), dtype=np.float32)
@@ -33,7 +35,7 @@ def prepare(path2data, path2save, log_file):
         cl_test_filenames= [x for x in cl_test_filenames if x.split('.')[-1] == 'off']
         
         for j, shapefile in enumerate(cl_train_filenames):
-            print(shapefile, file=log_file)
+            print(shapefile)
             with open(path2data + '/' + cl + '/train/' + shapefile, 'rb') as fobj:
                 for k, line in enumerate(fobj):
                     try:
@@ -64,7 +66,7 @@ def prepare(path2data, path2save, log_file):
 
         for j, shapefile in enumerate(cl_test_filenames):
             with open(path2data + '/' + cl + '/test/' + shapefile, 'rb') as fobj:
-                print(shapefile, file=log_file)
+                print(shapefile)
                 for k, line in enumerate(fobj):
                     try:
                         if k == 0 and line.strip() != 'OFF':

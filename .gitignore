@@ -3,3 +3,4 @@
 *.pydevproject
 Manual.html.bak
 data
+*.bak

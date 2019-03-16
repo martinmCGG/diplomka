@@ -7,7 +7,7 @@ if __name__ == "__main__":
     if config.dataset_type == 'modelnet':
         from lib.processors.modelnet40 import prepare
     elif config.dataset_type == 'shapenet':
-        from lib.processors.shapenet import prepare
+        from lib.processors.shapenetcore import prepare
     else:
         print("Unsupported dataset")
         sys.exit(1)

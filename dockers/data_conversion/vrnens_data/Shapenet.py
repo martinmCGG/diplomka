@@ -10,7 +10,7 @@ def parse_shapenet_split(csv_file):
     coding = {
         'train':0,
         'test':1,
-        'val':2
+        'val':1
         }
     with open(csv_file, 'r') as f:
         f.readline()
@@ -57,4 +57,6 @@ def get_metadata(shapenet_root_dir):
     cat_names = get_cat_names(shapenet_root_dir)
     return categories, split
 
+
+    
 
