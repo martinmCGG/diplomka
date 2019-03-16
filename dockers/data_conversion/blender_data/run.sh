@@ -1,12 +1,10 @@
 ##########################################################################################################
 # Set required variables
 
-#name="ModelNet40A_mvcnn_shaded"
-name="Small_converted"
-#dataset="/home/krabec/data/ModelNet40A"
-dataset_path="/local/krabec/Small"
-output_dir="/local/krabec"
-docker_hidden=t
+name="shaded"
+dataset_path="/local/krabec/ShapeNet/ShapeNet"
+output_dir="/local/krabec/ShapeNet"
+docker_hidden=d
 
 #This must be one of shaded or depth
 render=shaded

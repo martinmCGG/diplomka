@@ -1,12 +1,10 @@
 ##########################################################################################################
 # Set required variables
 
-#name="ModelNet40A_vrnens"
-name="Small_converted"
-#dataset_path="/home/krabec/data/ModelNet40A"
-dataset_path="/local/krabec/Small"
-output_dir="/local/krabec"
-docker_hidden=t
+name="vrnens"
+dataset_path="/local/krabec/ShapeNet"
+output_dir="/home/krabec"
+docker_hidden=d
 
 ##########################################################################################################
 

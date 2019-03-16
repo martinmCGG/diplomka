@@ -20,7 +20,7 @@ def read_obj_file(filename):
     vertices = []
     triangles = []
     quads = []
-    with open(filename, 'r', encoding='UTF-8') as f:
+    with open(filename, 'r') as f:
         for line in f:
             splited = line.split()
             if splited and splited[0] == 'f':

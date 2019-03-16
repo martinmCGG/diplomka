@@ -11,13 +11,7 @@ scene = bpy.context.scene
 context = bpy.context
 
 def get_name_of_image_file(output_dir, file_id, i):
-    return os.path.join(output_dir , file_id, file_id +'_'+ str(i) + ".png")
-
-def delete_cube():
-    #Delete default cube
-    objs = bpy.data.objects
-    objs.remove(objs["Cube"], True)
-
+    return os.path.join(output_dir, file_id +'_'+ str(i) + ".png")
 
 def render_one_model(model_path, file_id, output_dir, dataset_type='modelnet', nviews=12, resolution=224):
         

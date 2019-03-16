@@ -44,10 +44,11 @@ def file_to_pointcloud(filename, type, args):
         points, triangles, quads = read_obj_file(filename)
     elif type == 'modelnet':
         points, triangles, quads = read_off_file(filename)
+    else:
+        print("bad dataset type")
     if args.normal:
         return mesh_to_point_cloud(points, triangles, args.num_points, normal=True)
     else:
-
         return mesh_to_point_cloud(points, triangles, args.num_points)
 
         

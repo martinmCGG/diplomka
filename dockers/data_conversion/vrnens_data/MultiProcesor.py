@@ -50,7 +50,7 @@ class MultiProcesor:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 self.log("Exception occured in thread {}. Failed to proccess file {}".format(id, filename))
-                self.log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno))                  
+                self.log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno))             
                     
         for j in range(len(datasets)):
             if len(buffer_cats[j])  > 0:

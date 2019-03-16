@@ -1,11 +1,9 @@
 ##########################################################################################################
 # Set required variables
 
-#name="ModelNet40A_octree"
-name="Small_converted"
-#dataset_path="/home/krabec/data/ShapeNet"
-dataset_path="/local/krabec/Ssmall"
-output_dir="/local/krabec"
+name="octree_adaptive"
+dataset_path="/local/krabec/ShapeNet"
+output_dir="/home/krabec"
 docker_hidden=t
 
 ##########################################################################################################

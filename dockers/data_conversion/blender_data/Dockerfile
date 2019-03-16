@@ -1,9 +1,6 @@
 FROM ubuntu:xenial
 
-LABEL authors="Isaac (Ike) Arias <ikester@gmail.com>"
-
-RUN apt-get update && \
-	apt-get install -yq \
+RUN apt-get update && apt-get install -yq \
 		build-essential \
 		curl \
 		bzip2 \

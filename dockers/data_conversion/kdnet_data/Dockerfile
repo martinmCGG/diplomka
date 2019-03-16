@@ -17,7 +17,7 @@ RUN git clone https://github.com/Regenerator/kdnets.git
 WORKDIR kdnets
 RUN mkdir logs
 COPY *.py ./
-RUN mv modelnet40.py ./lib/processors && mv shapenet.py ./lib/processors
+RUN mv modelnet40.py ./lib/processors && mv shapenetcore.py ./lib/processors
 COPY *.ini ./
 
 ENTRYPOINT /bin/bash 
