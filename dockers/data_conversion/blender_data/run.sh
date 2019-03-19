@@ -1,13 +1,13 @@
 ##########################################################################################################
 # Set required variables
 
-name="shaded"
-dataset_path="/local/krabec/ShapeNet/ShapeNet"
-output_dir="/local/krabec/ShapeNet"
-docker_hidden=d
+name="depth"
+dataset_path="/local/krabec/ModelNet40A/ModelNet40A"
+output_dir="/local/krabec/ModelNet40A"
+docker_hidden=t
 
 #This must be one of shaded or depth
-render=shaded
+render=depth
 
 ##########################################################################################################
 

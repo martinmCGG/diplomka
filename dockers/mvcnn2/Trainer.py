@@ -26,7 +26,7 @@ class ModelNetTrainer(object):
 
         self.LOSS_LOGGER = Logger("{}_loss".format(config.name))
         self.ACC_LOGGER = Logger("{}_acc".format(config.name))
-    def train(self, config):
+    def train(self, config, batch_size):
 
         self.model.train()
         for epoch in range(config.max_epoch+1):
@@ -70,7 +70,7 @@ class ModelNetTrainer(object):
                 loss.backward()
                 self.optimizer.step()
                 
-                if i % max(config.train_log_frq/config.batch_size,1) == 0:
+                if i % max(config.train_log_frq/batch_size,1) == 0:
                     acc = np.mean(accs)
                     loss = np.mean(losses)
                     self.LOSS_LOGGER.log(loss, epoch, "train_loss")

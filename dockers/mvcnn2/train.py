@@ -43,7 +43,7 @@ def train(config):
     print('num_val_files: '+str(len(val_dataset.filepaths)))
     
     trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(),config, log_dir, num_views=1)
-    trainer.train(config)
+    trainer.train(config,config.stage1_batch_size)
 
     # STAGE 2
     print('--------------stage 2--------------')
@@ -62,7 +62,7 @@ def train(config):
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))
     trainer = ModelNetTrainer(cnet_2, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), config, log_dir, num_views=config.num_views)
-    trainer.train(config)
+    trainer.train(config,config.stage2_batch_size)
 
 def test(config):
     log_dir = os.path.join(config.log_dir, config.name+'_stage_2')

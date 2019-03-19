@@ -139,6 +139,18 @@ if __name__ == '__main__':
             print("Exception occured while reading files.", file=f)
             print("Exception {}".format(e), file=f)
         sys.exit(1)'''
+    
+    '''new_files = []
+    for file in files:
+        file_id = get_file_id(file, config.dataset_type)
+        cat_name = config.cat_names[categories[file_id]]
+        output_dir = config.output
+        dataset = coding[get_split(file_id, split)]
+        whole_path = os.path.join(output_dir, cat_name, dataset, file_id)
+        if os.path.isdir(whole_path):
+            new_files.append(file)
+    files = new_files'''
+    
     save_for_mvcnn(config, files, categories,split)
     collect_files(files, split,categories, config)
     if config.dataset_type == 'modelnet' and config.remove_obj:

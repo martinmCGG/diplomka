@@ -16,6 +16,7 @@ def get_metadata(root_dir, files):
         splited = file.split('/')
         name = os.path.join(Path(file).stem)
         categories[name] = cats_mapping[splited[-3]]
+
         split[name] = coding[splited[-2]]    
     return categories, split
 
