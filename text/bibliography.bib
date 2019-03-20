@@ -1,0 +1,490 @@
+
+@inproceedings{maturana_voxnet:_2015,
+	title = {Voxnet: {A} 3d convolutional neural network for real-time object recognition},
+	booktitle = {{IROS} 2015},
+	author = {Maturana, D. and Scherer, S.},
+	year = {2015}
+}
+
+@article{brock_generative_2016,
+	title = {Generative and {Discriminative} {Voxel} {Modeling} with {Convolutional} {Neural} {Networks}},
+	url = {http://arxiv.org/abs/1608.04236},
+	abstract = {When working with three-dimensional data, choice of representation is key. We explore voxel-based models, and present evidence for the viability of voxellated representations in applications including shape modeling and object classification. Our key contributions are methods for training voxel-based variational autoencoders, a user interface for exploring the latent space learned by the autoencoder, and a deep convolutional neural network architecture for object classification. We address challenges unique to voxel-based representations, and empirically evaluate our models on the ModelNet benchmark, where we demonstrate a 51.5\% relative improvement in the state of the art for object classification.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1608.04236 [cs, stat]},
+	author = {Brock, Andrew and Lim, Theodore and Ritchie, J. M. and Weston, Nick},
+	month = aug,
+	year = {2016},
+	note = {arXiv: 1608.04236},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Human-Computer Interaction, Computer Science - Machine Learning, Statistics - Machine Learning},
+	annote = {Comment: 9 pages, 5 figures, 2 tables},
+	file = {arXiv\:1608.04236 PDF:C\:\\Users\\miros\\Zotero\\storage\\M6RC42Q5\\Brock et al. - 2016 - Generative and Discriminative Voxel Modeling with .pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\B8LJWTH3\\1608.html:text/html}
+}
+
+@article{sedaghat_orientation-boosted_2016,
+	title = {Orientation-boosted {Voxel} {Nets} for 3D {Object} {Recognition}},
+	url = {http://arxiv.org/abs/1604.03351},
+	abstract = {Recent work has shown good recognition results in 3D object recognition using 3D convolutional networks. In this paper, we show that the object orientation plays an important role in 3D recognition. More specifically, we argue that objects induce different features in the network under rotation. Thus, we approach the category-level classification task as a multi-task problem, in which the network is trained to predict the pose of the object in addition to the class label as a parallel task. We show that this yields significant improvements in the classification results. We test our suggested architecture on several datasets representing various 3D data sources: LiDAR data, CAD models, and RGB-D images. We report state-of-the-art results on classification as well as significant improvements in precision and speed over the baseline on 3D detection.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1604.03351 [cs]},
+	author = {Sedaghat, Nima and Zolfaghari, Mohammadreza and Amiri, Ehsan and Brox, Thomas},
+	month = apr,
+	year = {2016},
+	note = {arXiv: 1604.03351},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Neural and Evolutionary Computing},
+	annote = {Comment: BMVC'17 version. Added some experiments + auto-alignment of Modelnet40},
+	file = {arXiv\:1604.03351 PDF:C\:\\Users\\miros\\Zotero\\storage\\WGB8XCGV\\Sedaghat et al. - 2016 - Orientation-boosted Voxel Nets for 3D Object Recog.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\7RGTSC4D\\1604.html:text/html}
+}
+
+@article{hegde_fusionnet:_2016,
+	title = {{FusionNet}: 3D {Object} {Classification} {Using} {Multiple} {Data} {Representations}},
+	shorttitle = {{FusionNet}},
+	url = {http://arxiv.org/abs/1607.05695},
+	abstract = {High-quality 3D object recognition is an important component of many vision and robotics systems. We tackle the object recognition problem using two data representations, to achieve leading results on the Princeton ModelNet challenge. The two representations: 1. Volumetric representation: the 3D object is discretized spatially as binary voxels - \$1\$ if the voxel is occupied and \$0\$ otherwise. 2. Pixel representation: the 3D object is represented as a set of projected 2D pixel images. Current leading submissions to the ModelNet Challenge use Convolutional Neural Networks (CNNs) on pixel representations. However, we diverge from this trend and additionally, use Volumetric CNNs to bridge the gap between the efficiency of the above two representations. We combine both representations and exploit them to learn new features, which yield a significantly better classifier than using either of the representations in isolation. To do this, we introduce new Volumetric CNN (V-CNN) architectures.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1607.05695 [cs]},
+	author = {Hegde, Vishakh and Zadeh, Reza},
+	month = jul,
+	year = {2016},
+	note = {arXiv: 1607.05695},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	file = {arXiv\:1607.05695 PDF:C\:\\Users\\miros\\Zotero\\storage\\WUPDMN7W\\Hegde and Zadeh - 2016 - FusionNet 3D Object Classification Using Multiple.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\DSLYML7N\\1607.html:text/html}
+}
+
+@article{szegedy_inception-v4_2016,
+	title = {Inception-v4, {Inception}-{ResNet} and the {Impact} of {Residual} {Connections} on {Learning}},
+	url = {http://arxiv.org/abs/1602.07261},
+	abstract = {Very deep convolutional networks have been central to the largest advances in image recognition performance in recent years. One example is the Inception architecture that has been shown to achieve very good performance at relatively low computational cost. Recently, the introduction of residual connections in conjunction with a more traditional architecture has yielded state-of-the-art performance in the 2015 ILSVRC challenge; its performance was similar to the latest generation Inception-v3 network. This raises the question of whether there are any benefit in combining the Inception architecture with residual connections. Here we give clear empirical evidence that training with residual connections accelerates the training of Inception networks significantly. There is also some evidence of residual Inception networks outperforming similarly expensive Inception networks without residual connections by a thin margin. We also present several new streamlined architectures for both residual and non-residual Inception networks. These variations improve the single-frame recognition performance on the ILSVRC 2012 classification task significantly. We further demonstrate how proper activation scaling stabilizes the training of very wide residual Inception networks. With an ensemble of three residual and one Inception-v4, we achieve 3.08 percent top-5 error on the test set of the ImageNet classification (CLS) challenge},
+	urldate = {2019-02-27},
+	journal = {arXiv:1602.07261 [cs]},
+	author = {Szegedy, Christian and Ioffe, Sergey and Vanhoucke, Vincent and Alemi, Alex},
+	month = feb,
+	year = {2016},
+	note = {arXiv: 1602.07261},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	file = {arXiv\:1602.07261 PDF:C\:\\Users\\miros\\Zotero\\storage\\HQSVZHXE\\Szegedy et al. - 2016 - Inception-v4, Inception-ResNet and the Impact of R.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\BWBV8XRQ\\1602.html:text/html}
+}
+
+@article{he_deep_2015,
+	title = {Deep {Residual} {Learning} for {Image} {Recognition}},
+	url = {http://arxiv.org/abs/1512.03385},
+	abstract = {Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers---8x deeper than VGG nets but still having lower complexity. An ensemble of these residual nets achieves 3.57\% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28\% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC \& COCO 2015 competitions, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1512.03385 [cs]},
+	author = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+	month = dec,
+	year = {2015},
+	note = {arXiv: 1512.03385},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: Tech report},
+	file = {arXiv\:1512.03385 PDF:C\:\\Users\\miros\\Zotero\\storage\\XBHJG5TD\\He et al. - 2015 - Deep Residual Learning for Image Recognition.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\3NRAI2FL\\1512.html:text/html}
+}
+
+@article{huang_deep_2016,
+	title = {Deep {Networks} with {Stochastic} {Depth}},
+	url = {http://arxiv.org/abs/1603.09382},
+	abstract = {Very deep convolutional networks with hundreds of layers have led to significant reductions in error on competitive benchmarks. Although the unmatched expressiveness of the many layers can be highly desirable at test time, training very deep networks comes with its own set of challenges. The gradients can vanish, the forward flow often diminishes, and the training time can be painfully slow. To address these problems, we propose stochastic depth, a training procedure that enables the seemingly contradictory setup to train short networks and use deep networks at test time. We start with very deep networks but during training, for each mini-batch, randomly drop a subset of layers and bypass them with the identity function. This simple approach complements the recent success of residual networks. It reduces training time substantially and improves the test error significantly on almost all data sets that we used for evaluation. With stochastic depth we can increase the depth of residual networks even beyond 1200 layers and still yield meaningful improvements in test error (4.91\% on CIFAR-10).},
+	urldate = {2019-02-27},
+	journal = {arXiv:1603.09382 [cs]},
+	author = {Huang, Gao and Sun, Yu and Liu, Zhuang and Sedra, Daniel and Weinberger, Kilian},
+	month = mar,
+	year = {2016},
+	note = {arXiv: 1603.09382},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Machine Learning, Computer Science - Neural and Evolutionary Computing},
+	annote = {Comment: first two authors contributed equally},
+	file = {arXiv\:1603.09382 PDF:C\:\\Users\\miros\\Zotero\\storage\\DWPL8HWP\\Huang et al. - 2016 - Deep Networks with Stochastic Depth.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\6LBCANJT\\1603.html:text/html}
+}
+
+@article{he_identity_2016,
+	title = {Identity {Mappings} in {Deep} {Residual} {Networks}},
+	url = {http://arxiv.org/abs/1603.05027},
+	abstract = {Deep residual networks have emerged as a family of extremely deep architectures showing compelling accuracy and nice convergence behaviors. In this paper, we analyze the propagation formulations behind the residual building blocks, which suggest that the forward and backward signals can be directly propagated from one block to any other block, when using identity mappings as the skip connections and after-addition activation. A series of ablation experiments support the importance of these identity mappings. This motivates us to propose a new residual unit, which makes training easier and improves generalization. We report improved results using a 1001-layer ResNet on CIFAR-10 (4.62\% error) and CIFAR-100, and a 200-layer ResNet on ImageNet. Code is available at: https://github.com/KaimingHe/resnet-1k-layers},
+	urldate = {2019-02-27},
+	journal = {arXiv:1603.05027 [cs]},
+	author = {He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+	month = mar,
+	year = {2016},
+	note = {arXiv: 1603.05027},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Machine Learning},
+	annote = {Comment: ECCV 2016 camera-ready},
+	file = {arXiv\:1603.05027 PDF:C\:\\Users\\miros\\Zotero\\storage\\CDASPU8R\\He et al. - 2016 - Identity Mappings in Deep Residual Networks.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\VZD926JW\\1603.html:text/html}
+}
+
+@article{su_multi-view_2015,
+	title = {Multi-view {Convolutional} {Neural} {Networks} for 3D {Shape} {Recognition}},
+	url = {http://arxiv.org/abs/1505.00880},
+	abstract = {A longstanding question in computer vision concerns the representation of 3D shapes for recognition: should 3D shapes be represented with descriptors operating on their native 3D formats, such as voxel grid or polygon mesh, or can they be effectively represented with view-based descriptors? We address this question in the context of learning to recognize 3D shapes from a collection of their rendered views on 2D images. We first present a standard CNN architecture trained to recognize the shapes' rendered views independently of each other, and show that a 3D shape can be recognized even from a single view at an accuracy far higher than using state-of-the-art 3D shape descriptors. Recognition rates further increase when multiple views of the shapes are provided. In addition, we present a novel CNN architecture that combines information from multiple views of a 3D shape into a single and compact shape descriptor offering even better recognition performance. The same architecture can be applied to accurately recognize human hand-drawn sketches of shapes. We conclude that a collection of 2D views can be highly informative for 3D shape recognition and is amenable to emerging CNN architectures and their derivatives.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1505.00880 [cs]},
+	author = {Su, Hang and Maji, Subhransu and Kalogerakis, Evangelos and Learned-Miller, Erik},
+	month = may,
+	year = {2015},
+	note = {arXiv: 1505.00880},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Graphics},
+	annote = {Comment: v1: Initial version. v2: An updated ModelNet40 training/test split is used; results with low-rank Mahalanobis metric learning are added. v3 (ICCV 2015): A second camera setup without the upright orientation assumption is added; some accuracy and mAP numbers are changed slightly because a small issue in mesh rendering related to specularities is fixed},
+	file = {arXiv\:1505.00880 PDF:C\:\\Users\\miros\\Zotero\\storage\\ZZZ5NYW9\\Su et al. - 2015 - Multi-view Convolutional Neural Networks for 3D Sh.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\YL49TX8E\\1505.html:text/html}
+}
+
+@article{su_deeper_2018,
+	title = {A {Deeper} {Look} at 3D {Shape} {Classifiers}},
+	url = {http://arxiv.org/abs/1809.02560},
+	abstract = {We investigate the role of representations and architectures for classifying 3D shapes in terms of their computational efficiency, generalization, and robustness to adversarial transformations. By varying the number of training examples and employing cross-modal transfer learning we study the role of initialization of existing deep architectures for 3D shape classification. Our analysis shows that multiview methods continue to offer the best generalization even without pretraining on large labeled image datasets, and even when trained on simplified inputs such as binary silhouettes. Furthermore, the performance of voxel-based 3D convolutional networks and point-based architectures can be improved via cross-modal transfer from image representations. Finally, we analyze the robustness of 3D shape classifiers to adversarial transformations and present a novel approach for generating adversarial perturbations of a 3D shape for multiview classifiers using a differentiable renderer. We find that point-based networks are more robust to point position perturbations while voxel-based and multiview networks are easily fooled with the addition of imperceptible noise to the input.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1809.02560 [cs]},
+	author = {Su, Jong-Chyi and Gadelha, Matheus and Wang, Rui and Maji, Subhransu},
+	month = sep,
+	year = {2018},
+	note = {arXiv: 1809.02560},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition, Computer Science - Machine Learning, Computer Science - Graphics},
+	annote = {Comment: Accepted to Second Workshop on 3D Reconstruction Meets Semantics, ECCV 2018},
+	file = {arXiv\:1809.02560 PDF:C\:\\Users\\miros\\Zotero\\storage\\UTT2NMY6\\Su et al. - 2018 - A Deeper Look at 3D Shape Classifiers.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\PU9LXSUB\\1809.html:text/html}
+}
+
+@article{kanezaki_rotationnet:_2016,
+	title = {{RotationNet}: {Joint} {Object} {Categorization} and {Pose} {Estimation} {Using} {Multiviews} from {Unsupervised} {Viewpoints}},
+	shorttitle = {{RotationNet}},
+	url = {http://arxiv.org/abs/1603.06208},
+	abstract = {We propose a Convolutional Neural Network (CNN)-based model "RotationNet," which takes multi-view images of an object as input and jointly estimates its pose and object category. Unlike previous approaches that use known viewpoint labels for training, our method treats the viewpoint labels as latent variables, which are learned in an unsupervised manner during the training using an unaligned object dataset. RotationNet is designed to use only a partial set of multi-view images for inference, and this property makes it useful in practical scenarios where only partial views are available. Moreover, our pose alignment strategy enables one to obtain view-specific feature representations shared across classes, which is important to maintain high accuracy in both object categorization and pose estimation. Effectiveness of RotationNet is demonstrated by its superior performance to the state-of-the-art methods of 3D object classification on 10- and 40-class ModelNet datasets. We also show that RotationNet, even trained without known poses, achieves the state-of-the-art performance on an object pose estimation dataset. The code is available on https://github.com/kanezaki/rotationnet},
+	urldate = {2019-02-27},
+	journal = {arXiv:1603.06208 [cs]},
+	author = {Kanezaki, Asako and Matsushita, Yasuyuki and Nishida, Yoshifumi},
+	month = mar,
+	year = {2016},
+	note = {arXiv: 1603.06208},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: 24 pages, 23 figures. Accepted to CVPR 2018},
+	file = {arXiv\:1603.06208 PDF:C\:\\Users\\miros\\Zotero\\storage\\8HTQZVBB\\Kanezaki et al. - 2016 - RotationNet Joint Object Categorization and Pose .pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\MG3JL3HP\\1603.html:text/html}
+}
+
+@article{zhizhong_seqviews2seqlabels:_2018,
+	title = {{SeqViews}2SeqLabels: {Learning} 3D {Global} {Features} via {Aggregating} {Sequential} {Views} by {RNN} {With} {Attention}},
+	volume = {28},
+	abstract = {Learning 3D global features by aggregating multiple views has been introduced as a successful strategy for 3D shape analysis. In recent deep learning models with end-to-end training, pooling is a widely adopted procedure for view aggregation. However, pooling merely retains the max or mean value over all views, which disregards the content information of almost all views and also the spatial information among the views. To resolve these issues, we propose Sequential Views To Sequential Labels (SeqViews2SeqLabels) as a novel deep learning model with an encoder-decoder structure based on recurrent neural networks (RNNs) with attention. SeqViews2SeqLabels consists of two connected parts, an encoder-RNN followed by a decoder-RNN, that aim to learn the global features by aggregating sequential views and then performing shape classification from the learned global features, respectively. Specifically, the encoder-RNN learns the global features by simultaneously encoding the spatial and content information of sequential views, which captures the semantics of the view sequence. With the proposed prediction of sequential labels, the decoder-RNN performs more accurate classification using the learned global features by predicting sequential labels step by step. Learning to predict sequential labels provides more and finer discriminative information among shape classes to learn, which alleviates the overfitting problem inherent in training using a limited number of 3D shapes. Moreover, we introduce an attention mechanism to further improve the discriminative ability of SeqViews2SeqLabels. This mechanism increases the weight of views that are distinctive to each shape class, and it dramatically reduces the effect of selecting the first view position. Shape classification and retrieval results under three large-scale benchmarks verify that SeqViews2SeqLabels learns more discriminative global features by more effectively aggregating sequential views than state-of-the-art methods.},
+	number = {2},
+	journal = {IEEE Transactions on Image Processing},
+	author = {Zhizhong, Han and Mingyang, Shang and Zhenbao, Liu},
+	month = sep,
+	year = {2018},
+	pages = {658 -- 672}
+}
+
+@article{qi_pointnet:_2016,
+	title = {{PointNet}: {Deep} {Learning} on {Point} {Sets} for 3D {Classification} and {Segmentation}},
+	shorttitle = {{PointNet}},
+	url = {http://arxiv.org/abs/1612.00593},
+	abstract = {Point cloud is an important type of geometric data structure. Due to its irregular format, most researchers transform such data to regular 3D voxel grids or collections of images. This, however, renders data unnecessarily voluminous and causes issues. In this paper, we design a novel type of neural network that directly consumes point clouds and well respects the permutation invariance of points in the input. Our network, named PointNet, provides a unified architecture for applications ranging from object classification, part segmentation, to scene semantic parsing. Though simple, PointNet is highly efficient and effective. Empirically, it shows strong performance on par or even better than state of the art. Theoretically, we provide analysis towards understanding of what the network has learnt and why the network is robust with respect to input perturbation and corruption.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1612.00593 [cs]},
+	author = {Qi, Charles R. and Su, Hao and Mo, Kaichun and Guibas, Leonidas J.},
+	month = dec,
+	year = {2016},
+	note = {arXiv: 1612.00593},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: CVPR 2017},
+	file = {arXiv\:1612.00593 PDF:C\:\\Users\\miros\\Zotero\\storage\\FA4VUBGZ\\Qi et al. - 2016 - PointNet Deep Learning on Point Sets for 3D Class.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\HBZJAWL4\\1612.html:text/html}
+}
+
+@article{qi_pointnet++:_2017,
+	title = {{PointNet}++: {Deep} {Hierarchical} {Feature} {Learning} on {Point} {Sets} in a {Metric} {Space}},
+	shorttitle = {{PointNet}++},
+	url = {http://arxiv.org/abs/1706.02413},
+	abstract = {Few prior works study deep learning on point sets. PointNet by Qi et al. is a pioneer in this direction. However, by design PointNet does not capture local structures induced by the metric space points live in, limiting its ability to recognize fine-grained patterns and generalizability to complex scenes. In this work, we introduce a hierarchical neural network that applies PointNet recursively on a nested partitioning of the input point set. By exploiting metric space distances, our network is able to learn local features with increasing contextual scales. With further observation that point sets are usually sampled with varying densities, which results in greatly decreased performance for networks trained on uniform densities, we propose novel set learning layers to adaptively combine features from multiple scales. Experiments show that our network called PointNet++ is able to learn deep point set features efficiently and robustly. In particular, results significantly better than state-of-the-art have been obtained on challenging benchmarks of 3D point clouds.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1706.02413 [cs]},
+	author = {Qi, Charles R. and Yi, Li and Su, Hao and Guibas, Leonidas J.},
+	month = jun,
+	year = {2017},
+	note = {arXiv: 1706.02413},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	file = {arXiv\:1706.02413 PDF:C\:\\Users\\miros\\Zotero\\storage\\KYT4KPZ8\\Qi et al. - 2017 - PointNet++ Deep Hierarchical Feature Learning on .pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\PRUPKS2Y\\1706.html:text/html}
+}
+
+@article{klokov_escape_2017,
+	title = {Escape from {Cells}: {Deep} {Kd}-{Networks} for the {Recognition} of 3D {Point} {Cloud} {Models}},
+	shorttitle = {Escape from {Cells}},
+	url = {http://arxiv.org/abs/1704.01222},
+	abstract = {We present a new deep learning architecture (called Kd-network) that is designed for 3D model recognition tasks and works with unstructured point clouds. The new architecture performs multiplicative transformations and share parameters of these transformations according to the subdivisions of the point clouds imposed onto them by Kd-trees. Unlike the currently dominant convolutional architectures that usually require rasterization on uniform two-dimensional or three-dimensional grids, Kd-networks do not rely on such grids in any way and therefore avoid poor scaling behaviour. In a series of experiments with popular shape recognition benchmarks, Kd-networks demonstrate competitive performance in a number of shape recognition tasks such as shape classification, shape retrieval and shape part segmentation.},
+	urldate = {2019-02-27},
+	journal = {arXiv:1704.01222 [cs]},
+	author = {Klokov, Roman and Lempitsky, Victor},
+	month = apr,
+	year = {2017},
+	note = {arXiv: 1704.01222},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: Spotlight at ICCV'17},
+	file = {arXiv\:1704.01222 PDF:C\:\\Users\\miros\\Zotero\\storage\\9FVEPSYX\\Klokov and Lempitsky - 2017 - Escape from Cells Deep Kd-Networks for the Recogn.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\WXBBYGQ3\\1704.html:text/html}
+}
+
+@book{dominguez_general-purpose_2018,
+	title = {General-{Purpose} {Deep} {Point} {Cloud} {Feature} {Extractor}},
+	abstract = {Depth sensors used in autonomous driving and gaming
+systems often report back 3D point clouds. The lack of
+structure from these sensors does not allow these systems
+to take advantage of recent advances in convolutional neural
+networks which are dependent upon traditional filtering
+and pooling operations. Analogous to image based convolutional
+architectures, recently introduced graph based architectures
+afford similar filtering and pooling operations
+on arbitrary graphs. We adopt these graph based methods
+to 3D point clouds to introduce a generic vector representation
+of 3D graphs, we call graph 3D (G3D). We believe
+we are the first to use large scale transfer learning on 3D
+point cloud data and demonstrate the discriminant power
+of our salient latent representation of 3D point clouds on
+unforeseen test sets. By using our G3D network (G3DNet)
+as a feature extractor, and then pairing G3D feature vectors
+with a standard classifier, we achieve the best accuracy on
+ModelNet10 (93.1\%) and ModelNet 40 (91.7\%) for a graph
+network, and comparable performance on the Sydney Urban
+Objects dataset to other methods. This general-purpose
+feature extractor can be used as an off-the-shelf component
+in other 3D scene understanding or object tracking works.},
+	author = {Dominguez, Miguel and Dhamdhere, Rohan and Petkar, Atir and Jain, Saloni and Sah, Shagan and Ptucha, Raymond},
+	month = mar,
+	year = {2018},
+	doi = {10.1109/WACV.2018.00218}
+}
+
+@article{bentley_multidimensional_1975,
+	title = {Multidimensional binary search trees used for associative searching},
+	volume = {18},
+	issn = {00010782},
+	url = {http://portal.acm.org/citation.cfm?doid=361002.361007},
+	doi = {10.1145/361002.361007},
+	number = {9},
+	urldate = {2019-02-28},
+	journal = {Communications of the ACM},
+	author = {Bentley, Jon Louis},
+	month = sep,
+	year = {1975},
+	pages = {509--517}
+}
+
+@book{meagher_octree_1980,
+	title = {Octree {Encoding}: {A} {New} {Technique} for the {Representation}, {Manipulation} and {Display} of {Arbitrary} 3-{D} {Objects} by {Computer}},
+	author = {Meagher, Donald},
+	month = oct,
+	year = {1980}
+}
+
+@article{kingma_adam:_2014,
+	title = {Adam: {A} {Method} for {Stochastic} {Optimization}},
+	shorttitle = {Adam},
+	url = {http://arxiv.org/abs/1412.6980},
+	abstract = {We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm.},
+	urldate = {2019-03-04},
+	journal = {arXiv:1412.6980 [cs]},
+	author = {Kingma, Diederik P. and Ba, Jimmy},
+	month = dec,
+	year = {2014},
+	note = {arXiv: 1412.6980},
+	keywords = {Computer Science - Machine Learning},
+	annote = {Comment: Published as a conference paper at the 3rd International Conference for Learning Representations, San Diego, 2015},
+	file = {arXiv\:1412.6980 PDF:C\:\\Users\\miros\\Zotero\\storage\\5PPGH73R\\Kingma and Ba - 2014 - Adam A Method for Stochastic Optimization.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\JXGMDVBV\\1412.html:text/html}
+}
+
+@article{ioffe_batch_2015,
+	title = {Batch {Normalization}: {Accelerating} {Deep} {Network} {Training} by {Reducing} {Internal} {Covariate} {Shift}},
+	shorttitle = {Batch {Normalization}},
+	url = {http://arxiv.org/abs/1502.03167},
+	abstract = {Training Deep Neural Networks is complicated by the fact that the distribution of each layer's inputs changes during training, as the parameters of the previous layers change. This slows down the training by requiring lower learning rates and careful parameter initialization, and makes it notoriously hard to train models with saturating nonlinearities. We refer to this phenomenon as internal covariate shift, and address the problem by normalizing layer inputs. Our method draws its strength from making normalization a part of the model architecture and performing the normalization for each training mini-batch. Batch Normalization allows us to use much higher learning rates and be less careful about initialization. It also acts as a regularizer, in some cases eliminating the need for Dropout. Applied to a state-of-the-art image classification model, Batch Normalization achieves the same accuracy with 14 times fewer training steps, and beats the original model by a significant margin. Using an ensemble of batch-normalized networks, we improve upon the best published result on ImageNet classification: reaching 4.9\% top-5 validation error (and 4.8\% test error), exceeding the accuracy of human raters.},
+	urldate = {2019-03-04},
+	journal = {arXiv:1502.03167 [cs]},
+	author = {Ioffe, Sergey and Szegedy, Christian},
+	month = feb,
+	year = {2015},
+	note = {arXiv: 1502.03167},
+	keywords = {Computer Science - Machine Learning},
+	file = {arXiv\:1502.03167 PDF:C\:\\Users\\miros\\Zotero\\storage\\HMAZCD9N\\Ioffe and Szegedy - 2015 - Batch Normalization Accelerating Deep Network Tra.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\3ZIHNN45\\1502.html:text/html}
+}
+
+@article{wu_3d_2014,
+	title = {3D {ShapeNets}: {A} {Deep} {Representation} for {Volumetric} {Shapes}},
+	shorttitle = {3D {ShapeNets}},
+	url = {http://arxiv.org/abs/1406.5670},
+	abstract = {3D shape is a crucial but heavily underutilized cue in today's computer vision systems, mostly due to the lack of a good generic shape representation. With the recent availability of inexpensive 2.5D depth sensors (e.g. Microsoft Kinect), it is becoming increasingly important to have a powerful 3D shape representation in the loop. Apart from category recognition, recovering full 3D shapes from view-based 2.5D depth maps is also a critical part of visual understanding. To this end, we propose to represent a geometric 3D shape as a probability distribution of binary variables on a 3D voxel grid, using a Convolutional Deep Belief Network. Our model, 3D ShapeNets, learns the distribution of complex 3D shapes across different object categories and arbitrary poses from raw CAD data, and discovers hierarchical compositional part representations automatically. It naturally supports joint object recognition and shape completion from 2.5D depth maps, and it enables active object recognition through view planning. To train our 3D deep learning model, we construct ModelNet -- a large-scale 3D CAD model dataset. Extensive experiments show that our 3D deep representation enables significant performance improvement over the-state-of-the-arts in a variety of tasks.},
+	urldate = {2019-03-04},
+	journal = {arXiv:1406.5670 [cs]},
+	author = {Wu, Zhirong and Song, Shuran and Khosla, Aditya and Yu, Fisher and Zhang, Linguang and Tang, Xiaoou and Xiao, Jianxiong},
+	month = jun,
+	year = {2014},
+	note = {arXiv: 1406.5670},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: to be appeared in CVPR 2015},
+	file = {arXiv\:1406.5670 PDF:C\:\\Users\\miros\\Zotero\\storage\\KRSHV87U\\Wu et al. - 2014 - 3D ShapeNets A Deep Representation for Volumetric.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\XNKBZ5UL\\1406.html:text/html}
+}
+
+@article{you_pvnet:_2018,
+	title = {{PVNet}: {A} {Joint} {Convolutional} {Network} of {Point} {Cloud} and {Multi}-{View} for 3D {Shape} {Recognition}},
+	shorttitle = {{PVNet}},
+	url = {http://arxiv.org/abs/1808.07659},
+	abstract = {3D object recognition has attracted wide research attention in the field of multimedia and computer vision. With the recent proliferation of deep learning, various deep models with different representations have achieved the state-of-the-art performance. Among them, point cloud and multi-view based 3D shape representations are promising recently, and their corresponding deep models have shown significant performance on 3D shape recognition. However, there is little effort concentrating point cloud data and multi-view data for 3D shape representation, which is, in our consideration, beneficial and compensated to each other. In this paper, we propose the Point-View Network (PVNet), the first framework integrating both the point cloud and the multi-view data towards joint 3D shape recognition. More specifically, an embedding attention fusion scheme is proposed that could employ high-level features from the multi-view data to model the intrinsic correlation and discriminability of different structure features from the point cloud data. In particular, the discriminative descriptions are quantified and leveraged as the soft attention mask to further refine the structure feature of the 3D shape. We have evaluated the proposed method on the ModelNet40 dataset for 3D shape classification and retrieval tasks. Experimental results and comparisons with state-of-the-art methods demonstrate that our framework can achieve superior performance.},
+	urldate = {2019-03-05},
+	journal = {arXiv:1808.07659 [cs]},
+	author = {You, Haoxuan and Feng, Yifan and Ji, Rongrong and Gao, Yue},
+	month = aug,
+	year = {2018},
+	note = {arXiv: 1808.07659},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: ACM Multimedia Conference 2018},
+	file = {arXiv\:1808.07659 PDF:C\:\\Users\\miros\\Zotero\\storage\\ZHUXDMFX\\You et al. - 2018 - PVNet A Joint Convolutional Network of Point Clou.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\A4FF827R\\1808.html:text/html}
+}
+
+@inproceedings{sarkar_learning_2018,
+	title = {Learning 3D {Shapes} as {Multi}-{Layered} {Height}-maps using 2D {Convolutional} {Networks}},
+	booktitle = {The {European} {Conference} on {Computer} {Vision} ({ECCV})},
+	author = {Sarkar, Kripasindhu and Hampiholi, Basavaraj and Varanasi, Kiran and Stricker, Didier},
+	month = sep,
+	year = {2018}
+}
+
+@inproceedings{feng_gvcnn:_2018,
+	title = {{GVCNN}: {Group}-{View} {Convolutional} {Neural} {Networks} for 3D {Shape} {Recognition}},
+	booktitle = {The {IEEE} {Conference} on {Computer} {Vision} and {Pattern} {Recognition} ({CVPR})},
+	author = {Feng, Yifan and Zhang, Zizhao and Zhao, Xibin and Ji, Rongrong and Gao, Yue},
+	month = jun,
+	year = {2018}
+}
+
+@inproceedings{krizhevsky_imagenet_2012,
+	address = {USA},
+	series = {{NIPS}'12},
+	title = {{ImageNet} {Classification} with {Deep} {Convolutional} {Neural} {Networks}},
+	url = {http://dl.acm.org/citation.cfm?id=2999134.2999257},
+	booktitle = {Proceedings of the 25th {International} {Conference} on {Neural} {Information} {Processing} {Systems} - {Volume} 1},
+	publisher = {Curran Associates Inc.},
+	author = {Krizhevsky, Alex and Sutskever, Ilya and Hinton, Geoffrey E.},
+	year = {2012},
+	note = {event-place: Lake Tahoe, Nevada},
+	pages = {1097--1105}
+}
+
+@article{simonyan_very_2014,
+	title = {Very {Deep} {Convolutional} {Networks} for {Large}-{Scale} {Image} {Recognition}},
+	volume = {abs/1409.1556},
+	journal = {CoRR},
+	author = {Simonyan, K. and Zisserman, A.},
+	year = {2014}
+}
+
+@book{goodfellow_deep_2016,
+	title = {Deep {Learning}},
+	url = {https://www.deeplearningbook.org/},
+	publisher = {MIT Press},
+	author = {Goodfellow, Ian and Bengio, Yoshua and Courville, Aaron},
+	year = {2016},
+	annote = {http://www.deeplearningbook.org}
+}
+
+@article{lecun_backpropagation_1989,
+	title = {Backpropagation {Applied} to {Handwritten} {Zip} {Code} {Recognition}},
+	volume = {1},
+	number = {4},
+	journal = {Neural Computation},
+	author = {LeCun, Y. and Boser, B. and Denker, J. S. and Henderson, D. and Howard, R. E. and Hubbard, W. and Jackel, L. D.},
+	year = {1989},
+	pages = {541--551}
+}
+
+@article{hochreiter_long_1997,
+	title = {Long {Short}-term {Memory}},
+	volume = {9},
+	doi = {10.1162/neco.1997.9.8.1735},
+	journal = {Neural computation},
+	author = {Hochreiter, Sepp and Schmidhuber, Jürgen},
+	year = {1997},
+	pages = {1735--80}
+}
+
+@article{cho_learning_2014,
+	title = {Learning {Phrase} {Representations} using {RNN} {Encoder}-{Decoder} for {Statistical} {Machine} {Translation}},
+	url = {http://arxiv.org/abs/1406.1078},
+	abstract = {In this paper, we propose a novel neural network model called RNN Encoder-Decoder that consists of two recurrent neural networks (RNN). One RNN encodes a sequence of symbols into a fixed-length vector representation, and the other decodes the representation into another sequence of symbols. The encoder and decoder of the proposed model are jointly trained to maximize the conditional probability of a target sequence given a source sequence. The performance of a statistical machine translation system is empirically found to improve by using the conditional probabilities of phrase pairs computed by the RNN Encoder-Decoder as an additional feature in the existing log-linear model. Qualitatively, we show that the proposed model learns a semantically and syntactically meaningful representation of linguistic phrases.},
+	urldate = {2019-03-20},
+	journal = {arXiv:1406.1078 [cs, stat]},
+	author = {Cho, Kyunghyun and van Merrienboer, Bart and Gulcehre, Caglar and Bahdanau, Dzmitry and Bougares, Fethi and Schwenk, Holger and Bengio, Yoshua},
+	month = jun,
+	year = {2014},
+	note = {arXiv: 1406.1078},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning, Computer Science - Neural and Evolutionary Computing, Computer Science - Computation and Language},
+	annote = {Comment: EMNLP 2014},
+	file = {arXiv\:1406.1078 PDF:C\:\\Users\\miros\\Zotero\\storage\\D7WLKQWN\\Cho et al. - 2014 - Learning Phrase Representations using RNN Encoder-.pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\9NBTKJZ8\\1406.html:text/html}
+}
+
+@article{bahdanau_neural_2014,
+	title = {Neural {Machine} {Translation} by {Jointly} {Learning} to {Align} and {Translate}},
+	url = {http://arxiv.org/abs/1409.0473},
+	abstract = {Neural machine translation is a recently proposed approach to machine translation. Unlike the traditional statistical machine translation, the neural machine translation aims at building a single neural network that can be jointly tuned to maximize the translation performance. The models proposed recently for neural machine translation often belong to a family of encoder-decoders and consists of an encoder that encodes a source sentence into a fixed-length vector from which a decoder generates a translation. In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder-decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. With this new approach, we achieve a translation performance comparable to the existing state-of-the-art phrase-based system on the task of English-to-French translation. Furthermore, qualitative analysis reveals that the (soft-)alignments found by the model agree well with our intuition.},
+	urldate = {2019-03-20},
+	journal = {arXiv:1409.0473 [cs, stat]},
+	author = {Bahdanau, Dzmitry and Cho, Kyunghyun and Bengio, Yoshua},
+	month = sep,
+	year = {2014},
+	note = {arXiv: 1409.0473},
+	keywords = {Computer Science - Machine Learning, Statistics - Machine Learning, Computer Science - Neural and Evolutionary Computing, Computer Science - Computation and Language},
+	annote = {Comment: Accepted at ICLR 2015 as oral presentation},
+	file = {arXiv\:1409.0473 PDF:C\:\\Users\\miros\\Zotero\\storage\\W27BPW7R\\Bahdanau et al. - 2014 - Neural Machine Translation by Jointly Learning to .pdf:application/pdf;arXiv.org Snapshot:C\:\\Users\\miros\\Zotero\\storage\\LEZKPG28\\1409.html:text/html}
+}
+
+@article{sutskever_importance_2013,
+	title = {On the importance of initialization and momentum in deep learning},
+	journal = {30th International Conference on Machine Learning, ICML 2013},
+	author = {Sutskever, I and Martens, J and Dahl, G and Hinton, G},
+	year = {2013},
+	pages = {1139--1147}
+}
+
+@article{srivastava_dropout:_2014,
+	title = {Dropout: {A} {Simple} {Way} to {Prevent} {Neural} {Networks} from {Overfitting}},
+	volume = {15},
+	url = {http://jmlr.org/papers/v15/srivastava14a.html},
+	journal = {Journal of Machine Learning Research},
+	author = {Srivastava, Nitish and Hinton, Geoffrey and Krizhevsky, Alex and Sutskever, Ilya and Salakhutdinov, Ruslan},
+	year = {2014},
+	pages = {1929--1958}
+}
+
+@misc{hinton_neural_nodate,
+	title = {Neural {Networks} for {Machine} {Learning}: 	{Lecture} 6a {Overview} of mini-batch gradient descent},
+	url = {http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf},
+	author = {Hinton, Geoffrey and Srivastava, Nitish and Swersky, Kevin}
+}
+
+@article{wang_o-cnn:_2017,
+	title = {O-{CNN}: {Octree}-based {Convolutional} {Neural} {Networks} for 3D {Shape} {Analysis}},
+	volume = {36},
+	number = {4},
+	journal = {ACM Transactions on Graphics (SIGGRAPH)},
+	author = {Wang, Peng-Shuai and Liu, Yang and Guo, Yu-Xiao and Sun, Chun-Yu and Tong, Xin},
+	year = {2017}
+}
+
+@article{wang_adaptive_2018,
+	title = {Adaptive {O}-{CNN}: {A} {Patch}-based {Deep} {Representation} of 3D {Shapes}},
+	volume = {37},
+	number = {6},
+	journal = {ACM Transactions on Graphics (SIGGRAPH Asia)},
+	author = {Wang, Peng-Shuai and Liu, Yang and Guo, Yu-Xiao and Sun, Chun-Yu and Tong, Xin},
+	year = {2018}
+}
+
+@misc{machrisaa_tensorflow-vgg_nodate,
+	title = {tensorflow-vgg},
+	url = {https://github.com/machrisaa/tensorflow-vgg},
+	author = {machrisaa}
+}
+
+@article{li_so-net:_2018,
+	title = {{SO}-{Net}: {Self}-{Organizing} {Network} for {Point} {Cloud} {Analysis}},
+	shorttitle = {{SO}-{Net}},
+	url = {http://arxiv.org/abs/1803.04249},
+	abstract = {This paper presents SO-Net, a permutation invariant architecture for deep learning with orderless point clouds. The SO-Net models the spatial distribution of point cloud by building a Self-Organizing Map (SOM). Based on the SOM, SO-Net performs hierarchical feature extraction on individual points and SOM nodes, and ultimately represents the input point cloud by a single feature vector. The receptive field of the network can be systematically adjusted by conducting point-to-node k nearest neighbor search. In recognition tasks such as point cloud reconstruction, classification, object part segmentation and shape retrieval, our proposed network demonstrates performance that is similar with or better than state-of-the-art approaches. In addition, the training speed is significantly faster than existing point cloud recognition networks because of the parallelizability and simplicity of the proposed architecture. Our code is available at the project website. https://github.com/lijx10/SO-Net},
+	urldate = {2019-03-20},
+	journal = {arXiv:1803.04249 [cs]},
+	author = {Li, Jiaxin and Chen, Ben M. and Lee, Gim Hee},
+	month = mar,
+	year = {2018},
+	note = {arXiv: 1803.04249},
+	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+	annote = {Comment: 17 pages, CVPR 2018}
+}

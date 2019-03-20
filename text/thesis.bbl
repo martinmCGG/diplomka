@@ -1,0 +1,260 @@
+\begin{thebibliography}{32}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bahdanau et~al.(2014)Bahdanau, Cho, and Bengio]{bahdanau_neural_2014}
+Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio.
+\newblock Neural {Machine} {Translation} by {Jointly} {Learning} to {Align} and
+  {Translate}.
+\newblock \emph{arXiv:1409.0473 [cs, stat]}, September 2014.
+\newblock URL \url{http://arxiv.org/abs/1409.0473}.
+\newblock arXiv: 1409.0473.
+
+\bibitem[Bentley(1975)]{bentley_multidimensional_1975}
+Jon~Louis Bentley.
+\newblock Multidimensional binary search trees used for associative searching.
+\newblock \emph{Communications of the ACM}, 18\penalty0 (9):\penalty0 509--517,
+  September 1975.
+\newblock ISSN 00010782.
+\newblock \doi{10.1145/361002.361007}.
+\newblock URL \url{http://portal.acm.org/citation.cfm?doid=361002.361007}.
+
+\bibitem[Brock et~al.(2016)Brock, Lim, Ritchie, and
+  Weston]{brock_generative_2016}
+Andrew Brock, Theodore Lim, J.~M. Ritchie, and Nick Weston.
+\newblock Generative and {Discriminative} {Voxel} {Modeling} with
+  {Convolutional} {Neural} {Networks}.
+\newblock \emph{arXiv:1608.04236 [cs, stat]}, August 2016.
+\newblock URL \url{http://arxiv.org/abs/1608.04236}.
+\newblock arXiv: 1608.04236.
+
+\bibitem[Cho et~al.(2014)Cho, van Merrienboer, Gulcehre, Bahdanau, Bougares,
+  Schwenk, and Bengio]{cho_learning_2014}
+Kyunghyun Cho, Bart van Merrienboer, Caglar Gulcehre, Dzmitry Bahdanau, Fethi
+  Bougares, Holger Schwenk, and Yoshua Bengio.
+\newblock Learning {Phrase} {Representations} using {RNN} {Encoder}-{Decoder}
+  for {Statistical} {Machine} {Translation}.
+\newblock \emph{arXiv:1406.1078 [cs, stat]}, June 2014.
+\newblock URL \url{http://arxiv.org/abs/1406.1078}.
+\newblock arXiv: 1406.1078.
+
+\bibitem[Dominguez et~al.(2018)Dominguez, Dhamdhere, Petkar, Jain, Sah, and
+  Ptucha]{dominguez_general-purpose_2018}
+Miguel Dominguez, Rohan Dhamdhere, Atir Petkar, Saloni Jain, Shagan Sah, and
+  Raymond Ptucha.
+\newblock \emph{General-{Purpose} {Deep} {Point} {Cloud} {Feature}
+  {Extractor}}.
+\newblock March 2018.
+\newblock \doi{10.1109/WACV.2018.00218}.
+
+\bibitem[Goodfellow et~al.(2016)Goodfellow, Bengio, and
+  Courville]{goodfellow_deep_2016}
+Ian Goodfellow, Yoshua Bengio, and Aaron Courville.
+\newblock \emph{Deep {Learning}}.
+\newblock MIT Press, 2016.
+\newblock URL \url{https://www.deeplearningbook.org/}.
+
+\bibitem[Hegde and Zadeh(2016)]{hegde_fusionnet:_2016}
+Vishakh Hegde and Reza Zadeh.
+\newblock {FusionNet}: 3d {Object} {Classification} {Using} {Multiple} {Data}
+  {Representations}.
+\newblock \emph{arXiv:1607.05695 [cs]}, July 2016.
+\newblock URL \url{http://arxiv.org/abs/1607.05695}.
+\newblock arXiv: 1607.05695.
+
+\bibitem[Hinton et~al.()Hinton, Srivastava, and Swersky]{hinton_neural_nodate}
+Geoffrey Hinton, Nitish Srivastava, and Kevin Swersky.
+\newblock Neural {Networks} for {Machine} {Learning}: {Lecture} 6a {Overview}
+  of mini-batch gradient descent.
+\newblock URL
+  \url{http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf}.
+
+\bibitem[Hochreiter and Schmidhuber(1997)]{hochreiter_long_1997}
+Sepp Hochreiter and Jürgen Schmidhuber.
+\newblock Long {Short}-term {Memory}.
+\newblock \emph{Neural computation}, 9:\penalty0 1735--80, 1997.
+\newblock \doi{10.1162/neco.1997.9.8.1735}.
+
+\bibitem[Huang et~al.(2016)Huang, Sun, Liu, Sedra, and
+  Weinberger]{huang_deep_2016}
+Gao Huang, Yu~Sun, Zhuang Liu, Daniel Sedra, and Kilian Weinberger.
+\newblock Deep {Networks} with {Stochastic} {Depth}.
+\newblock \emph{arXiv:1603.09382 [cs]}, March 2016.
+\newblock URL \url{http://arxiv.org/abs/1603.09382}.
+\newblock arXiv: 1603.09382.
+
+\bibitem[Ioffe and Szegedy(2015)]{ioffe_batch_2015}
+Sergey Ioffe and Christian Szegedy.
+\newblock Batch {Normalization}: {Accelerating} {Deep} {Network} {Training} by
+  {Reducing} {Internal} {Covariate} {Shift}.
+\newblock \emph{arXiv:1502.03167 [cs]}, February 2015.
+\newblock URL \url{http://arxiv.org/abs/1502.03167}.
+\newblock arXiv: 1502.03167.
+
+\bibitem[Kanezaki et~al.(2016)Kanezaki, Matsushita, and
+  Nishida]{kanezaki_rotationnet:_2016}
+Asako Kanezaki, Yasuyuki Matsushita, and Yoshifumi Nishida.
+\newblock {RotationNet}: {Joint} {Object} {Categorization} and {Pose}
+  {Estimation} {Using} {Multiviews} from {Unsupervised} {Viewpoints}.
+\newblock \emph{arXiv:1603.06208 [cs]}, March 2016.
+\newblock URL \url{http://arxiv.org/abs/1603.06208}.
+\newblock arXiv: 1603.06208.
+
+\bibitem[Kingma and Ba(2014)]{kingma_adam:_2014}
+Diederik~P. Kingma and Jimmy Ba.
+\newblock Adam: {A} {Method} for {Stochastic} {Optimization}.
+\newblock \emph{arXiv:1412.6980 [cs]}, December 2014.
+\newblock URL \url{http://arxiv.org/abs/1412.6980}.
+\newblock arXiv: 1412.6980.
+
+\bibitem[Klokov and Lempitsky(2017)]{klokov_escape_2017}
+Roman Klokov and Victor Lempitsky.
+\newblock Escape from {Cells}: {Deep} {Kd}-{Networks} for the {Recognition} of
+  3d {Point} {Cloud} {Models}.
+\newblock \emph{arXiv:1704.01222 [cs]}, April 2017.
+\newblock URL \url{http://arxiv.org/abs/1704.01222}.
+\newblock arXiv: 1704.01222.
+
+\bibitem[Krizhevsky et~al.(2012)Krizhevsky, Sutskever, and
+  Hinton]{krizhevsky_imagenet_2012}
+Alex Krizhevsky, Ilya Sutskever, and Geoffrey~E. Hinton.
+\newblock {ImageNet} {Classification} with {Deep} {Convolutional} {Neural}
+  {Networks}.
+\newblock In \emph{Proceedings of the 25th {International} {Conference} on
+  {Neural} {Information} {Processing} {Systems} - {Volume} 1}, {NIPS}'12, pages
+  1097--1105, USA, 2012. Curran Associates Inc.
+\newblock URL \url{http://dl.acm.org/citation.cfm?id=2999134.2999257}.
+\newblock event-place: Lake Tahoe, Nevada.
+
+\bibitem[LeCun et~al.(1989)LeCun, Boser, Denker, Henderson, Howard, Hubbard,
+  and Jackel]{lecun_backpropagation_1989}
+Y.~LeCun, B.~Boser, J.~S. Denker, D.~Henderson, R.~E. Howard, W.~Hubbard, and
+  L.~D. Jackel.
+\newblock Backpropagation {Applied} to {Handwritten} {Zip} {Code}
+  {Recognition}.
+\newblock \emph{Neural Computation}, 1\penalty0 (4):\penalty0 541--551, 1989.
+
+\bibitem[Li et~al.(2018)Li, Chen, and Lee]{li_so-net:_2018}
+Jiaxin Li, Ben~M. Chen, and Gim~Hee Lee.
+\newblock {SO}-{Net}: {Self}-{Organizing} {Network} for {Point} {Cloud}
+  {Analysis}.
+\newblock \emph{arXiv:1803.04249 [cs]}, March 2018.
+\newblock URL \url{http://arxiv.org/abs/1803.04249}.
+\newblock arXiv: 1803.04249.
+
+\bibitem[machrisaa()]{machrisaa_tensorflow-vgg_nodate}
+machrisaa.
+\newblock tensorflow-vgg.
+\newblock URL \url{https://github.com/machrisaa/tensorflow-vgg}.
+
+\bibitem[Maturana and Scherer(2015)]{maturana_voxnet:_2015}
+D.~Maturana and S.~Scherer.
+\newblock Voxnet: {A} 3d convolutional neural network for real-time object
+  recognition.
+\newblock In \emph{{IROS} 2015}, 2015.
+
+\bibitem[Meagher(1980)]{meagher_octree_1980}
+Donald Meagher.
+\newblock \emph{Octree {Encoding}: {A} {New} {Technique} for the
+  {Representation}, {Manipulation} and {Display} of {Arbitrary} 3-{D} {Objects}
+  by {Computer}}.
+\newblock October 1980.
+
+\bibitem[Qi et~al.(2016)Qi, Su, Mo, and Guibas]{qi_pointnet:_2016}
+Charles~R. Qi, Hao Su, Kaichun Mo, and Leonidas~J. Guibas.
+\newblock {PointNet}: {Deep} {Learning} on {Point} {Sets} for 3d
+  {Classification} and {Segmentation}.
+\newblock \emph{arXiv:1612.00593 [cs]}, December 2016.
+\newblock URL \url{http://arxiv.org/abs/1612.00593}.
+\newblock arXiv: 1612.00593.
+
+\bibitem[Qi et~al.(2017)Qi, Yi, Su, and Guibas]{qi_pointnet++:_2017}
+Charles~R. Qi, Li~Yi, Hao Su, and Leonidas~J. Guibas.
+\newblock {PointNet}++: {Deep} {Hierarchical} {Feature} {Learning} on {Point}
+  {Sets} in a {Metric} {Space}.
+\newblock \emph{arXiv:1706.02413 [cs]}, June 2017.
+\newblock URL \url{http://arxiv.org/abs/1706.02413}.
+\newblock arXiv: 1706.02413.
+
+\bibitem[Sedaghat et~al.(2016)Sedaghat, Zolfaghari, Amiri, and
+  Brox]{sedaghat_orientation-boosted_2016}
+Nima Sedaghat, Mohammadreza Zolfaghari, Ehsan Amiri, and Thomas Brox.
+\newblock Orientation-boosted {Voxel} {Nets} for 3d {Object} {Recognition}.
+\newblock \emph{arXiv:1604.03351 [cs]}, April 2016.
+\newblock URL \url{http://arxiv.org/abs/1604.03351}.
+\newblock arXiv: 1604.03351.
+
+\bibitem[Simonyan and Zisserman(2014)]{simonyan_very_2014}
+K.~Simonyan and A.~Zisserman.
+\newblock Very {Deep} {Convolutional} {Networks} for {Large}-{Scale} {Image}
+  {Recognition}.
+\newblock \emph{CoRR}, abs/1409.1556, 2014.
+
+\bibitem[Srivastava et~al.(2014)Srivastava, Hinton, Krizhevsky, Sutskever, and
+  Salakhutdinov]{srivastava_dropout:_2014}
+Nitish Srivastava, Geoffrey Hinton, Alex Krizhevsky, Ilya Sutskever, and Ruslan
+  Salakhutdinov.
+\newblock Dropout: {A} {Simple} {Way} to {Prevent} {Neural} {Networks} from
+  {Overfitting}.
+\newblock \emph{Journal of Machine Learning Research}, 15:\penalty0 1929--1958,
+  2014.
+\newblock URL \url{http://jmlr.org/papers/v15/srivastava14a.html}.
+
+\bibitem[Su et~al.(2015)Su, Maji, Kalogerakis, and
+  Learned-Miller]{su_multi-view_2015}
+Hang Su, Subhransu Maji, Evangelos Kalogerakis, and Erik Learned-Miller.
+\newblock Multi-view {Convolutional} {Neural} {Networks} for 3d {Shape}
+  {Recognition}.
+\newblock \emph{arXiv:1505.00880 [cs]}, May 2015.
+\newblock URL \url{http://arxiv.org/abs/1505.00880}.
+\newblock arXiv: 1505.00880.
+
+\bibitem[Su et~al.(2018)Su, Gadelha, Wang, and Maji]{su_deeper_2018}
+Jong-Chyi Su, Matheus Gadelha, Rui Wang, and Subhransu Maji.
+\newblock A {Deeper} {Look} at 3d {Shape} {Classifiers}.
+\newblock \emph{arXiv:1809.02560 [cs]}, September 2018.
+\newblock URL \url{http://arxiv.org/abs/1809.02560}.
+\newblock arXiv: 1809.02560.
+
+\bibitem[Sutskever et~al.(2013)Sutskever, Martens, Dahl, and
+  Hinton]{sutskever_importance_2013}
+I~Sutskever, J~Martens, G~Dahl, and G~Hinton.
+\newblock On the importance of initialization and momentum in deep learning.
+\newblock \emph{30th International Conference on Machine Learning, ICML 2013},
+  pages 1139--1147, 2013.
+
+\bibitem[Szegedy et~al.(2016)Szegedy, Ioffe, Vanhoucke, and
+  Alemi]{szegedy_inception-v4_2016}
+Christian Szegedy, Sergey Ioffe, Vincent Vanhoucke, and Alex Alemi.
+\newblock Inception-v4, {Inception}-{ResNet} and the {Impact} of {Residual}
+  {Connections} on {Learning}.
+\newblock \emph{arXiv:1602.07261 [cs]}, February 2016.
+\newblock URL \url{http://arxiv.org/abs/1602.07261}.
+\newblock arXiv: 1602.07261.
+
+\bibitem[Wang et~al.(2017)Wang, Liu, Guo, Sun, and Tong]{wang_o-cnn:_2017}
+Peng-Shuai Wang, Yang Liu, Yu-Xiao Guo, Chun-Yu Sun, and Xin Tong.
+\newblock O-{CNN}: {Octree}-based {Convolutional} {Neural} {Networks} for 3d
+  {Shape} {Analysis}.
+\newblock \emph{ACM Transactions on Graphics (SIGGRAPH)}, 36\penalty0 (4),
+  2017.
+
+\bibitem[Wang et~al.(2018)Wang, Liu, Guo, Sun, and Tong]{wang_adaptive_2018}
+Peng-Shuai Wang, Yang Liu, Yu-Xiao Guo, Chun-Yu Sun, and Xin Tong.
+\newblock Adaptive {O}-{CNN}: {A} {Patch}-based {Deep} {Representation} of 3d
+  {Shapes}.
+\newblock \emph{ACM Transactions on Graphics (SIGGRAPH Asia)}, 37\penalty0 (6),
+  2018.
+
+\bibitem[Zhizhong et~al.(2018)Zhizhong, Mingyang, and
+  Zhenbao]{zhizhong_seqviews2seqlabels:_2018}
+Han Zhizhong, Shang Mingyang, and Liu Zhenbao.
+\newblock {SeqViews}2seqlabels: {Learning} 3d {Global} {Features} via
+  {Aggregating} {Sequential} {Views} by {RNN} {With} {Attention}.
+\newblock \emph{IEEE Transactions on Image Processing}, 28\penalty0
+  (2):\penalty0 658 -- 672, September 2018.
+
+\end{thebibliography}

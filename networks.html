@@ -77,7 +77,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker: </b><i>dockers/vgg</i><br>
       <b>Data:</b> <i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
-      <b>Framework:</b> Tensorflow</p>
+      <b>Framework:</b> TensorFlow</p>
     <p><b>Details: </b>This is an implementation of classic VGG network which
       we modified to vote across multiple views to classify 3D models. Before
       running the network download pretrained <a href="https://mega.nz/#%21xZ8glS6J%21MAnE91ND_WyfZ_8mvkuSa2YcA7q-1ehfSm-Q1fxOvvs">here</a>
@@ -100,7 +100,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker: </b><i>dockers/mvcnn</i><br>
       <b>Data: </b><i>dockers/data_conversion/mvcnn_data, </i><i>dockers/data_conversion/blender_data</i><br>
-      <b>Framework:</b> Tensorflow</p>
+      <b>Framework:</b> TensorFlow</p>
     <p><b>Details: </b>Uses pretrained AlexNet which is prepared automatically.
       If you want to use different weight, you have to copy them to docker
       container and change parameter <code>pretrained_network_file</code>.</p>
@@ -143,7 +143,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker: </b><i>dockers/seq2seq</i><br>
       <b>Data: </b><i>vgg_features (explained below)</i><br>
-      <b>Framework:</b> Tensorflow</p>
+      <b>Framework:</b> TensorFlow</p>
     <p><b>Details: </b>This network gets feature vectors extracted by
       pretrained image classification network as its input. You can get these
       features by training and using above described VGG network.&nbsp; The
@@ -165,7 +165,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker:</b> <i>dockers/pointnet</i><br>
       <b>Data:</b> <i>dockers/data_conversion/pnet_data</i><br>
-      <b>Framework:</b> Tensorflow</p>
+      <b>Framework:</b> TensorFlow</p>
     <p><b>Details: </b>This network gets point cloud as its input. Number of
       points used is specified by <code>num_points </code>parameter. During
       testing you can use voting across several views to get better results,
@@ -179,7 +179,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker:</b> <i>dockers/pointnet2</i><br>
       <b>Data: </b><i>dockers/data_conversion/pnet_data</i><br>
-      <b>Framework: </b>Tensorflow</p>
+      <b>Framework: </b>TensorFlow</p>
     <p><b>Details: </b>Same as the original pointnet described above.</p>
     <h3>SONET</h3>
     <p><b>Paper: </b><a href="http://openaccess.thecvf.com/content_cvpr_2018/papers/Li_SO-Net_Self-Organizing_Network_CVPR_2018_paper.pdf">SO-Net:
@@ -190,7 +190,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker:</b> <i>dockers/sonet</i><br>
       <b>Data:</b> <i>dockers/data_conversion/sonet_data</i><br>
-      <b>Framework:</b> Pytorch</p>
+      <b>Framework:</b> PyTorch</p>
     <p><b>Details: </b>Similarly to pointnet this network gets specific number
       of points as its inputvspecified by <code>num_points </code>parameter.
       In addition to points it uses a self organizing network to get better
@@ -207,7 +207,7 @@ style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transpare
 style="font-size:11pt;font-family:Arial;color:#1155cc;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:underline;-webkit-text-decoration-skip:none;text-decoration-skip-ink:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;"></span></a></b><br>
       <b>Docker:</b> <i>dockers/kdnet</i><br>
       <b>Data:</b> <i>dockers/data_conversion/</i><i><i>kdnet</i>_data</i><br>
-      <b>Framework:</b> Pytorch</p>
+      <b>Framework:</b> PyTorch</p>
     <p></p>
     <p><b>Details: </b>This network constructs its input which is kd-trees on
       the fly. But you still need to prepare mesh data to some more convenient
