@@ -26,7 +26,7 @@ def  save_for_kdnet(files, config, categories, split):
     test_faces_cnt = 0
 
     for i, shapefile in enumerate(train_filenames):
-        with open(shapefile, 'rb') as fobj:
+        with open(shapefile, 'r') as fobj:
             for line in fobj:
                 if 'v' in line:
                     train_vertices_cnt += 1
@@ -35,7 +35,7 @@ def  save_for_kdnet(files, config, categories, split):
 
 
     for i, shapefile in enumerate(test_filenames):
-        with open(shapefile, 'rb') as fobj:
+        with open(shapefile, 'r') as fobj:
             for line in fobj:
                 if 'v' in line:
                     test_vertices_cnt += 1
@@ -60,6 +60,7 @@ def  save_for_kdnet(files, config, categories, split):
     vertices_pos = 0
     faces_pos = 0
     for i, shapefile in enumerate(train_filenames):
+        print(shapefile)
         shape_name = get_file_id(shapefile)
         
         shape_vertices, shape_faces, _ = read_obj_file(shapefile)
@@ -83,6 +84,7 @@ def  save_for_kdnet(files, config, categories, split):
     vertices_pos = 0
     faces_pos = 0
     for i, shapefile in enumerate(test_filenames):
+        print(shapefile)
         shape_name = get_file_id(shapefile)
         shape_vertices, shape_faces, _ = read_obj_file(shapefile)
 
@@ -91,7 +93,7 @@ def  save_for_kdnet(files, config, categories, split):
         shape_vertices[:, 1] = shape_vertices[:, 2]
         shape_vertices[:, 2] = buf
         shape_faces = np.array(shape_faces) - 1
-
+        
         vertices_offset = shape_vertices.shape[0]
         faces_offset = shape_faces.shape[0]
 
@@ -108,11 +110,13 @@ def  save_for_kdnet(files, config, categories, split):
 
     hf = h5.File(path2save + '/data' + '.h5', 'w')
     for i, name in enumerate(names):
+        print(name)
         hf.create_dataset(name, data=data[i])
     hf.close()
-
+    print('ENDING')
 
 def prepare(config):
+    print('Starting')
     path2data = config.data
     path2save = config.output
     categories, split = Shapenet.get_metadata(path2data)

@@ -15,7 +15,7 @@ coding = {
     }
 
 def get_name_of_image_file(output_dir, file_id, angle, camera_angle):
-    return os.path.join(output_dir , file_id, file_id + "_{:.2f}_{:.2f}.png".format(angle, camera_angle))
+    return os.path.join(output_dir, file_id, file_id + "_{:.2f}_{:.2f}.png".format(angle, camera_angle))
     
 def get_name_of_txt_file(output_dir,cat, dataset, file_id):
     return os.path.join(output_dir , cat, dataset, file_id, file_id + ".txt")
@@ -37,7 +37,7 @@ def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir
 def render_model(obj_file, id, file_id, views, camera_rotations, output_dir, cat, fov, dodecahedron=False):
     geometry = os.path.join(os.path.split(obj_file)[0] , Path(obj_file).stem + ".pbrt")
     
-    os.system("mkdir -m 777 {}".format(os.path.join(output_dir,file_id)))
+    os.system("mkdir -m 777 \"{}\"".format(os.path.join(output_dir,file_id)))
     
     cmd = "./obj2pbrt {} {}".format(obj_file, geometry)
     os.system(cmd) 
@@ -92,9 +92,9 @@ def save_for_mvcnn(config, files, categories, split):
         config.dodecahedron = compute_dodecahedron_vertices()
     
     for cat in config.cat_names:
-        os.system("mkdir -m 777 {}".format(os.path.join(config.output,cat)))
+        os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
         for dataset in coding.values():
-            os.system("mkdir -m 777 {}".format(os.path.join(config.output,cat,dataset)))
+            os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
     
     if len(files) > 20:
         log("Starting {} threads on {} files.".format(config.num_threads, len(files)),lock, config.log_file)
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     
     save_for_mvcnn(config, files, categories, split)
     collect_files(files, split, categories, config)
-    if config.dataset_type and config.remove_obj:
+    if config.dataset_type == 'modelnet' and config.remove_obj:
         os.system('find {} -name *.obj -delete'.format(config.data))
     
     

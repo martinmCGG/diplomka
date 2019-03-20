@@ -1,11 +1,9 @@
 ##########################################################################################################
 # Set required variables
 
-#name="ModelNet40A_mvcnn_pbrt"
-name="Small_converted"
-#dataset_path="/home/krabec/data/ModelNet40A"
-dataset_path="/local/krabec/Small"
-output_dir="/local/krabec"
+name="pbrt2"
+dataset_path="/local/krabec/ModelNet40A/pbrt"
+output_dir="/local/krabec/ModelNet40A"
 docker_hidden=t
 
 ##########################################################################################################
@@ -19,6 +17,7 @@ docker kill "$image_name"
 docker rm "$image_name"
 
 docker run --rm -id --name "$image_name" -v "$dataset_path":/dataset -v "$output_dir":/data "$image_name"
-docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 mvcnn_data.py"
+#docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 mvcnn_data.py"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 convert.py"
 
 ##########################################################################################################

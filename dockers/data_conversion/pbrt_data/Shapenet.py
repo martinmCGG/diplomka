@@ -41,6 +41,7 @@ def get_cat_names(root_dir):
             for dato in data:
                 if dato['synsetId'] == dir:
                     cat_names.append(dato['name'].split(',')[0])
+    cat_names = [name.replace(' ', '_') for name in cat_names]
     return cat_names
 
 def write_cat_names(root_dir, dest):

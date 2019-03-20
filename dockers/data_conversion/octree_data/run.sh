@@ -2,8 +2,8 @@
 # Set required variables
 
 name="octree_adaptive"
-dataset_path="/local/krabec/ShapeNet"
-output_dir="/home/krabec"
+dataset_path="/local/krabec/ShapeNet/ShapeNet"
+output_dir="/local/krabec/ShapeNet"
 docker_hidden=t
 
 ##########################################################################################################

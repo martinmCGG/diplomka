@@ -1,6 +1,9 @@
 from __future__ import print_function
 from collections import namedtuple
-import configparser
+try:
+    import ConfigParser as cp
+except:
+    import configparser as cp
 
 def Parse(value):
     if value in ['False','false']:
@@ -22,7 +25,7 @@ def Parse(value):
 class config:
     
     def __init__(self, ini_file, data_size=0):
-        self.cp = configparser.RawConfigParser()
+        self.cp = cp.RawConfigParser()
         self.cp.read(ini_file) 
         self.config_to_dict(data_size=data_size)
     

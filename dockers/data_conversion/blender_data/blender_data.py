@@ -24,7 +24,7 @@ def render_model(obj_file, id, file_id, views, output_dir, cat, dataset, cat_nam
     
     
     whole_path = os.path.join(output_dir, cat_name, dataset, file_id)
-    os.system("mkdir -m 777 {}".format(whole_path))
+    os.system("mkdir -m 777 \"{}\"".format(whole_path))
     render_one_model(obj_file, file_id, whole_path, nviews=views)
     
     with open(get_name_of_txt_file(output_dir ,cat, dataset, file_id), 'w') as f:
@@ -62,9 +62,9 @@ def save_for_mvcnn(config, files, categories, split):
     lock = Lock()
     
     for cat in config.cat_names:
-        os.system("mkdir -m 777 {}".format(os.path.join(config.output,cat)))
+        os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
         for dataset in coding.values():
-            os.system("mkdir -m 777 {}".format(os.path.join(config.output,cat,dataset)))
+            os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
             
     log("Starting {} threads on {} files.".format(config.num_threads, len(files)),lock, config.log_file)
     if len(files) > 20:

@@ -1,6 +1,9 @@
 from __future__ import print_function
 from collections import namedtuple
-import ConfigParser
+try:
+    import ConfigParser as cp
+except:
+    import configparser as cp
 
 def Parse(value):
     if value in ['False','false']:
@@ -22,7 +25,7 @@ def Parse(value):
 class config:
     
     def __init__(self, ini_file, data_size=0):
-        self.cp = ConfigParser.RawConfigParser()
+        self.cp = cp.RawConfigParser()
         self.cp.read(ini_file) 
         self.config_to_dict(data_size=data_size)
     
@@ -66,11 +69,6 @@ def prepare_solver_file(ini_file = 'config.ini', data_size=0):
     
 def epoch_to_iters(epochs, batch_size, data_size):
     return epochs * data_size / batch_size
-
-def add_to_config(config, key, value):
-    new_dict = config._asdict()
-    new_dict[key] = value
-    return namedtuple("config", new_dict.keys())(*new_dict.values())
 
     
     

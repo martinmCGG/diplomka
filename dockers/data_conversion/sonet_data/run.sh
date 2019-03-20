@@ -1,11 +1,9 @@
 ##########################################################################################################
 # Set required variables
 
-#name="ModelNet40A_sonet"
-name="Small_converted"
-#dataset_path="/home/krabec/data/ModelNet40A"
-dataset_path="/local/krabec/Small"
-output_dir="/local/krabec"
+name="sonet"
+dataset_path="/local/krabec/ShapeNet"
+output_dir="/home/krabec"
 GPU=2
 docker_hidden=t
 

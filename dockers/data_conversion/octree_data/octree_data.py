@@ -27,19 +27,25 @@ def collect_files(directory, name, dataset_type = 'modelnet', split = None):
     if dataset_type == 'modelnet':
         files = [file for file in files if re.match('.*{}.*'.format(name), file)]
     else:
-        files = [file for file in files if coding[split[file.split('/')[-3]]] == name]
-    
+        files = [file for file in files if get_split(split, file.split('/')[-3]) == name]
     print(files)
     with open (point_file, 'w') as f:
         for file in files:
-            print(file, file=f)
+            newname = os.path.dirname(file)+ '/' + file.split('/')[-3] + '.points'
+            os.rename(file,newname)
+            print(newname, file=f)
     return point_file
+
+def get_split(split, id):
+    if id in split:
+        return coding[split[id]]
+    else:
+        return 'train'
+
 
 def convert_one_category(arguments):
     input_dir, output_dir, category_id, all_test_file, all_train_file, dataset_type, adaptive, num_rotations, split = arguments
-
-    os.system("mkdir -m 777 {}".format(output_dir))
-    
+    os.system("mkdir -m 777 \"{}\"".format(output_dir))
     scanner = DirectoryTreeScanner(view_num=num_rotations, flags=False, normalize=True)
     scanner.scan_tree(input_base_folder=input_dir, output_base_folder=output_dir, num_threads=1)
     
@@ -71,23 +77,21 @@ if __name__ == '__main__':
     config = get_config()
     with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
-        os.system("rm -rf {}/*".format(config.output))
+        #os.system("rm -rf {}/*".format(config.output))
         print("previous data removed", file = f)
     if config.clean_off_files:
         clean_off_folder(config.data)
         print(".off files cleaned", file = f)    
     try:
         if config.dataset_type == "shapenet":
-            #files = find_files(config.data, 'obj')
             categories, split = Shapenet.get_metadata(config.data)
             cat_names = Shapenet.get_cat_names(config.data)
+
             input_categories = sorted([os.path.join(config.data,cat) for cat in os.listdir(config.data) if os.path.isdir(os.path.join(config.data,cat))])
             output_categories = sorted([os.path.join(config.output,cat) for cat in cat_names]) 
             Shapenet.write_cat_names(config.data, config.output)
 
         elif config.dataset_type == "modelnet":
-            #files = find_files(config.data, 'off')
-            #categories, split= Modelnet.get_metadata(config.data, files)
             split = None
             cat_names = Modelnet.get_cat_names(config.data)
             Modelnet.write_cat_names(config.data, config.output)
@@ -102,16 +106,19 @@ if __name__ == '__main__':
         
     all_test_file = os.path.join(config.output, 'test.txt')
     all_train_file = os.path.join(config.output, 'train.txt')
-    
-    arguments = [(input_categories[i], output_categories[i], i, all_test_file, all_train_file, config.dataset_type, config.adaptive, config.num_rotations, split) for i in range(0,len(input_categories))]
 
+    arguments = [(input_categories[i], output_categories[i], i, all_test_file, all_train_file, config.dataset_type, config.adaptive, config.num_rotations, split) for i in range(0,len(input_categories))]
+    arguments = [arguments[i] for i in range(len(arguments)) if i in [17,18,19]]
+    for arg in arguments:
+        os.system("rm -rf "+ arg[1])
     pool = Pool(processes=config.num_threads)
     pool.map(convert_one_category, arguments)
     pool.close()
     pool.join()
     
-    os.system('/opt/caffe/build/tools/convert_octree_data {} {} {}'.format("/",  os.path.join(config.output,'train.txt'), os.path.join(config.output,'train_lmdb')))
-    os.system('/opt/caffe/build/tools/convert_octree_data {} {} {}'.format("/", os.path.join(config.output,'test.txt'), os.path.join(config.output,'test_lmdb')))
+    #os.system('/opt/caffe/build/tools/convert_octree_data {} \"{}\" \"{}\"'.format("/", os.path.join(config.output,'test.txt'), os.path.join(config.output,'test_lmdb')))    
+    #os.system('/opt/caffe/build/tools/convert_octree_data {} \"{}\" \"{}\"'.format("/",  os.path.join(config.output,'train.txt'), os.path.join(config.output,'train_lmdb')))
+
     
     
     
