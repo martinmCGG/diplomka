@@ -14,6 +14,8 @@ As is common with neural networks, data augmentation is a very important part of
 Results of VoxNet were improved by ORION \cite{sedaghat_orientation-boosted_2016}, wherein the classification task was augmented
 with an orientation estimation task and FusionNet \cite{hegde_fusionnet:_2016} combining 3D convolutions on voxel representation with multi-view approach.
 
+\input{./img/voxnet.tex}
+
 \subsection{Voxception Residual Network}
 Voxception Residual Network \cite{brock_generative_2016} is inspired by deep residual convolutional networks for image recognition which are the state of the art approach for this task. It uses Inception-style \cite{szegedy_inception-v4_2016} modules, batch normalization (Section XYZ), residual connections (Section XYZ) and stochastic network depth \cite{huang_deep_2016} The Voxception network consists of several sequential voxception modules. These modules  should enable for information to propagate through the network through many possible “pathways”, while still maintaining simplicity and efficiency. \par
 For example, one of the basic blocks concatenates the result of a 3x3x3 convolution and the result of a 1x1x1 convolution, so the network can learn which of these filters to apply. There are several types of the so called Voxception blocks with residual connections with pre-activation (nonlinearity is used before the addition) employed in the network. \par
@@ -22,6 +24,8 @@ The model is quite big and slow to train, authors report one epoch taking around
 Voxel grid resolution of $32^3$ is used. The network is trained using 24 rotations of each input instance along the vertical axis and using binary voxel representation but with binary voxel range $\{-1,5\}$ instead $\{0,1\}$  to encourage the network to pay more attention to positive entries. \par
 As there is not much new research done in the area of voxel based classification we chose a single Voxel Residual Network as a representative of this category. It still achieves accuracy comparable to the latest networks and has publicly available code. It is implemented in Theano with Lasagne and offers several models to train and make ensemble from. We opted for only one of these models as it is very time demanding to train even a single network. The model chosen is the model reported by authors as the best one and described in detail in the original paper. 
 This approach still represents the state of the art in voxel based classification as ensemble of similar models reports 95.54\% accuracy on ModelNet40 dataset which remains one of the highest reported.
+
+\input{./img/voxblock.tex}
 
 \subsection{Octree and Adaptive Octree Networks}
 Octree-based Convolutional Neural Network \cite{wang_o-cnn:_2017} uses another data structure for representing 3D data -- an octree \cite{meagher_octree_1980}. Octree is a tree where each node has exactly eight children so partitioning the space into finer and finer cubes. This basically means voxelization of the 3D model, but in this case only voxels on the borders are considered. This can be implemented efficiently and represented in a format suitable for GPU computation. In each leaf node a normal vector of the surface is stored. Authors then present an efficient way of performing convolutions on octrees and construct a hierarchical structure of shared layers for individual levels of the tree. The computation proceeds from the finest leaf octants and continues upwards to the root of the tree.
