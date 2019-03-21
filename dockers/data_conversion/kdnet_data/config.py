@@ -66,7 +66,11 @@ def prepare_solver_file(ini_file = 'config.ini', data_size=0):
     cfg = config(ini_file, data_size=data_size)
     solver = cfg.get_named_tuple().solver
     cfg.prepare_caffe_files(solver)
-    
+def add_to_config(config, key, value):
+    new_dict = config._asdict()
+    new_dict[key] = value
+    return namedtuple("config", new_dict.keys())(*new_dict.values())
+
 def epoch_to_iters(epochs, batch_size, data_size):
     return epochs * data_size / batch_size
 
