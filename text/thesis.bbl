@@ -1,9 +1,55 @@
-\begin{thebibliography}{32}
+\begin{thebibliography}{39}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Al-Rfou et~al.(2016)Al-Rfou, Alain, Almahairi, Angermueller, Bahdanau,
+  Ballas, Bastien, Bayer, Belikov, Belopolsky, Bengio, Bergeron, Bergstra,
+  Bisson, Snyder, Bouchard, Boulanger-Lewandowski, Bouthillier, Brébisson,
+  Breuleux, Carrier, Cho, Chorowski, Christiano, Cooijmans, Côté, Côté,
+  Courville, Dauphin, Delalleau, Demouth, Desjardins, Dieleman, Dinh, Ducoffe,
+  Dumoulin, Kahou, Erhan, Fan, Firat, Germain, Glorot, Goodfellow, Graham,
+  Gulcehre, Hamel, Harlouchet, Heng, Hidasi, Honari, Jain, Jean, Jia, Korobov,
+  Kulkarni, Lamb, Lamblin, Larsen, Laurent, Lee, Lefrancois, Lemieux, Léonard,
+  Lin, Livezey, Lorenz, Lowin, Ma, Manzagol, Mastropietro, McGibbon, Memisevic,
+  Merriënboer, Michalski, Mirza, Orlandi, Pal, Pascanu, Pezeshki, Raffel,
+  Renshaw, Rocklin, Romero, Roth, Sadowski, Salvatier, Savard, Schlüter,
+  Schulman, Schwartz, Serban, Serdyuk, Shabanian, Simon, Spieckermann,
+  Subramanyam, Sygnowski, Tanguay, Tulder, Turian, Urban, Vincent, Visin,
+  Vries, Warde-Farley, Webb, Willson, Xu, Xue, Yao, Zhang, and
+  Zhang]{al-rfou_theano:_2016}
+Rami Al-Rfou, Guillaume Alain, Amjad Almahairi, Christof Angermueller, Dzmitry
+  Bahdanau, Nicolas Ballas, Frédéric Bastien, Justin Bayer, Anatoly Belikov,
+  Alexander Belopolsky, Yoshua Bengio, Arnaud Bergeron, James Bergstra,
+  Valentin Bisson, Josh~Bleecher Snyder, Nicolas Bouchard, Nicolas
+  Boulanger-Lewandowski, Xavier Bouthillier, Alexandre~de Brébisson, Olivier
+  Breuleux, Pierre-Luc Carrier, Kyunghyun Cho, Jan Chorowski, Paul Christiano,
+  Tim Cooijmans, Marc-Alexandre Côté, Myriam Côté, Aaron Courville, Yann~N.
+  Dauphin, Olivier Delalleau, Julien Demouth, Guillaume Desjardins, Sander
+  Dieleman, Laurent Dinh, Mélanie Ducoffe, Vincent Dumoulin, Samira~Ebrahimi
+  Kahou, Dumitru Erhan, Ziye Fan, Orhan Firat, Mathieu Germain, Xavier Glorot,
+  Ian Goodfellow, Matt Graham, Caglar Gulcehre, Philippe Hamel, Iban
+  Harlouchet, Jean-Philippe Heng, Balázs Hidasi, Sina Honari, Arjun Jain,
+  Sébastien Jean, Kai Jia, Mikhail Korobov, Vivek Kulkarni, Alex Lamb, Pascal
+  Lamblin, Eric Larsen, César Laurent, Sean Lee, Simon Lefrancois, Simon
+  Lemieux, Nicholas Léonard, Zhouhan Lin, Jesse~A. Livezey, Cory Lorenz,
+  Jeremiah Lowin, Qianli Ma, Pierre-Antoine Manzagol, Olivier Mastropietro,
+  Robert~T. McGibbon, Roland Memisevic, Bart~van Merriënboer, Vincent
+  Michalski, Mehdi Mirza, Alberto Orlandi, Christopher Pal, Razvan Pascanu,
+  Mohammad Pezeshki, Colin Raffel, Daniel Renshaw, Matthew Rocklin, Adriana
+  Romero, Markus Roth, Peter Sadowski, John Salvatier, François Savard, Jan
+  Schlüter, John Schulman, Gabriel Schwartz, Iulian~Vlad Serban, Dmitriy
+  Serdyuk, Samira Shabanian, Étienne Simon, Sigurd Spieckermann, S.~Ramana
+  Subramanyam, Jakub Sygnowski, Jérémie Tanguay, Gijs~van Tulder, Joseph
+  Turian, Sebastian Urban, Pascal Vincent, Francesco Visin, Harm~de Vries,
+  David Warde-Farley, Dustin~J. Webb, Matthew Willson, Kelvin Xu, Lijun Xue,
+  Li~Yao, Saizheng Zhang, and Ying Zhang.
+\newblock Theano: {A} {Python} framework for fast computation of mathematical
+  expressions.
+\newblock \emph{arXiv e-prints}, abs/1605.02688, May 2016.
+\newblock URL \url{http://arxiv.org/abs/1605.02688}.
 
 \bibitem[Bahdanau et~al.(2014)Bahdanau, Cho, and Bengio]{bahdanau_neural_2014}
 Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio.
@@ -40,6 +86,26 @@ Kyunghyun Cho, Bart van Merrienboer, Caglar Gulcehre, Dzmitry Bahdanau, Fethi
 \newblock \emph{arXiv:1406.1078 [cs, stat]}, June 2014.
 \newblock URL \url{http://arxiv.org/abs/1406.1078}.
 \newblock arXiv: 1406.1078.
+
+\bibitem[Chollet and {others}(2015)]{chollet_keras_2015}
+François Chollet and {others}.
+\newblock \emph{Keras}.
+\newblock 2015.
+\newblock URL \url{https://keras.io}.
+
+\bibitem[Dieleman et~al.(2015)Dieleman, Schlüter, Raffel, Olson, Sønderby,
+  Nouri, Maturana, Thoma, Battenberg, Kelly, Fauw, Heilman, Almeida, McFee,
+  Weideman, Takács, Rivaz, Crall, Sanders, Rasul, Liu, French, and
+  Degrave]{dieleman_lasagne:_2015}
+Sander Dieleman, Jan Schlüter, Colin Raffel, Eben Olson, Søren~Kaae
+  Sønderby, Daniel Nouri, Daniel Maturana, Martin Thoma, Eric Battenberg, Jack
+  Kelly, Jeffrey~De Fauw, Michael Heilman, Diogo Moitinho~de Almeida, Brian
+  McFee, Hendrik Weideman, Gábor Takács, Peter~de Rivaz, Jon Crall, Gregory
+  Sanders, Kashif Rasul, Cong Liu, Geoffrey French, and Jonas Degrave.
+\newblock \emph{Lasagne: {First} release.}
+\newblock August 2015.
+\newblock \doi{10.5281/zenodo.27878}.
+\newblock URL \url{http://dx.doi.org/10.5281/zenodo.27878}.
 
 \bibitem[Dominguez et~al.(2018)Dominguez, Dhamdhere, Petkar, Jain, Sah, and
   Ptucha]{dominguez_general-purpose_2018}
@@ -93,6 +159,19 @@ Sergey Ioffe and Christian Szegedy.
 \newblock \emph{arXiv:1502.03167 [cs]}, February 2015.
 \newblock URL \url{http://arxiv.org/abs/1502.03167}.
 \newblock arXiv: 1502.03167.
+
+\bibitem[Jia et~al.(2014)Jia, Shelhamer, Donahue, Karayev, Long, Girshick,
+  Guadarrama, and Darrell]{jia_caffe:_2014}
+Yangqing Jia, Evan Shelhamer, Jeff Donahue, Sergey Karayev, Jonathan Long, Ross
+  Girshick, Sergio Guadarrama, and Trevor Darrell.
+\newblock Caffe: {Convolutional} {Architecture} for {Fast} {Feature}
+  {Embedding}.
+\newblock In \emph{Proceedings of the 22Nd {ACM} {International} {Conference}
+  on {Multimedia}}, {MM} '14, pages 675--678, New York, NY, USA, 2014. ACM.
+\newblock ISBN 978-1-4503-3063-3.
+\newblock \doi{10.1145/2647868.2654889}.
+\newblock URL \url{http://doi.acm.org/10.1145/2647868.2654889}.
+\newblock event-place: Orlando, Florida, USA.
 
 \bibitem[Kanezaki et~al.(2016)Kanezaki, Matsushita, and
   Nishida]{kanezaki_rotationnet:_2016}
@@ -150,6 +229,31 @@ machrisaa.
 \newblock tensorflow-vgg.
 \newblock URL \url{https://github.com/machrisaa/tensorflow-vgg}.
 
+\bibitem[{Martín Abadi} et~al.(2015){Martín Abadi}, {Ashish Agarwal}, {Paul
+  Barham}, {Eugene Brevdo}, {Zhifeng Chen}, {Craig Citro}, {Greg S. Corrado},
+  {Andy Davis}, {Jeffrey Dean}, {Matthieu Devin}, {Sanjay Ghemawat}, {Ian
+  Goodfellow}, {Andrew Harp}, {Geoffrey Irving}, {Michael Isard}, Jia, {Rafal
+  Jozefowicz}, {Lukasz Kaiser}, {Manjunath Kudlur}, {Josh Levenberg}, {Dan
+  Mané}, {Rajat Monga}, {Sherry Moore}, {Derek Murray}, {Chris Olah}, {Mike
+  Schuster}, {Jonathon Shlens}, {Benoit Steiner}, {Ilya Sutskever}, {Kunal
+  Talwar}, {Paul Tucker}, {Vincent Vanhoucke}, {Vijay Vasudevan}, {Fernanda
+  Viégas}, {Oriol Vinyals}, {Pete Warden}, {Martin Wattenberg}, {Martin
+  Wicke}, {Yuan Yu}, and {Xiaoqiang Zheng}]{martin_abadi_tensorflow:_2015}
+{Martín Abadi}, {Ashish Agarwal}, {Paul Barham}, {Eugene Brevdo}, {Zhifeng
+  Chen}, {Craig Citro}, {Greg S. Corrado}, {Andy Davis}, {Jeffrey Dean},
+  {Matthieu Devin}, {Sanjay Ghemawat}, {Ian Goodfellow}, {Andrew Harp},
+  {Geoffrey Irving}, {Michael Isard}, Yangqing Jia, {Rafal Jozefowicz}, {Lukasz
+  Kaiser}, {Manjunath Kudlur}, {Josh Levenberg}, {Dan Mané}, {Rajat Monga},
+  {Sherry Moore}, {Derek Murray}, {Chris Olah}, {Mike Schuster}, {Jonathon
+  Shlens}, {Benoit Steiner}, {Ilya Sutskever}, {Kunal Talwar}, {Paul Tucker},
+  {Vincent Vanhoucke}, {Vijay Vasudevan}, {Fernanda Viégas}, {Oriol Vinyals},
+  {Pete Warden}, {Martin Wattenberg}, {Martin Wicke}, {Yuan Yu}, and {Xiaoqiang
+  Zheng}.
+\newblock \emph{{TensorFlow}: {Large}-{Scale} {Machine} {Learning} on
+  {Heterogeneous} {Systems}}.
+\newblock 2015.
+\newblock URL \url{http://tensorflow.org/}.
+
 \bibitem[Maturana and Scherer(2015)]{maturana_voxnet:_2015}
 D.~Maturana and S.~Scherer.
 \newblock Voxnet: {A} 3d convolutional neural network for real-time object
@@ -162,6 +266,13 @@ Donald Meagher.
   {Representation}, {Manipulation} and {Display} of {Arbitrary} 3-{D} {Objects}
   by {Computer}}.
 \newblock October 1980.
+
+\bibitem[Paszke et~al.(2017)Paszke, Gross, Chintala, Chanan, Yang, DeVito, Lin,
+  Desmaison, Antiga, and Lerer]{paszke_automatic_2017}
+Adam Paszke, Sam Gross, Soumith Chintala, Gregory Chanan, Edward Yang, Zachary
+  DeVito, Zeming Lin, Alban Desmaison, Luca Antiga, and Adam Lerer.
+\newblock Automatic differentiation in {PyTorch}.
+\newblock In \emph{{NIPS}-{W}}, 2017.
 
 \bibitem[Qi et~al.(2016)Qi, Su, Mo, and Guibas]{qi_pointnet:_2016}
 Charles~R. Qi, Hao Su, Kaichun Mo, and Leonidas~J. Guibas.
@@ -186,6 +297,17 @@ Nima Sedaghat, Mohammadreza Zolfaghari, Ehsan Amiri, and Thomas Brox.
 \newblock \emph{arXiv:1604.03351 [cs]}, April 2016.
 \newblock URL \url{http://arxiv.org/abs/1604.03351}.
 \newblock arXiv: 1604.03351.
+
+\bibitem[Seide and Agarwal(2016)]{seide_cntk:_2016}
+Frank Seide and Amit Agarwal.
+\newblock {CNTK}: {Microsoft}'s {Open}-{Source} {Deep}-{Learning} {Toolkit}.
+\newblock In \emph{Proceedings of the 22Nd {ACM} {SIGKDD} {International}
+  {Conference} on {Knowledge} {Discovery} and {Data} {Mining}}, {KDD} '16,
+  pages 2135--2135, New York, NY, USA, 2016. ACM.
+\newblock ISBN 978-1-4503-4232-2.
+\newblock \doi{10.1145/2939672.2945397}.
+\newblock URL \url{http://doi.acm.org/10.1145/2939672.2945397}.
+\newblock event-place: San Francisco, California, USA.
 
 \bibitem[Simonyan and Zisserman(2014)]{simonyan_very_2014}
 K.~Simonyan and A.~Zisserman.

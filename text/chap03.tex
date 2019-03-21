@@ -2,33 +2,7 @@
 \label{sec:chap3}
 In recent years many techniques of classifying 3D shapes by means of artificial neural networks were devised. In this chapter we present most of the commonly used and successful of them. As mentioned in previous chapters the usual mesh format is not suitable for processing by neural network so we divide the networks according to format which they use as their input: voxel-based, multi-view, and point-cloud based. \ref{Table:1} shows a list of neural networks described in this chapter. There is a citation of an original paper, a framework of the publicly available code and if we included the network in our testing.
 
-\begin{table}[]
-	\begin{tabular}{lllll}
-		\hline
-		\textbf{Acronym}            & \textbf{Reference}                       & \textbf{Framework} & \textbf{Included} &  \\ \hline
-		\textbf{Voxel based }       &                                          &                    &                   &  \\
-		VoxNet                      & \cite{maturana_voxnet:_2015}             & TensorFlow         & No                &  \\
-		ORION                       & \cite{sedaghat_orientation-boosted_2016} & Caffe              & No                &  \\
-		FusionNet                   & \cite{hegde_fusionnet:_2016}             & Not available      & No                &  \\
-		VRN                         & \cite{brock_generative_2016}             & Theano             & Yes               &  \\
-		O-CNN                       & \cite{wang_o-cnn:_2017}                  & Caffe              & Yes               &  \\
-		AO-CNN                      & \cite{wang_adaptive_2018}                & Caffe              & Yes               &  \\
-		\textbf{Multi-view based }  &                                          &                    &                   &  \\
-		VGG-voting                  & \cite{simonyan_very_2014}                & TensorFlow         & Yes               &  \\
-		MVCNN                       & \cite{su_multi-view_2015}                & TensorFlow         & Yes               &  \\
-		MVCNN2                      & \cite{su_deeper_2018}                    & PyTorch            &                   &  \\
-		RotationNet                 & \cite{kanezaki_rotationnet:_2016}        & Caffe              & Yes               &  \\
-		Seq2Seq                     & \cite{zhizhong_seqviews2seqlabels:_2018} & TensorFlow         & Yes               &  \\
-		\textbf{Point-cloud based } &                                          &                    & Yes               &  \\
-		PointNet                    & \cite{qi_pointnet:_2016}                 & TensorFlow         & Yes               &  \\
-		PointNet++                  & \cite{qi_pointnet++:_2017}               & TensorFlow         & Yes               &  \\
-		SO-Net                      & \cite{li_so-net:_2018}                   & PyTorch            & Yes               &  \\
-		KD-Net                      & \cite{klokov_escape_2017}                & PyTorch            & Yes               &  \\
-		GraphNet                    & \cite{dominguez_general-purpose_2018}    & TensorFlow         & No                &
-	\end{tabular}
-\caption{List of examined neural networks.}
-\label{Table:1}
-\end{table}
+\input{./tables/survey.tex}
 
 \section{Voxel Based Neural Networks}
 As 2D convolutional neural networks were a great breakthrough in image recognition, it is natural to try to generalize this approach to three dimensions. Instead of pixels we use 3D occupancy grid of so called voxels. As shown later we can easily extend convolutions to three dimensions. Convolutions seem to be suitable for the task as they can make use of the spatial structure of the problem. However they are computationally demanding and voxel grids have high memory requirements as their size grows with the cube of the resolution. For this reason only relatively small resolutions can be used, the most usual being $32^3$. 
