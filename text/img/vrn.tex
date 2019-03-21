@@ -1,0 +1,45 @@
+\begin{figure}
+\def\layersep{0.5cm}
+\centering
+
+
+\begin{tikzpicture}[shorten >=1pt,->,draw=black, node distance=\layersep]
+
+\tikzstyle{layer}=[rounded rectangle,align=center,minimum width=300,minimum height=30,inner sep=3pt, draw=black];
+
+\node[layer] at (0,0) (layer1) {Voxel Grid Input \\ $32\times32\times32$};
+\node[layer, below = of layer1] (layer2) {3D Convolution $3\times3\times3$ size filter \\ $32\times32\times32$, 32 filters};
+\node[layer, below = of layer2] (layer3) {3x Voxception Residual Block \\$32\times32\times32$, 32 filters};
+\node[layer, below = of layer3] (layer4) {Downsampling Block \\ $16\times16\times16$, 64 filters};
+\node[layer, below = of layer4] (layer5) {3x Voxception Residual Block \\$16\times16\times16$, 64 filters};
+\node[layer, below = of layer5] (layer6) {Downsampling Block \\ $8\times8\times8$, 128 filters};
+\node[layer, below = of layer6] (layer7) {3x Voxception Residual Block \\$8\times8\times8$, 128 filters};
+\node[layer, below = of layer7] (layer8) {Downsampling Block \\ $4\times4\times4$, 256 filters};
+\node[layer, below = of layer8] (layer9) {3x Voxception Residual Block \\$4\times4\times4$, 256 filters};
+\node[layer, below = of layer9] (layer10) {Downsampling Block \\ $2\times2\times2$, 512 filters};
+\node[layer, below = of layer10] (layer11) {3D Convolution $3\times3\times3$ size filter \\ $2\times2\times2$, 512 filters};
+\node[layer, below = of layer11] (layer12) {Global Pooling (Flatten)};
+\node[layer, below = of layer12] (layer13) {Dense \\ 512};
+\node[layer, below = of layer13] (layer14) {Dense \\ Number of categories};
+
+
+\path[line width=1.4pt]
+(layer1) edge          		node {} (layer2) 
+(layer2) edge          		node {} (layer3)    
+(layer3) edge          		node {} (layer4)    
+(layer4) edge          		node {} (layer5)    
+(layer5) edge          		node {} (layer6)    
+(layer6) edge          		node {} (layer7)       
+(layer7) edge          		node {} (layer8) 
+(layer8) edge          		node {} (layer9)
+(layer9) edge          		node {} (layer10)
+(layer10) edge          	node {} (layer11)  
+(layer11) edge          	node {} (layer12)
+(layer12) edge          	node {} (layer13)
+(layer13) edge          	node {} (layer14);   
+
+
+\end{tikzpicture}
+\caption{VRN architecture}
+\label{vrn}
+\end{figure}

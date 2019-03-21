@@ -1,20 +1,19 @@
 \begin{figure}
-\def\layersep{0.8cm}
+\def\layersep{0.5cm}
 \centering
 
 \begin{tikzpicture}[shorten >=1pt,->,draw=black, node distance=\layersep, layer/.style 2 args={rounded rectangle,align=center,minimum width=#1,minimum height=#2,inner sep=3pt, draw=black}]
 
-\node[layer={200pt}{40pt}] at (0,0) (input) {Block Input};
+\node[layer={200pt}{30pt}] at (0,0) (input) {Block Input};
 
-\node[layer={150pt}{40pt}, below = of input]  (c3) {3D Convolution \\ 3x3x3 sized filters};
+\node[layer={150pt}{30pt}, below = of input]  (c3) {3D Convolution \\ 3x3x3 sized filters};
 
-\node[layer={150pt}{40pt}, below right = of input]  (c1) {3D Convolution \\ 1x1x1 sized filters};
+\node[layer={150pt}{30pt}, below right = of input]  (c1) {3D Convolution \\ 1x1x1 sized filters};
 
-\node[layer={200pt}{40pt}, below = 3cm of input] (concat) {Concatenate};
+\node[layer={200pt}{30pt}, below = 2cm of input] (concat) {Concatenate};
 
-\node[layer={200pt}{40pt}, below = of concat]  (add) {Addition};
+\node[layer={200pt}{30pt}, below = of concat]  (add) {Addition};
 
-%\path [line width=1.4pt,  ;
 
 \path[line width=1.4pt, sloped, anchor=north, auto=false]
 (input) edge          		node {} (c3)            
@@ -25,6 +24,6 @@
 [bend right=90](input) edge node {Residual connection} (add);
 
 \end{tikzpicture}
-\caption{Example of residual block}
+\caption{Example of a simple residual block}
 \label{voxblock}
 \end{figure}

@@ -4,7 +4,8 @@
 \contentsline {figure}{\numberline {2.2}{\ignorespaces Multi-layer perceptron}}{5}{figure.2.2}% 
 \addvspace {10\p@ }
 \contentsline {figure}{\numberline {3.1}{\ignorespaces VoxNet architecture}}{10}{figure.3.1}% 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Example of residual block}}{12}{figure.3.2}% 
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Example of a simple residual block}}{12}{figure.3.2}% 
+\contentsline {figure}{\numberline {3.3}{\ignorespaces VRN architecture}}{13}{figure.3.3}% 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }

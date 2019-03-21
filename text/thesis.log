@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  21 MAR 2019 17:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  21 MAR 2019 20:42
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -811,7 +811,11 @@ Package hyperref Info: Option `breaklinks' set `true' on input line 105.
 \c@thm=\count140
 \c@defn=\count141
 ) (thesis.aux (title.aux) (chap01.aux) (chap02.aux) (chap03.aux)
-(chap04.aux) (chap05.aux) (chap06.aux) (bibliography.aux))
+(chap04.aux
+
+LaTeX Warning: Label `Table:1' multiply defined.
+
+) (chap05.aux) (chap06.aux) (bibliography.aux))
 \openout1 = `thesis.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 111.
@@ -987,22 +991,29 @@ Overfull \hbox (0.50066pt too wide) in paragraph at lines 2--25
 
 
 
-] [10] (img/voxblock.tex) [11] [12] [13] [14]) [15]
+] [10] (img/voxblock.tex) (img/vrn.tex
+Missing character: There is no ; in font nullfont!
+) [11] [12] [13]
+[14] [15]) [16]
 \openout2 = `chap04.aux'.
 
-
-(chap04.tex
+ (chap04.tex
 Chapter 4.
-) [16
+(tables/accuracies.tex
+
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `tbp') on input line 1.
+
+)) [17
 
 
 
-]
+] [18]
 \openout2 = `chap05.aux'.
 
  (chap05.tex
 Chapter 5.
-) [17
+) [19
 
 
 
@@ -1011,7 +1022,7 @@ Chapter 5.
 
  (chap06.tex
 Chapter 6.
-) [18
+) [20
 
 
 
@@ -1030,7 +1041,7 @@ Underfull \hbox (badness 1082) in paragraph at lines 23--53
 ebisson,
  []
 
-[19
+[21
 
 
 
@@ -1040,7 +1051,7 @@ Underfull \hbox (badness 2762) in paragraph at lines 135--140
 Neu-ral Net-
  []
 
-[20]
+[22]
 Underfull \hbox (badness 10000) in paragraph at lines 228--231
 []\OT1/lmr/m/n/12 machrisaa.  tensorflow-vgg.  URL []$\OT1/lmtt/m/n/12 https : 
 / / github . com / machrisaa /
@@ -1052,7 +1063,7 @@ Underfull \hbox (badness 1028) in paragraph at lines 278--284
 oint-
  []
 
-[21]
+[23]
 Underfull \hbox (badness 2582) in paragraph at lines 295--300
 \OT1/lmr/m/it/12 [cs]\OT1/lmr/m/n/12 , April 2016.  URL []$\OT1/lmtt/m/n/12 htt
 p : / / arxiv . org / abs / 1604 . 03351$[]\OT1/lmr/m/n/12 .  arXiv:
@@ -1064,24 +1075,24 @@ Underfull \hbox (badness 3058) in paragraph at lines 330--336
 g-ni-tion.
  []
 
-)) [22] (thesis.lof)
+)) [24] (thesis.lof)
 \tf@lof=\write8
 \openout8 = `thesis.lof'.
 
- [23
+ [25
 
 
 ] (thesis.lot)
 \tf@lot=\write9
 \openout9 = `thesis.lot'.
 
- [24
+ [26
 
-] [25
+] [27
 
 ]
 Appendix A.
-[26
+[28
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 159.
@@ -1092,13 +1103,17 @@ Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 159.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 159.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: 21AF380088C43B03AD8B53788F8D25F9;6104.
+
+
+LaTeX Warning: There were multiply-defined labels.
+
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 159.
  ) 
 Here is how much of TeX's memory you used:
- 27064 strings out of 492946
- 490269 string characters out of 3135527
- 584334 words of memory out of 3000000
- 30306 multiletter control sequences out of 15000+200000
+ 27144 strings out of 492946
+ 491646 string characters out of 3135527
+ 584422 words of memory out of 3000000
+ 30376 multiletter control sequences out of 15000+200000
  55149 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,10n,71p,1215b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1116,9 +1131,9 @@ ype1/public/lm/lmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr
  Files/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9
 /fonts/type1/public/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
 c/lm/lmtt12.pfb>
-Output written on thesis.pdf (30 pages, 659056 bytes).
+Output written on thesis.pdf (32 pages, 664508 bytes).
 PDF statistics:
- 637 PDF objects out of 1000 (max. 8388607)
- 112 named destinations out of 1000 (max. 500000)
+ 651 PDF objects out of 1000 (max. 8388607)
+ 116 named destinations out of 1000 (max. 500000)
  326 words of extra memory for PDF output out of 10000 (max. 10000000)
 

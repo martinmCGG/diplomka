@@ -26,6 +26,7 @@ As there is not much new research done in the area of voxel based classification
 This approach still represents the state of the art in voxel based classification as ensemble of similar models reports 95.54\% accuracy on ModelNet40 dataset which remains one of the highest reported.
 
 \input{./img/voxblock.tex}
+\input{./img/vrn.tex}
 
 \subsection{Octree and Adaptive Octree Networks}
 Octree-based Convolutional Neural Network \cite{wang_o-cnn:_2017} uses another data structure for representing 3D data -- an octree \cite{meagher_octree_1980}. Octree is a tree where each node has exactly eight children so partitioning the space into finer and finer cubes. This basically means voxelization of the 3D model, but in this case only voxels on the borders are considered. This can be implemented efficiently and represented in a format suitable for GPU computation. In each leaf node a normal vector of the surface is stored. Authors then present an efficient way of performing convolutions on octrees and construct a hierarchical structure of shared layers for individual levels of the tree. The computation proceeds from the finest leaf octants and continues upwards to the root of the tree.
