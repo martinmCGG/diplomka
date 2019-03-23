@@ -48,7 +48,7 @@ if __name__ == '__main__':
         elif config.dataset_type == "modelnet":
             files = find_files(config.data, 'off')
             categories, split= Modelnet.get_metadata(config.data, files)
-            Modelnet.write_cat_names(config.data, config.outputa)
+            Modelnet.write_cat_names(config.data, config.output)
     except:
         e = sys.exc_info()
         with open(config.log_file, 'a') as f:
