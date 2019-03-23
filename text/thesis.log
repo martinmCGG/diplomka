@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  21 MAR 2019 20:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  22 MAR 2019 15:23
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -720,6 +720,23 @@ File: pgfmodulematrix.code.tex 2019/02/02 v3.1.1 (3.1.1)
 librarytopaths.code.tex"
 File: tikzlibrarytopaths.code.tex 2019/02/02 v3.1.1 (3.1.1)
 )))
+("C:\Program Files\MiKTeX 2.9\tex/latex/csvsimple\csvsimple.sty"
+Package: csvsimple 2016/07/01 version 1.20 LaTeX CSV file processing
+
+("C:\Program Files\MiKTeX 2.9\tex/latex/etoolbox\etoolbox.sty"
+Package: etoolbox 2018/08/19 v2.5f e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count140
+)
+("C:\Program Files\MiKTeX 2.9\tex/latex/tools\shellesc.sty"
+Package: shellesc 2016/06/07 v0.02a unified shell escape interface for LaTeX
+Package shellesc Info: Restricted shell escape enabled on input line 69.
+)
+\csv@file=\read4
+\c@csvinputline=\count141
+\c@csvrow=\count142
+\c@csvcol=\count143
+\csv@out=\write6
+)
 ("C:\Program Files\MiKTeX 2.9\tex/generic/pgf/frontendlayer/tikz/libraries\tikz
 libraryarrows.code.tex"
 File: tikzlibraryarrows.code.tex 2019/02/02 v3.1.1 (3.1.1)
@@ -801,40 +818,39 @@ File: pgflibraryshapes.multipart.code.tex 2019/02/02 v3.1.1 (3.1.1)
 \pgfnodepartsixbox=\box61
 \pgfnodepartfivebox=\box62
 )))
-Package hyperref Info: Option `unicode' set `true' on input line 104.
-Package hyperref Info: Option `breaklinks' set `true' on input line 105.
+Package hyperref Info: Option `unicode' set `true' on input line 105.
+Package hyperref Info: Option `breaklinks' set `true' on input line 106.
 
 \@input{macros.aux}
 \openout2 = `macros.aux'.
 
 (macros.tex
-\c@thm=\count140
-\c@defn=\count141
-) (thesis.aux (title.aux) (chap01.aux) (chap02.aux) (chap03.aux)
-(chap04.aux
+\c@thm=\count144
+\c@defn=\count145
+) (thesis.aux (title.aux) (chap01.aux) (chap02.aux) (chap03.aux
 
-LaTeX Warning: Label `Table:1' multiply defined.
+LaTeX Warning: Label `Table:shapenetcats' multiply defined.
 
-) (chap05.aux) (chap06.aux) (bibliography.aux))
+) (chap04.aux) (chap05.aux) (chap06.aux) (bibliography.aux))
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 111.
-LaTeX Font Info:    ... okay on input line 111.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 111.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 112.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex/latex/lm\ot1lmr.fd"
@@ -843,16 +859,16 @@ File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 ABD: EveryShipout initializing macros
 ("C:\Program Files\MiKTeX 2.9\tex/context/base/mkii\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count142
+\scratchcounter=\count146
 \scratchdimen=\dimen180
 \scratchbox=\box63
-\nofMPsegments=\count143
-\nofMParguments=\count144
+\nofMPsegments=\count147
+\nofMParguments=\count148
 \everyMPshowfont=\toks44
-\MPscratchCnt=\count145
+\MPscratchCnt=\count149
 \MPscratchDim=\dimen181
-\MPnumerator=\count146
-\makeMPintoPDFobject=\count147
+\MPnumerator=\count150
+\makeMPintoPDFobject=\count151
 \everyMPtoPDFconversion=\toks45
 ) ("C:\Program Files\MiKTeX 2.9\tex/latex/oberdiek\epstopdf-base.sty"
 Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
@@ -868,7 +884,7 @@ G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 456.
 )
 \AtBeginShipoutBox=\box64
-Package hyperref Info: Link coloring OFF on input line 111.
+Package hyperref Info: Link coloring OFF on input line 112.
 
 ("C:\Program Files\MiKTeX 2.9\tex/latex/hyperref\nameref.sty"
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -876,15 +892,15 @@ Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 ("C:\Program Files\MiKTeX 2.9\tex/generic/oberdiek\gettitlestring.sty"
 Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
-\c@section@level=\count148
+\c@section@level=\count152
 )
-LaTeX Info: Redefining \ref on input line 111.
-LaTeX Info: Redefining \pageref on input line 111.
-LaTeX Info: Redefining \nameref on input line 111.
+LaTeX Info: Redefining \ref on input line 112.
+LaTeX Info: Redefining \pageref on input line 112.
+LaTeX Info: Redefining \nameref on input line 112.
 
 (thesis.out) (thesis.out)
-\@outlinefile=\write6
-\openout6 = `thesis.out'.
+\@outlinefile=\write7
+\openout7 = `thesis.out'.
 
 \openout2 = `title.aux'.
 
@@ -941,8 +957,8 @@ Package hyperref Info: Option `pageanchor' set `true' on input line 55.
 ] [3
 
 ]) (thesis.toc)
-\tf@toc=\write7
-\openout7 = `thesis.toc'.
+\tf@toc=\write8
+\openout8 = `thesis.toc'.
 
  [1
 
@@ -994,35 +1010,45 @@ Overfull \hbox (0.50066pt too wide) in paragraph at lines 2--25
 ] [10] (img/voxblock.tex) (img/vrn.tex
 Missing character: There is no ; in font nullfont!
 ) [11] [12] [13]
-[14] [15]) [16]
-\openout2 = `chap04.aux'.
-
- (chap04.tex
-Chapter 4.
-(tables/accuracies.tex
+[14] [15] (tables/shapenet_cats.tex
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `tbp') on input line 1.
 
-)) [17
+) (tables/modelnet_cats.tex
 
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `tbp') on input line 1.
 
+)) [16] [17] [18]
+\openout2 = `chap04.aux'.
 
-] [18]
-\openout2 = `chap05.aux'.
-
- (chap05.tex
-Chapter 5.
+ (chap04.tex
+Chapter 4.
 ) [19
 
 
 
 ]
+\openout2 = `chap05.aux'.
+
+ (chap05.tex
+Chapter 5.
+(tables/accuracies.tex
+
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `tbp') on input line 1.
+
+)) [20
+
+
+
+] [21]
 \openout2 = `chap06.aux'.
 
  (chap06.tex
 Chapter 6.
-) [20
+) [22
 
 
 
@@ -1030,93 +1056,87 @@ Chapter 6.
 \openout2 = `bibliography.aux'.
 
  (bibliography.tex (thesis.bbl
-LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 52.
+LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 13.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex/latex/lm\ot1lmtt.fd"
 File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-Underfull \hbox (badness 1082) in paragraph at lines 23--53
-\OT1/lmr/m/n/12 las Boulanger-Lewandowski, Xavier Bouthillier, Alexan-dre de Br
-ebisson,
- []
-
-[21
-
-
-
-]
-Underfull \hbox (badness 2762) in paragraph at lines 135--140
+Underfull \hbox (badness 2762) in paragraph at lines 89--94
 []\OT1/lmr/m/n/12 Geoffrey Hin-ton, Ni-tish Sri-vas-tava, and Kevin Swer-sky.  
 Neu-ral Net-
  []
 
-[22]
-Underfull \hbox (badness 10000) in paragraph at lines 228--231
+[23
+
+
+
+]
+Underfull \hbox (badness 10000) in paragraph at lines 182--185
 []\OT1/lmr/m/n/12 machrisaa.  tensorflow-vgg.  URL []$\OT1/lmtt/m/n/12 https : 
 / / github . com / machrisaa /
  []
 
-
-Underfull \hbox (badness 1028) in paragraph at lines 278--284
+[24]
+Underfull \hbox (badness 1028) in paragraph at lines 232--238
 []\OT1/lmr/m/n/12 Charles R. Qi, Hao Su, Kaichun Mo, and Leonidas J. Guibas.  P
 oint-
  []
 
-[23]
-Underfull \hbox (badness 2582) in paragraph at lines 295--300
+
+Underfull \hbox (badness 2582) in paragraph at lines 249--254
 \OT1/lmr/m/it/12 [cs]\OT1/lmr/m/n/12 , April 2016.  URL []$\OT1/lmtt/m/n/12 htt
 p : / / arxiv . org / abs / 1604 . 03351$[]\OT1/lmr/m/n/12 .  arXiv:
  []
 
 
-Underfull \hbox (badness 3058) in paragraph at lines 330--336
+Underfull \hbox (badness 3058) in paragraph at lines 284--290
 \OT1/lmr/m/n/12 Multi-view Con-vo-lu-tional Neu-ral Net-works for 3d Shape Reco
 g-ni-tion.
  []
 
-)) [24] (thesis.lof)
-\tf@lof=\write8
-\openout8 = `thesis.lof'.
+[25])) [26] (thesis.lof)
+\tf@lof=\write9
+\openout9 = `thesis.lof'.
 
- [25
+ [27
 
 
 ] (thesis.lot)
-\tf@lot=\write9
-\openout9 = `thesis.lot'.
+\tf@lot=\write10
+\openout10 = `thesis.lot'.
 
- [26
+ [28
 
-] [27
+] [29
 
 ]
 Appendix A.
-[28
+[30
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 159.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 159.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 160.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 160.
  (thesis.aux (title.aux) (chap01.aux) (chap02.aux) (chap03.aux) (chap04.aux) (c
 hap05.aux) (chap06.aux) (bibliography.aux))
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 159.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 159.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 160.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 160.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: 21AF380088C43B03AD8B53788F8D25F9;6104.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 159.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 160.
  ) 
 Here is how much of TeX's memory you used:
- 27144 strings out of 492946
- 491646 string characters out of 3135527
- 584422 words of memory out of 3000000
- 30376 multiletter control sequences out of 15000+200000
+ 27933 strings out of 492946
+ 507799 string characters out of 3135527
+ 602010 words of memory out of 3000000
+ 31144 multiletter control sequences out of 15000+200000
  55149 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,10n,71p,1215b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 55i,10n,71p,1175b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-rmtt.enc}{C:/Program Files
 /MiKTeX 2.9/fonts/enc/dvips/lm/lm-mathit.enc}{C:/Program Files/MiKTeX 2.9/fonts
 /enc/dvips/lm/lm-mathsy.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-
@@ -1131,9 +1151,9 @@ ype1/public/lm/lmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr
  Files/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9
 /fonts/type1/public/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
 c/lm/lmtt12.pfb>
-Output written on thesis.pdf (32 pages, 664508 bytes).
+Output written on thesis.pdf (34 pages, 666309 bytes).
 PDF statistics:
- 651 PDF objects out of 1000 (max. 8388607)
- 116 named destinations out of 1000 (max. 500000)
+ 662 PDF objects out of 1000 (max. 8388607)
+ 120 named destinations out of 1000 (max. 500000)
  326 words of extra memory for PDF output out of 10000 (max. 10000000)
 

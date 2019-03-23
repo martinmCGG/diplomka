@@ -24,14 +24,14 @@
 \contentsline {subsection}{\numberline {3.3.2}Self-Organizing Network}{15}{subsection.3.3.2}% 
 \contentsline {subsection}{\numberline {3.3.3}KD Network}{16}{subsection.3.3.3}% 
 \contentsline {subsection}{\numberline {3.3.4}Graph Based Convolutional Network}{16}{subsection.3.3.4}% 
-\contentsline {chapter}{\numberline {4}Methods}{17}{chapter.4}% 
-\contentsline {chapter}{\numberline {5}Experiments and Results}{19}{chapter.5}% 
-\contentsline {chapter}{\numberline {6}Conclusions}{20}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}Summary}{20}{section.6.1}% 
-\contentsline {section}{\numberline {6.2}Further Work}{20}{section.6.2}% 
-\contentsline {chapter}{Bibliography}{21}{chapter*.2}% 
-\contentsline {chapter}{List of Figures}{25}{chapter*.3}% 
-\contentsline {chapter}{List of Tables}{26}{chapter*.4}% 
-\contentsline {chapter}{List of Abbreviations}{27}{chapter*.5}% 
-\contentsline {chapter}{\numberline {A}Attachments}{28}{appendix.A}% 
-\contentsline {section}{\numberline {A.1}First Attachment}{28}{section.A.1}% 
+\contentsline {chapter}{\numberline {4}Methods}{19}{chapter.4}% 
+\contentsline {chapter}{\numberline {5}Experiments and Results}{20}{chapter.5}% 
+\contentsline {chapter}{\numberline {6}Conclusions}{22}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Summary}{22}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Further Work}{22}{section.6.2}% 
+\contentsline {chapter}{Bibliography}{23}{chapter*.2}% 
+\contentsline {chapter}{List of Figures}{27}{chapter*.3}% 
+\contentsline {chapter}{List of Tables}{28}{chapter*.4}% 
+\contentsline {chapter}{List of Abbreviations}{29}{chapter*.5}% 
+\contentsline {chapter}{\numberline {A}Attachments}{30}{appendix.A}% 
+\contentsline {section}{\numberline {A.1}First Attachment}{30}{section.A.1}% 

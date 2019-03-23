@@ -70,3 +70,6 @@ An implementation in Theano is supplied by the authors which also provides a fra
 
 \subsection{Graph Based Convolutional Network}
 For the completeness’ sake we mention a graph based approach \cite{dominguez_general-purpose_2018}, which constructs a graph from a point cloud. Vertices of the graph are the original points and edges are constructed to the six nearest neighbors and sorted by their direction by some arbitrary sorting. Then special graph convolutions are applied repeatedly simplifying the structure of the graph and extracting local features. This approach is interesting from theoretical standpoint but the training is very slow and it does not achieve state of the art results.
+
+\input{./tables/shapenet_cats.tex}
+\input{./tables/modelnet_cats.tex}
