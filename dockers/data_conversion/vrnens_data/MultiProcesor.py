@@ -14,6 +14,13 @@ class MultiProcesor:
         self.split = split
         self.dataset = dataset
         
+        if dataset == 'modelnet':
+            from Modelnet import get_file_id
+            self.id = get_file_id
+        elif dataset == 'shapenet':
+            from Shapenet import get_file_id
+            self.id = get_file_id
+            
     def run(self, args):
         size = len(self.files) // self.n_threads
         pool = []
@@ -40,8 +47,8 @@ class MultiProcesor:
             if i>0 and i%logging_frequency == 0:
                 self.log("Thread {} is {}% done.".format(id,float(i)/len(files)*100))
             try:
-                file_id = get_file_id(filename, self.dataset)
-                split_index = get_split(self.split, file_id)
+                file_id = self.id(filename)
+                split_index = self.split[file_id]
                 buffer[split_index].append(self.proccess_function(filename, self.dataset, args))  
                 splitss[split_index]+=1
                 buffer_cats[split_index].append(self.categories[file_id])   
@@ -65,15 +72,5 @@ class MultiProcesor:
             print(message, file = f)
         self.lock.release()
 
-def get_split(split, key):
-    if key in split:
-        return split[key]
-    else:
-        return 0
 
-def get_file_id(file, dataset):
-    if dataset == "shapenet":
-        return file.split('/')[-3]
-    elif dataset == "modelnet":
-        return file.split('/')[-1].split('.')[-2]
     

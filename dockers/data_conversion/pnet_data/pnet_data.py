@@ -42,13 +42,13 @@ if __name__ == '__main__':
         print("STARTING CONVERSION", file = f)
     try:
         if config.dataset_type == "shapenet":
-            files = find_files(config.data, 'obj')
-            categories, split = Shapenet.get_metadata(config.data)
-            Shapenet.write_cat_names(config.data, config.output)
+            from Shapenet import *
         elif config.dataset_type == "modelnet":
-            files = find_files(config.data, 'off')
-            categories, split= Modelnet.get_metadata(config.data, files)
-            Modelnet.write_cat_names(config.data, config.output)
+            from Modelnet import *
+        
+        categories, split, cat_names = get_metadata(config.data)
+        files = get_files_list(config.data, categories)
+        write_cat_names(config.data, config.output)
     except:
         e = sys.exc_info()
         with open(config.log_file, 'a') as f:

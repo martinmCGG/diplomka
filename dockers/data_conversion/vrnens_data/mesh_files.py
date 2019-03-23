@@ -5,7 +5,6 @@ from pathlib import Path
 
 def find_files(directory,extension):
     print("Scanning for files...")
-
     ext_files = []
     for folder, subs, files in os.walk(directory):
         for filename in files:

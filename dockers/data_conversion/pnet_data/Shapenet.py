@@ -4,34 +4,48 @@ import json
 import numpy as np
 from mesh_files import find_files
 
+decoding ={
+    0:'train',
+    1:'test'
+    }
 
-def parse_shapenet_split(csv_file):
+def parse_shapenet_split(csv_file, categories):
     split = {}
     coding = {
         'train':0,
         'test':1,
-        'val':1
+        'val':0
         }
+    telephones = 0
     with open(csv_file, 'r') as f:
         f.readline()
         for line in f:
             splited = line.strip().split(',')
-            split[splited[-2]] = coding[splited[-1]]
+            id = splited[-2]
+            dataset = coding[splited[-1]]
+            if categories[id] != 50 or dataset == 0:
+                split[id] = dataset
+            elif telephones < 150 and dataset == 1:
+                telephones+=1
+                split[id] = 0
+            else:
+                split[id] = dataset
     return split
 
 
 def get_shapenet_labels(root_dir):
-    categories = {}
+    categories = {}    
     dirs = sorted([f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir,f))])
-    for i in range(len(dirs)):
-        directory = os.path.join(root_dir, dirs[i])
+    for i, dir in enumerate(dirs):
+        directory = os.path.join(root_dir, dir)
         ids = os.listdir(directory)
         for id in ids:
-            categories[id] = i
+            if id not in categories:
+                categories[id] = i
     return categories
         
 
-def get_cat_names(root_dir):
+def get_cat_names(root_dir, return_dirnames=False):
     jsonfile = os.path.join(root_dir, 'taxonomy.json')
     cat_names = []
     dirs = sorted([f for f in os.listdir(root_dir) if os.path.isdir(os.path.join(root_dir,f))])
@@ -42,7 +56,11 @@ def get_cat_names(root_dir):
                 if dato['synsetId'] == dir:
                     cat_names.append(dato['name'].split(',')[0])
     cat_names = [name.replace(' ', '_') for name in cat_names]
-    return cat_names
+    if not return_dirnames:
+        return cat_names
+    else:
+        return cat_names, dirs
+
 
 def write_cat_names(root_dir, dest):
     with open(os.path.join(dest, "cat_names.txt"), 'w') as f:
@@ -52,12 +70,64 @@ def write_cat_names(root_dir, dest):
             
 
 def get_metadata(shapenet_root_dir):
-    splitfile = os.path.join(shapenet_root_dir, 'all.csv')
-    split = parse_shapenet_split(splitfile)
     categories = get_shapenet_labels(shapenet_root_dir)
+    splitfile = os.path.join(shapenet_root_dir, 'all.csv')
+    split = parse_shapenet_split(splitfile, categories)
+    for id in categories.keys():
+        if id not in split:
+            split[id] = 0
     cat_names = get_cat_names(shapenet_root_dir)
-    return categories, split
+    return categories, split, cat_names
 
+def get_file_id(file):
+    return file.split('/')[-3]
 
+def get_files_list(root_dir, categories):
+    files = find_files(root_dir, 'obj')
+    _, dirnames = get_cat_names(root_dir, return_dirnames=True)
+    newfiles = []
+    for file in files:
+        id = get_file_id(file)
+        cat = categories[id]
+        if file.split('/')[-4] == dirnames[cat]:
+            newfiles.append(file)
+    return newfiles
     
-
+if __name__ == "__main__":
+    categories, split, _ = get_metadata('/dataset')
+    files = get_files_list('/dataset', categories)
+    print('ALL files ',len(files))
+    cat_names, dirnames = get_cat_names('/dataset', return_dirnames=True)
+    total = 0
+    a = {0:0, 1:0,2:0}
+    for key in split.keys():
+        a[split[key]] +=1
+        total+=1
+    cat_count_train = {}
+    cat_count_test = {}
+    cat_counts = [cat_count_train, cat_count_test]
+    for cat in range(len(cat_names)):
+        for j in [0,1]:
+            cat_counts[j][cat] = 0
+        
+    for file in files:
+        id = get_file_id(file)
+        cat_counts[split[id]][categories[id]]+=1 
+        
+    with open('/dataset/shapenetsummary.csv', 'w') as f:
+        print('Category & Train & Test \\\\', file=f)
+        for i,cat in enumerate(cat_names):
+            trct = cat_counts[0][i]
+            tect = cat_counts[1][i]
+            print("{} & {} & {} \\\\".format(cat.replace('_',' '),trct,tect), file=f)
+        print('Total & {} & {} \\\\'.format(len(files)-a[1], a[1]), file=f)
+    
+    with open('/dataset/shapenetsplit.csv', 'w') as f:
+        print('ID,Dataset,Category,Category ID', file=f)
+        for file in files:
+            id = get_file_id(file)
+            cat = categories[id]
+            print('{},{},{},{}'.format(id,decoding[split[id]], cat, cat_names[cat]), file=f)
+            
+        
+    

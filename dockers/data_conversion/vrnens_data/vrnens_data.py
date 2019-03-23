@@ -4,13 +4,11 @@ import os
 import sys
 import math
 from mesh_to_volume import mesh_to_voxel_array
-from mesh_files import find_files
-import Shapenet
-import Modelnet
 
 from MultiProcesor import MultiProcesor
 from npz_join import join_npz
 from config import get_config, add_to_config
+from tty import IFLAG
 
 def write_for_vrnens(buffer, buffer_cats, dataset, id, config):
     features = np.array(buffer)
@@ -52,15 +50,16 @@ if __name__ == '__main__':
     try:
         ROT_MATRIX = create_ROT_MATRIX(config.num_rotations)
         config = add_to_config(config,'matrix', ROT_MATRIX)
-
+        
         if config.dataset_type == "shapenet":
-            files = find_files(config.data, 'obj')
-            categories, split = Shapenet.get_metadata(config.data)
-            Shapenet.write_cat_names(config.data, config.output)
+            from Shapenet import *
         elif config.dataset_type == "modelnet":
-            files = find_files(config.data, 'off')
-            categories, split= Modelnet.get_metadata(config.data, files)
-            Modelnet.write_cat_names(config.data, config.output)
+            from Modelnet import *
+        
+        categories, split, cat_names = get_metadata(config.data)
+        files = get_files_list(config.data, categories)
+        write_cat_names(config.data, config.output)
+        
     except:
         e = sys.exc_info()
         with open(config.log_file, 'a') as f:
