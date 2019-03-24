@@ -24,13 +24,13 @@ The code is made to work with ModelNet40 and ShapeNetCore datasets. The easiest 
 
     *   Get the dataset [here](http://modelnet.cs.princeton.edu/). For experiments we used manually aligned version which can be downloaded [here](https://github.com/lmb-freiburg/orion).
 
-*   Unpack the downloaded archive and you are ready to go!
+	*   Unpack the downloaded archive and you are ready to go!
 
 *  ###  ShapeNetCore
 
-*   Get the dataset [here](https://www.shapenet.org/download/shapenetcore). You need to register and wait for confirmation email.
-*   Unpack the downloaded archive.
-*   Download official dataset split [here](http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv) and copy it to the root directory of the dataset.
+	*   Get the dataset [here](https://www.shapenet.org/download/shapenetcore). You need to register and wait for confirmation email.
+	*   Unpack the downloaded archive.
+	*   Download official dataset split [here](http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv) and copy it to the root directory of the dataset.
 
 ## General Setup
 
