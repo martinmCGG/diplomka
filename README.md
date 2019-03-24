@@ -64,7 +64,7 @@ Parameters for data conversion in config.ini file:
 *   num_threads - maximum number of threads to use.
 *   dataset_type -  which dataset is converting. Must be one of modelnet or shapenet currently.
 
-For more detail about individual data conversion scripts, continue [here](conversions.html).
+For more detail about individual data conversion scripts, continue [here](conversions.md).
 
 ## Neural Networks
 
@@ -86,7 +86,7 @@ Parameters common to all neural networks:
 
 *   test - if you want to only test already trained network, set this to True. weights parameter has to have a valid value bigger than -1\. Should be False for training.
 
-For more details about individual networks, continue [here](networks.html).
+For more details about individual networks, continue [here](networks.md).
 
 ## Logging and Evaluation
 

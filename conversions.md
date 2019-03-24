@@ -49,4 +49,4 @@ Octree is a data structure for storing 3D data efficiently. This script which us
 
 This script only loads the data and saves them in a large _.h5_ file. Construction of kd-trees which are input of the kd-network is contructed during training.
 
-## [**<<< BACK**](Manual.html)
+## [**<<< BACK**](README.md)
