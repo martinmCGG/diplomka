@@ -26,7 +26,7 @@ The code is made to work with ModelNet40 and ShapeNetCore datasets. The easiest 
 
 *   Unpack the downloaded archive and you are ready to go!
 
-*   ShapeNetCore
+*  ###  ShapeNetCore
 
 *   Get the dataset [here](https://www.shapenet.org/download/shapenetcore). You need to register and wait for confirmation email.
 *   Unpack the downloaded archive.
