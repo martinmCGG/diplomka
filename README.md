@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <title>Manual</title>
-  </head>
-  <body>
+
     <h1>Manual to 3D Classification Survey</h1>
+    
     <h2>Abstract</h2>
     <p>We compiled set of publicly available neural networks for classification
       of 3D models. The code works with ModelNet40 and ShapeNetCore datasets
@@ -17,11 +12,14 @@
       NVIDIA GPU.</p>
     <p>You will need to install:</p>
     <ul>
-      <li>NVIDIA drivers (<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation"
+      <li>NVIDIA drivers (<a href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html#package-manager-installation"
+
           target="_blank">Installation guide here</a>)</li>
-      <li>Docker version 1.12 or higher (<a href="https://docs.docker.com/install/"
+      <li>Docker version 1.12 or higher (<a href="https://docs.docker.com/install/"
+
           target="_blank">Installation guide here</a>)</li>
-      <li>NVIDIA Container Runtime for Docker (<a href="https://github.com/NVIDIA/nvidia-docker"
+      <li>NVIDIA Container Runtime for Docker (<a href="https://github.com/NVIDIA/nvidia-docker"
+
           target="_blank">Installation guide here</a>)</li>
     </ul>
     <p>And that is all! Each neural network is an independent Docker image and
@@ -50,20 +48,24 @@
     <ul>
       <li>ShapeNetCore</li>
       <ul>
-        <li>Get the dataset <a href="https://www.shapenet.org/download/shapenetcore"
+        <li>Get the dataset <a href="https://www.shapenet.org/download/shapenetcore"
+
             target="_blank">here</a>. You need to register and wait for
           confirmation email.</li>
         <li>Unpack the downloaded archive.</li>
-        <li>Download official dataset split <a href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv"
+        <li>Download official dataset split <a href="http://shapenet.cs.stanford.edu/shapenet/obj-zip/SHREC16/all.csv"
+
             target="_blank">here</a> and copy it to the root directory of the
           dataset.</li>
       </ul>
     </ul>
     <h2>General Setup</h2>
-    <p>You can download all the code from Github <a href="https://github.com/Alobal123/diplomka"
+    <p>You can download all the code from Github <a href="https://github.com/Alobal123/diplomka"
+
         target="_blank">here</a>.</p>
     <p>Each network is implemented as a separate Docker image. To learn more
-      about Docker, images and containers visit <a href="https://docs.docker.com/get-started/"
+      about Docker, images and containers visit <a href="https://docs.docker.com/get-started/"
+
         target="_blank">this page</a>.</p>
     <p>Each neural network is contained in one directory in /dockers. None of
       the networks accepts mesh files as their input directly, so some data
@@ -97,7 +99,8 @@
       <li>docker_hidden - Must be one of t or d. With t the container will be
         run in interactive mode, meaning it will run in your console. With d it
         will in detached mode i.e. in the background. For more information check
-        docker documentation <a href="https://docs.docker.com/engine/reference/run/"
+        docker documentation <a href="https://docs.docker.com/engine/reference/run/"
+
           target="_blank">here</a>.</li>
     </ul>
     <p>config.ini contains most of the relevant parameters of the network or
@@ -123,7 +126,8 @@
       <li>dataset_type -&nbsp; which dataset is converting. Must be one of
         modelnet or shapenet currently.</li>
     </ul>
-    <p>For more detail about individual data conversion scripts, continue <a href="conversions.html"
+    <p>For more detail about individual data conversion scripts, continue <a href="conversions.html"
+
         target="_top">here</a>.</p>
     <h2>Neural Networks</h2>
     <p>Each of the neural networks is implemented in python but in different
@@ -160,7 +164,8 @@
         True. weights parameter has to have a valid value bigger than -1. Should
         be False for training. </li>
     </ul>
-    <p>For more details about individual networks, continue <a href="networks.html"
+    <p>For more details about individual networks, continue <a href="networks.html"
+
         target="_top">here</a>.</p>
     <h2>Logging and Evaluation</h2>
     <p>Our framework offers some basic logging options. It saves several .csv to
@@ -175,5 +180,4 @@
     <p><br>
     </p>
     <p> </p>
-  </body>
-</html>
+
