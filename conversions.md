@@ -49,4 +49,4 @@ Networks: dockers/pointnet, dockers/kdnet
 
 This script only loads the data and saves them in a large .h5 file. Construction of kd-trees which are input of the kd-network is contructed during training.
 
-## [<<< BACK](Manual.html)
+## [<<< BACK](README.md)
