@@ -1,5 +1,7 @@
+# Start with cudnn base image
 FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
 
+# Install basic utilities, python, and python libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         ca-certificates \
@@ -30,33 +32,39 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zip && \
     rm -rf /var/lib/apt/lists/*
 
+# Install pip
 RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     python get-pip.py && \
         rm get-pip.py
 
+# Install scikit and cython
 RUN pip --no-cache-dir install \
         scikit-build \
         Cython
 
+# Set environment variables
 ENV WORKSPACE=/workspace
 ENV PATH="${WORKSPACE}/bin:${PATH}"
 ARG WORKSPACE_BIN=$WORKSPACE/bin
 WORKDIR $WORKSPACE_BIN
-
 ARG OCNN_ROOT=$WORKSPACE/ocnn
 WORKDIR $OCNN_ROOT
 
+# Download original code
 ARG OCNN_COMMIT=origin
 RUN git clone https://github.com/Microsoft/O-CNN.git . && git reset --hard $OCNN_COMMIT
 
+# Build network
 RUN cd ocnn/octree && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DOUTPUT_DIRECTORY=$WORKSPACE_BIN .. && \
     make && cd ../ && rm -rf build
 
+# Install libraries for multigpu training
 ARG NCCL_COMMIT=286916a1a37ca1fe8cd43e280f5c42ec29569fc5
 WORKDIR $WORKSPACE
 RUN git clone https://github.com/NVIDIA/nccl.git && cd nccl && git reset --hard $NCCL_COMMIT && \
     make -j install && cd .. && rm -rf nccl
 
+# Install caffe
 ENV CAFFE_ROOT=/opt/caffe
 WORKDIR $CAFFE_ROOT
 ARG CAFFE_COMMIT=6bfc5ca8f7c2a4b7de09dfe7a01cf9d3470d22b3
@@ -69,6 +77,7 @@ RUN git clone https://github.com/BVLC/caffe.git . && git reset --hard $CAFFE_COM
     mkdir $CAFFE_ROOT/include/caffe/proto && \
     cp $CAFFE_ROOT/build/include/caffe/proto/caffe.pb.h $CAFFE_ROOT/include/caffe/proto/caffe.pb.h
 
+# Prepare newtrok for use 
 WORKDIR $OCNN_ROOT
 RUN cd ocnn/octree && pip install . && cd ../caffe && pip install .
 
@@ -81,13 +90,17 @@ RUN cd virtual_scanner && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Re
     cp virtualscanner $WORKSPACE_BIN && cd ../ && rm -rf build && \
     pip install .
 
+# set caffe related environment variables
 ENV PYCAFFE_ROOT $CAFFE_ROOT/python
 ENV PYTHONPATH $PYCAFFE_ROOT:$PYTHONPATH
 ENV PATH $CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
 RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
+# Install additional python librarires
 RUN pip install --upgrade pip    
 RUN pip install pathlib matplotlib pandas lmdb
+
+# Copy changed code
 WORKDIR /workspace
 RUN mkdir logs
 COPY examples ./

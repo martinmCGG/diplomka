@@ -62,9 +62,12 @@ RUN pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
 # Set up .theanorc for CUDA
 RUN echo "[global]\ndevice=cuda\nfloatX=float32\noptimizer_including=cudnn\n[lib]\ncnmem=0.1\n[nvcc]\nfastmath=True\n[dnn]\nenabled=True\ninclude_path=/usr/local/cuda/include\nlibrary_path=/usr/local/cuda/lib64" > /root/.theanorc
 
+# Download original code
 RUN git clone https://github.com/ajbrock/Generative-and-Discriminative-Voxel-Modeling.git
 RUN mv Generative-and-Discriminative-Voxel-Modeling vrnens
 RUN git clone https://github.com/dimatura/voxnet.git
+
+# Copy changed code
 WORKDIR vrnens
 COPY *.py Discriminative/
 RUN mv Discriminative/layers.py /voxnet/voxnet

@@ -9,7 +9,7 @@ docker_hidden=t
 
 ##########################################################################################################
 
-mkdir -r "$out_path"
+mkdir "$out_path"
 docker build -t "$name" .
 docker kill "$name"
 docker rm "$name"

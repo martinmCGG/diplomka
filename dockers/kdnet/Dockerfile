@@ -17,12 +17,10 @@ RUN apt-get update && apt-get install -y \
   
 # Remove OS-installed six
 RUN rm /usr/lib/python2.7/dist-packages/six*
+
+#Install required python libraries
 RUN pip install --upgrade pip
-RUN pip install numpy
-RUN pip install scipy
-RUN pip install matplotlib
-RUN pip install pandas
-RUN pip install h5py
+RUN pip install numpy scipy matplotlib pandas h5py
 
 # Set CUDA_ROOT
 ENV CUDA_ROOT /usr/local/cuda/bin
@@ -62,10 +60,12 @@ RUN pip install --upgrade https://github.com/Lasagne/Lasagne/archive/master.zip
 # Set up .theanorc for CUDA
 RUN echo "[global]\ndevice=cuda\nfloatX=float32\noptimizer_including=cudnn\n[lib]\ncnmem=0.1\n[nvcc]\nfastmath=True\n[dnn]\nenabled=True\ninclude_path=/usr/local/cuda/include\nlibrary_path=/usr/local/cuda/lib64" > /root/.theanorc
 
+#Download kdnetwork
 RUN git clone https://github.com/Regenerator/kdnets.git
 
 WORKDIR kdnets
 RUN mkdir logs
+#Copy changed code
 COPY *.py ./
 COPY *.ini ./
 

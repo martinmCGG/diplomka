@@ -146,7 +146,7 @@ def train(train_data, test_data, config):
                 accs.append(acc)
                 losses.append(loss)
                 
-                if it%50 == 0:
+                if i % max(config.train_log_frq/config.batch_size,1) == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accs)
                     print("TRAINING epoch: {} it: {}  loss: {} acc: {} ".format(epoch,it, loss, acc))
