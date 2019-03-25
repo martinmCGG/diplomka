@@ -23,7 +23,7 @@ def mesh_to_point_cloud(points, triangles, n, normal=False):
     v[is_outside] = 1 - v[is_outside]
     w = 1 - (u+v)
     xs = chosen_points[:, 0 ,:] * u
-    ys = chosen_points [:, 1, :] *v
+    ys = chosen_points [:, 1, :] * v
     zs = chosen_points[:, 2, :] * w
     
     if normals: 

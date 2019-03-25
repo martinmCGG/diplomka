@@ -1,10 +1,10 @@
 ##########################################################################################################
 # Set required variables
 
-name="pbrt2"
+name="pbrt"
 dataset_path="/local/krabec/ModelNet40A/ModelNet40A"
 output_dir="/local/krabec/ModelNet40A"
-docker_hidden=t
+docker_hidden=d
 
 ##########################################################################################################
 
