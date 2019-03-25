@@ -2,7 +2,7 @@
 # Set required variables
 
 name="pbrt2"
-dataset_path="/local/krabec/ModelNet40A/pbrt"
+dataset_path="/local/krabec/ModelNet40A/ModelNet40A"
 output_dir="/local/krabec/ModelNet40A"
 docker_hidden=t
 
@@ -17,7 +17,6 @@ docker kill "$image_name"
 docker rm "$image_name"
 
 docker run --rm -id --name "$image_name" -v "$dataset_path":/dataset -v "$output_dir":/data "$image_name"
-#docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 mvcnn_data.py"
-docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 convert.py"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 mvcnn_data.py"
 
 ##########################################################################################################

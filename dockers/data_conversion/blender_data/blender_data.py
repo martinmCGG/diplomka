@@ -3,11 +3,8 @@ import os
 import sys
 
 sys.path.append("/blender_scripts")
-
-import Shapenet
-import Modelnet
 from multiprocessing import Process, Pool, Lock
-from pathlib import Path
+
 from mesh_files import *
 from blender_scripts import *
 from config import get_config, add_to_config
@@ -17,17 +14,16 @@ coding = {
     1:'test'
     }
 
-def get_name_of_txt_file(output_dir, cat, dataset, file_id):
-    return os.path.join(output_dir , cat, dataset, file_id, file_id + ".txt")
+def get_name_of_txt_file(output_dir, cat_name, dataset, file_id):
+    return os.path.join(output_dir , cat_name, dataset, file_id, file_id + ".txt")
     
 def render_model(obj_file, id, file_id, views, output_dir, cat, dataset, cat_name):
-    
     
     whole_path = os.path.join(output_dir, cat_name, dataset, file_id)
     os.system("mkdir -m 777 \"{}\"".format(whole_path))
     render_one_model(obj_file, file_id, whole_path, nviews=views)
     
-    with open(get_name_of_txt_file(output_dir ,cat, dataset, file_id), 'w') as f:
+    with open(get_name_of_txt_file(output_dir ,cat_name, dataset, file_id), 'w') as f:
         print(cat, file=f)
         print(views, file=f)
         for view in range(views):
@@ -42,17 +38,10 @@ def files_to_images(files, id, config, categories, split, lock):
         file = files[i]
         if i%100 == 0:
             log("Thread {} is {:.2f}% done.".format(id,float(i)/len(files)*100), lock, config.log_file)
-        #try:
-        file_id = get_file_id(file, config.dataset_type)
-        cat_name = config.cat_names[categories[file_id]]
-        output_dir = config.output
-        render_model(file, id, file_id, views, output_dir, cat_name, coding[get_split(file_id, split)], cat_name)
-        '''except:
-            e = sys.exc_info()
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), lock, config.log_file)
-            log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno), lock, config.log_file)'''
+        file_id = get_file_id(file)
+        cat = categories[file_id]
+        cat_name = config.cat_names[cat]
+        render_model(file, id, file_id, views, output_dir, cat, coding[split[file_id]], cat_name)
     log("Ending thread {}.".format(id), lock, config.log_file)
     
     
@@ -87,22 +76,11 @@ def collect_files(files, split, cats, config):
     for dataset in datasets:
         with open ('{}/{}.txt'.format(config.output, dataset), 'w') as f:
             for file in files:
-                file_id = get_file_id(file, config.dataset_type)
+                file_id = get_file_id(file)
                 cat = categories[file_id]
-                if coding[get_split(file_id, split)] == dataset:
+                if coding[split[file_id]] == dataset:
                     print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat] , dataset , file_id), cat), file = f)
 
-def get_file_id(file, dataset):
-    if dataset == "shapenet":
-        return file.split('/')[-3]
-    elif dataset == "modelnet":
-        return file.split('/')[-1].split('.')[-2]
-
-def get_split(id, split):
-    if id in split:
-        return split[id]
-    else:
-        return 0
     
 def log(message, lock, log):
     lock.acquire()
@@ -116,42 +94,34 @@ if __name__ == '__main__':
     
     with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
-    #try:
-    if config.dataset_type == "shapenet":
-        files = find_files(config.data, 'obj')
-        categories, split = Shapenet.get_metadata(config.data)
-        cat_names = Shapenet.get_cat_names(config.data)
-        Shapenet.write_cat_names(config.data, config.output)
-    elif config.dataset_type == "modelnet":
-        files = find_files(config.data, 'off')
-        categories, split= Modelnet.get_metadata(config.data, files)
-        Modelnet.write_cat_names(config.data, config.output)
-        cat_names = Modelnet.get_cat_names(config.data)
-        pool = Pool(processes=config.num_threads)
-        pool.map(off2obj, files)
-        pool.close()
-        pool.join()
-        files = find_files(config.data, 'obj')
-    config = add_to_config(config,'cat_names', cat_names)
-    '''except: 
+    try:
+        if config.dataset_type == "shapenet":
+            from Shapenet import *
+        elif config.dataset_type == "modelnet":
+            from Modelnet import *
+            
+        categories, split, cat_names = get_metadata(config.data)
+        write_cat_names(config.data, config.output)
+        
+        if config.dataset_type == "shapenet":
+            files = get_files_list(config.data, categories)
+        elif config.dataset_type == "modelnet":
+            files = find_files(config.data, 'off')
+            pool = Pool(processes=config.num_threads)
+            pool.map(off2obj, files)
+            pool.close()
+            pool.join()
+            files = find_files(config.data, 'obj')
+        config = add_to_config(config,'cat_names', cat_names)
+    except: 
         e = sys.exc_info()
         with open(config.log_file, 'a') as f:
             print("Exception occured while reading files.", file=f)
             print("Exception {}".format(e), file=f)
-        sys.exit(1)'''
+        sys.exit(1)
     
-    '''new_files = []
-    for file in files:
-        file_id = get_file_id(file, config.dataset_type)
-        cat_name = config.cat_names[categories[file_id]]
-        output_dir = config.output
-        dataset = coding[get_split(file_id, split)]
-        whole_path = os.path.join(output_dir, cat_name, dataset, file_id)
-        if os.path.isdir(whole_path):
-            new_files.append(file)
-    files = new_files'''
     
-    save_for_mvcnn(config, files, categories,split)
+    save_for_mvcnn(config, files, categories, split)
     collect_files(files, split,categories, config)
     if config.dataset_type == 'modelnet' and config.remove_obj:
         os.system('find {} -name *.obj -delete'.format(config.data))
