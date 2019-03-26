@@ -1,7 +1,7 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces List of examined neural networks.}}{12}{table.3.1}% 
+\contentsline {table}{\numberline {3.1}{\ignorespaces List of examined neural networks. There is a citation of an original paper, a framework of the publicly available code and if we included the network in our testing.}}{12}{table.3.1}% 
 \contentsline {table}{\numberline {3.2}{\ignorespaces List of ShapeNetCore categories and their counts.}}{19}{table.3.2}% 
 \contentsline {table}{\numberline {3.3}{\ignorespaces List of ModelNet40 categories and their counts.}}{20}{table.3.3}% 
 \addvspace {10\p@ }

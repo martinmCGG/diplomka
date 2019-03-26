@@ -41,12 +41,14 @@ Another widely used class of artificial neural networks are \textit{recurrent ne
 Only one of the networks tested uses RNN architecture and techniques described in this section and  so we refer to \cite{goodfellow_deep_2016} for further information. 
 
 \subsection{Regularization}
+\label{sec:regularization}
 Overfitting is a common problem in machine learning. It is a phenomenon when a model represents the training set too well and fails to generalize. To avoid this problem several regularization techniques are employed. We can add regularization directly to the optimized loss function. This is usually implemented by adding some term which keeps the weights of the network in low absolute values. \par
 Dropout \cite{srivastava_dropout:_2014} is a stochastic regularization technique; during training, at every iteration, it randomly selects some nodes and removes them along with all of their incoming and outgoing connections. So each iteration has a different set of nodes and this results in a different set of outputs. It is a very effective technique which can be thought of as training a whole ensemble of networks at once. Dropout is usually applied after each fully connected layer. \par
 Another common way how to avoid overfitting is by increasing the size of the training set by some data augmentation. Specifics of data augmentation depend on the kind of data we are working with, but in general the dataset is increased by creating new instances from the training dataset. For example with image data, we can use geometric transformations such as mirroring, rotating, translating or scaling. \par
 These techniques are standard when training neural network and are employed in one form or another in all the networks we tested.
 
 \subsection{Training}
+\label{sec:training}
 In recent years very deep (tens of layers) neural networks are used. To train such a network several improvements were developed. Mini-batch training is used almost in all cases. The training dataset is divided into small chunks (typically 32 or 64 examples) and one batch is presented, gradient is computed and weights are updated correspondingly in each step of the training. This is much more efficient than computing the gradient of the whole dataset and has some positive regularization effects. \par
 For deep networks it is no longer sufficient to use a simple gradient descent algorithm. To speed up and stabilize the training process, algorithms with momentum such as Nesterov momentum \cite{sutskever_importance_2013} has been used. An important hyperparameter of the network is the learning rate, which controls the speed of training. Set the learning rate too small and the network can not learn at all, too big and the weights can diverge. To solve this problem, algorithms with adaptive learning rates, such as 
 RMSProp \cite{hinton_neural_nodate} or ADAM \cite{kingma_adam:_2014}, are used. \par
