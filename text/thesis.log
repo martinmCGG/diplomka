@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  25 MAR 2019 16:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  26 MAR 2019 14:41
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -903,7 +903,7 @@ LaTeX Info: Redefining \nameref on input line 112.
 
  (title.tex
 Package hyperref Info: Option `pageanchor' set `false' on input line 6.
-<./img/logo-en.pdf, id=157, 506.4591pt x 156.49065pt>
+<./img/logo-en.pdf, id=161, 506.4591pt x 156.49065pt>
 File: ./img/logo-en.pdf Graphic file (type pdf)
 <use ./img/logo-en.pdf>
 Package pdftex.def Info: ./img/logo-en.pdf  used on input line 9.
@@ -961,15 +961,15 @@ Package hyperref Info: Option `pageanchor' set `true' on input line 55.
 
 
 
-]
+] [2]
 \openout2 = `chap01.aux'.
 
  (chap01.tex
 Chapter 1.
-) [2
+[3
 
 
-] [3]
+]) [4]
 \openout2 = `chap02.aux'.
 
  (chap02.tex
@@ -977,7 +977,7 @@ Chapter 2.
 (img/slp.tex
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
-) [4
+) [5
 
 
 
@@ -985,7 +985,7 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
-) [5] [6] [7]) [8]
+) [6] [7] [8] [9]) [10]
 \openout2 = `chap03.aux'.
 
  (chap03.tex
@@ -1000,14 +1000,14 @@ Overfull \hbox (0.50066pt too wide) in paragraph at lines 2--25
 [][] |
  []
 
-) (img/voxnet.tex) [9
+) (img/voxnet.tex) [11
 
 
 
-] [10] (img/voxblock.tex) (img/vrn.tex
+] [12] (img/voxblock.tex) (img/vrn.tex
 Missing character: There is no ; in font nullfont!
-) [11] [12] [13]
-[14] [15] (tables/shapenet_cats.tex
+) [13] [14]
+[15] [16] [17] (tables/shapenet_cats.tex
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `tbp') on input line 1.
@@ -1017,12 +1017,12 @@ LaTeX Warning: No positions in optional float specifier.
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `tbp') on input line 1.
 
-)) [16] [17] [18]
+)) [18] [19] [20]
 \openout2 = `chap04.aux'.
 
  (chap04.tex
 Chapter 4.
-) [19
+) [21
 
 
 
@@ -1036,16 +1036,16 @@ Chapter 5.
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `tbp') on input line 1.
 
-)) [20
+)) [22
 
 
 
-] [21]
+] [23]
 \openout2 = `chap06.aux'.
 
  (chap06.tex
 Chapter 6.
-) [22
+) [24
 
 
 
@@ -1064,7 +1064,7 @@ Underfull \hbox (badness 2762) in paragraph at lines 89--94
 Neu-ral Net-
  []
 
-[23
+[25
 
 
 
@@ -1074,7 +1074,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 182--185
 / / github . com / machrisaa /
  []
 
-[24]
+[26]
 Underfull \hbox (badness 1028) in paragraph at lines 232--238
 []\OT1/lmr/m/n/12 Charles R. Qi, Hao Su, Kaichun Mo, and Leonidas J. Guibas.  P
 oint-
@@ -1092,24 +1092,24 @@ Underfull \hbox (badness 3058) in paragraph at lines 284--290
 g-ni-tion.
  []
 
-[25])) [26] (thesis.lof)
+[27])) [28] (thesis.lof)
 \tf@lof=\write9
 \openout9 = `thesis.lof'.
 
- [27
+ [29
 
 
 ] (thesis.lot)
 \tf@lot=\write10
 \openout10 = `thesis.lot'.
 
- [28
+ [30
 
-] [29
+] [31
 
 ]
 Appendix A.
-[30
+[32
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 160.
@@ -1119,14 +1119,14 @@ hap05.aux) (chap06.aux) (bibliography.aux))
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 160.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 160.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 21AF380088C43B03AD8B53788F8D25F9;6104.
+(rerunfilecheck)             Checksum: B1CFE096924C06AAC7190AF345D7B697;6147.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 160.
  ) 
 Here is how much of TeX's memory you used:
- 27933 strings out of 492946
- 507799 string characters out of 3135527
- 602043 words of memory out of 3000000
- 31144 multiletter control sequences out of 15000+200000
+ 27937 strings out of 492946
+ 507837 string characters out of 3135527
+ 623866 words of memory out of 3000000
+ 31145 multiletter control sequences out of 15000+200000
  55149 words of font info for 50 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,10n,71p,1175b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1144,9 +1144,9 @@ ype1/public/lm/lmr17.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr
  Files/MiKTeX 2.9/fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9
 /fonts/type1/public/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
 c/lm/lmtt12.pfb>
-Output written on thesis.pdf (34 pages, 666326 bytes).
+Output written on thesis.pdf (36 pages, 667306 bytes).
 PDF statistics:
- 662 PDF objects out of 1000 (max. 8388607)
- 120 named destinations out of 1000 (max. 500000)
- 326 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 676 PDF objects out of 1000 (max. 8388607)
+ 123 named destinations out of 1000 (max. 500000)
+ 334 words of extra memory for PDF output out of 10000 (max. 10000000)
 
