@@ -2,9 +2,9 @@
 # Set required variables
 
 name="pnet"
-dataset_path="/local/krabec/ModelNet10/ModelNet10"
-output_dir="/local/krabec/ModelNet10"
-docker_hidden=t
+dataset_path="/local/krabec/ShapeNet/ShapeNet"
+output_dir="/local/krabec/ShapeNet"
+docker_hidden=d
 
 ##########################################################################################################
 

@@ -9,27 +9,23 @@ decoding ={
     1:'test'
     }
 
-def parse_shapenet_split(csv_file, categories):
+def parse_shapenet_split(root_dir, categories):
+    files = find_files(root_dir,'obj')
     split = {}
     coding = {
         'train':0,
         'test':1,
-        'val':0
         }
-    telephones = 0
-    with open(csv_file, 'r') as f:
-        f.readline()
-        for line in f:
-            splited = line.strip().split(',')
-            id = splited[-2]
-            dataset = coding[splited[-1]]
-            if categories[id] != 50 or dataset == 0:
-                split[id] = dataset
-            elif telephones < 150 and dataset == 1:
-                telephones+=1
-                split[id] = 0
-            else:
-                split[id] = dataset
+    counter = [0]*55
+
+    for file in files:
+        id = get_file_id(file)
+        cat = categories[id]
+        if counter[cat]%10 in [0,5]:
+            split[id] = 1
+        else:
+            split[id]=0
+        counter[cat]+=1
     return split
 
 
@@ -71,16 +67,12 @@ def write_cat_names(root_dir, dest):
 
 def get_metadata(shapenet_root_dir):
     categories = get_shapenet_labels(shapenet_root_dir)
-    splitfile = os.path.join(shapenet_root_dir, 'all.csv')
-    split = parse_shapenet_split(splitfile, categories)
-    for id in categories.keys():
-        if id not in split:
-            split[id] = 0
+    split = parse_shapenet_split(shapenet_root_dir, categories)
     cat_names = get_cat_names(shapenet_root_dir)
     return categories, split, cat_names
 
 def get_file_id(file):
-    return file.split('/')[-3]
+    return file.split(os.sep)[-3]
 
 def get_files_list(root_dir, categories):
     files = find_files(root_dir, 'obj')
@@ -89,14 +81,14 @@ def get_files_list(root_dir, categories):
     for file in files:
         id = get_file_id(file)
         cat = categories[id]
-        if file.split('/')[-4] == dirnames[cat]:
+        if file.split(os.sep)[-4] == dirnames[cat]:
             newfiles.append(file)
     return newfiles
     
 if __name__ == "__main__":
     categories, split, _ = get_metadata('/dataset')
     files = get_files_list('/dataset', categories)
-    print('ALL files ',len(files))
+
     cat_names, dirnames = get_cat_names('/dataset', return_dirnames=True)
     total = 0
     a = {0:0, 1:0,2:0}

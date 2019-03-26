@@ -21,7 +21,7 @@ def get_metadata(root_dir):
     for i in range(len(cats)):
         cats_mapping[cats[i]] = i
     for file in files:
-        splited = file.split('/')
+        splited = file.split(os.sep)
         name = os.path.join(Path(file).stem)
         categories[name] = cats_mapping[splited[-3]]
         split[name] = coding[splited[-2]]
@@ -46,7 +46,7 @@ def get_files_list(root_dir, categories):
     return find_files(root_dir, 'off')
 
 def get_file_id(file):
-    return file.split('/')[-1].split('.')[-2]
+    return file.split(os.sep)[-1].split('.')[-2]
 
 if __name__ == "__main__":
     categories, split, cat_names = get_metadata('/dataset')

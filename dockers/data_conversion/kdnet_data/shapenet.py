@@ -72,7 +72,7 @@ def get_metadata(shapenet_root_dir):
     return categories, split, cat_names
 
 def get_file_id(file):
-    return file.split('/')[-3]
+    return file.split(os.sep)[-3]
 
 def get_files_list(root_dir, categories):
     files = find_files(root_dir, 'obj')
@@ -81,7 +81,7 @@ def get_files_list(root_dir, categories):
     for file in files:
         id = get_file_id(file)
         cat = categories[id]
-        if file.split('/')[-4] == dirnames[cat]:
+        if file.split(os.sep)[-4] == dirnames[cat]:
             newfiles.append(file)
     return newfiles
     

@@ -2,8 +2,8 @@
 # Set required variables
 
 name="pbrt"
-dataset_path="/local/krabec/ModelNet40A/ModelNet40A"
-output_dir="/local/krabec/ModelNet40A"
+dataset_path="/local/krabec/ShapeNet/ShapeNet"
+output_dir="/local/krabec/ShapeNet"
 docker_hidden=d
 
 ##########################################################################################################
