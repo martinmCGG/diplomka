@@ -1,12 +1,23 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Single-layer perceptron}}{6}{figure.2.1}% 
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Multi-layer perceptron}}{6}{figure.2.2}% 
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Single-layer perceptron\relax }}{6}{figure.caption.2}% 
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Multi-layer perceptron\relax }}{6}{figure.caption.3}% 
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces VoxNet architecture}}{12}{figure.3.1}% 
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Example of a simple residual block}}{14}{figure.3.2}% 
-\contentsline {figure}{\numberline {3.3}{\ignorespaces VRN architecture}}{15}{figure.3.3}% 
+\contentsline {figure}{\numberline {3.1}{\ignorespaces VoxNet architecture\relax }}{12}{figure.caption.5}% 
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Example of a simple residual block\relax }}{14}{figure.caption.6}% 
+\contentsline {figure}{\numberline {3.3}{\ignorespaces VRN architecture\relax }}{15}{figure.caption.7}% 
 \addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Illustration of voxel representation\relax }}{24}{figure.caption.12}% 
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Original voxel representation provided by authors of VRN}}}{24}{subfigure.1.1}% 
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Our voxelization using OpenVDB}}}{24}{subfigure.1.2}% 
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Illustration of different image representations\relax }}{25}{figure.caption.13}% 
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Original rendering provided by authors of Rotation Net}}}{25}{subfigure.2.1}% 
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Our pbrt rendering}}}{25}{subfigure.2.2}% 
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {Depth image provided by authors of MVCNN2}}}{25}{subfigure.2.3}% 
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {Shaded image provided by authors of MVCNN2}}}{25}{subfigure.2.4}% 
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Illustration of point cloud representation\relax }}{26}{figure.caption.14}% 
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {Original point cloud representation provided by authors of PointNet}}}{26}{subfigure.3.1}% 
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {Our point cloud representation}}}{26}{subfigure.3.2}% 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
