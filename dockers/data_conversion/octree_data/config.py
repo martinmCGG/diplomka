@@ -36,12 +36,11 @@ class config:
                 self.dictionary[key] = Parse(value)
                 if section == 'ITER_PARAMETERS' and data_size:
                     value = epoch_to_iters(Parse(value), self.dictionary['batch_size'], data_size )
-                    print(key, value)
                     self.dictionary[key] = value
         print(self.dictionary)
     
     def get_named_tuple(self):
-        return namedtuple("config", self.dictionary.keys())(*self.dictionary.values())
+        return dict_to_tuple(self.dictionary)
     
     def prepare_caffe_files(self,file):
         newfile = []
@@ -66,6 +65,10 @@ def prepare_solver_file(ini_file = 'config.ini', data_size=0):
     cfg = config(ini_file, data_size=data_size)
     solver = cfg.get_named_tuple().solver
     cfg.prepare_caffe_files(solver)
+    
+def dict_to_tuple(dict):
+    return namedtuple("config", dict.keys())(*dict.values())
+ 
 def add_to_config(config, key, value):
     new_dict = config._asdict()
     new_dict[key] = value

@@ -1,6 +1,7 @@
 from __future__ import print_function
 from multiprocessing import Process, Lock
 import sys, os
+from config import dict_to_tuple
 
 class MultiProcesor:
     def __init__(self, files, n_threads, log_file, categories, split, dataset, proccess_function, write_function):
@@ -21,21 +22,22 @@ class MultiProcesor:
             from Shapenet import get_file_id
             self.id = get_file_id
             
-    def run(self, args):
+    def run(self, arguments):
         size = len(self.files) // self.n_threads
         pool = []
         for i in range(self.n_threads-1):
-            p = Process(target=self.run_conversion, args=(self.files[i*size:(i+1)*size], i, args))
+            p = Process(target=self.run_conversion, args=(self.files[i*size:(i+1)*size], i, arguments))
             p.start()
             pool.append(p)
         if self.files[(self.n_threads-1)*size:]:
-            p = Process(target=self.run_conversion, args=(self.files[(self.n_threads-1)*size:], self.n_threads-1, args))
+            p = Process(target=self.run_conversion, args=(self.files[(self.n_threads-1)*size:], self.n_threads-1, arguments))
             p.start()
             pool.append(p)
         for p in pool:
             p.join()
       
     def run_conversion(self, files, id, args):
+        args = dict_to_tuple(args)
         datasets = ["train","test"]
         self.log("Starting thread {} on {} files.".format(id, len(files)))
         buffer = [[] for _ in range(len(datasets))]

@@ -2,8 +2,6 @@ from __future__ import print_function
 import numpy as np
 from random import shuffle
 from mesh_files import find_files
-import Shapenet
-import Modelnet
 from mesh_to_pointcloud import file_to_pointcloud
 from MultiProcesor import MultiProcesor
 import h5py 
@@ -16,7 +14,7 @@ DATASETS = ['train', 'test', 'val']
 
 def save_for_pnet(config, files, categories, split):
     procesor = MultiProcesor(files, config.num_threads, config.log_file, categories, split, config.dataset_type, file_to_pointcloud, write_for_pnet)
-    procesor.run(config)
+    procesor.run(config._asdict())
 
 def write_for_pnet(buffer, buffer_cats, dataset, id, config):
     h5f = h5py.File(os.path.join(config.output,"{}_{}.h5".format(dataset,id)), 'w')
@@ -34,7 +32,9 @@ def collect_files(dest):
             for file in files:
                 if file.split('_')[0] == dataset:
                     print(os.path.join(dest,file),file=f)
-    
+ 
+
+   
 if __name__ == '__main__':
   
     config = get_config()
