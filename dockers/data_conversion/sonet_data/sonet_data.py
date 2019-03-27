@@ -8,8 +8,6 @@ import os.path
 import numpy as np
 import struct
 import math
-import Shapenet
-import Modelnet
 import torch
 import torchvision
 import h5py 
@@ -30,7 +28,7 @@ DATASETS = ['train', 'test', 'val']
 
 def save_for_sonet(config, files, categories, split):
     procesor = MultiProcesor(files, config.num_threads, config.log_file, categories, split, config.dataset_type, file_to_pointcloud, write_for_sonet)
-    procesor.run(config)
+    procesor.run(config._asdict())
     
 
 def write_for_sonet(buffer, buffer_cats, dataset, id, config):
@@ -70,8 +68,6 @@ def add_soms(config):
                 h5file.create_dataset('label', data=labels)
                 h5file.create_dataset('som', data=soms)                
                 h5file.close()
-                
-                
     
 def som_one_cloud(data, som_builder):
     pc_np = data[:, 0:3]
@@ -111,5 +107,5 @@ if __name__ == '__main__':
     save_for_sonet(config, files, categories, split)
     collect_files(config.output)
     print("Starting soma")
-    add_soms(config.output)
+    add_soms(config)
     

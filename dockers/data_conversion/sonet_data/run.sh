@@ -2,10 +2,10 @@
 # Set required variables
 
 name="sonet"
-dataset_path="/local/krabec/ShapeNet"
-output_dir="/home/krabec"
+dataset_path="/local/krabec/ShapeNet/ShapeNet"
+output_dir="/local/krabec/ShapeNet"
 GPU=2
-docker_hidden=t
+docker_hidden=d	
 
 ##########################################################################################################
 

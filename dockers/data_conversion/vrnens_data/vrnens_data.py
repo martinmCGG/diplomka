@@ -23,7 +23,7 @@ def write_for_vrnens(buffer, buffer_cats, dataset, id, config):
 
 def save_for_VRNENS(config, categories, split, files):
     procesor = MultiProcesor(files, config.num_threads, config.log_file, categories, split, config.dataset_type, mesh_to_voxel_array, write_for_vrnens)
-    procesor.run(config)
+    procesor.run(config._asdict())
         
 def create_ROT_MATRIX(rotation):
     angle = math.pi/180 * 360/rotation

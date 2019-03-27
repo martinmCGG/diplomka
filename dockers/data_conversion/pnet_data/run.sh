@@ -4,7 +4,7 @@
 name="pnet"
 dataset_path="/local/krabec/ShapeNet/ShapeNet"
 output_dir="/local/krabec/ShapeNet"
-docker_hidden=d
+docker_hidden=t
 
 ##########################################################################################################
 
