@@ -41,8 +41,8 @@ In order to use voxel based systems we need to convert mesh files to voxel occup
 \end{figure}
 
 \subsection{Mesh to Images}
-For multi-view based neural network we have to be able to render images taken from arbitrary viewpoints of a 3D mesh. Firstly we tried to replicate results used by the authors of RotationNet \cite{kanezaki_rotationnet:_2016} and we used pbrt \cite{pharr_physically_2010}, which is physically based rendering software with publicly available code. This turned out to be a plausible approach. 
-Later in our research we found blender scripts from the authors of MVCNN2 \cite{su_deeper_2018}. These work faster and achieve better accuracy than both ours and original RotationNet images. In our framework we provide both approaches implemented with python scripts and multiprocessing support. 
+For multi-view based neural network we have to be able to render images taken from arbitrary viewpoints of a 3D mesh. Firstly we tried to replicate results used by the authors of MVCNN \cite{su_multi-view_2015} and we used pbrt \cite{pharr_physically_2010}, which is physically based rendering software with publicly available code. This turned out to be a plausible approach. 
+Later in our research we found blender scripts from the authors of MVCNN2 \cite{su_deeper_2018}. These work faster and achieve better accuracy than both ours and original MVCNN images. In our framework we provide both approaches implemented with python scripts and multiprocessing support. 
 
 \begin{figure}[!h]
 	\centering

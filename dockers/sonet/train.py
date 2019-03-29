@@ -109,20 +109,23 @@ def test(model, config, best_accuracy=0, epoch=None):
         batch_amount += input_label.size()[0]
         model.test_loss += model.loss.detach() * input_label.size()[0]
 
-        # # accumulate accuracy
+        # accumulate accuracy
         _, predicted_idx = torch.max(model.score.data, dim=1, keepdim=False)
         predictions += list(predicted_idx)
         labels += list(input_label)
+        
         correct_mask = torch.eq(predicted_idx, model.input_label).float()
         test_accuracy = torch.mean(correct_mask).cpu()
+        
         model.test_accuracy += test_accuracy * input_label.size()[0]
-
+        
     model.test_loss /= batch_amount
     model.test_accuracy /= batch_amount
-    
+
     if config.test:
         predictions = [x.item() for x in predictions]
         labels = [x.item() for x in labels]
+        #print(sum([0 if abs(predictions[i] - labels[i]) else 1 for i in range(len(predictions))]) / 2648.0)
         import Evaluation_tools as et
         eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
         et.write_eval_file(config.data, eval_file, predictions, labels, config.name)

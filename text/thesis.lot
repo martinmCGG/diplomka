@@ -11,5 +11,6 @@
 \contentsline {table}{\numberline {5.1}{\ignorespaces List of ModelNet40 accuracies.\relax }}{28}{table.caption.15}% 
 \contentsline {table}{\numberline {5.2}{\ignorespaces Comparison of multi-view methods.\relax }}{28}{table.caption.16}% 
 \contentsline {table}{\numberline {5.3}{\ignorespaces Table of approximate training times on ModelNet40.\relax }}{29}{table.caption.17}% 
+\contentsline {table}{\numberline {5.4}{\ignorespaces Approximate sizes of saved models, which roughly corresponds to number of trainable parameters of the model.\relax }}{29}{table.caption.18}% 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
