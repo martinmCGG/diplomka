@@ -14,7 +14,7 @@ sys.path.append(os.path.join(BASE_DIR, 'utils'))
 import provider
 import tf_util
 from Logger import Logger
-from config import get_config
+from config import get_config, add_to_config
 
 config = get_config()
 
@@ -128,7 +128,9 @@ def train(config):
                'train_op': train_op,
                'step': batch}
         
-        for epoch in range(start_epoch, config.max_epoch+start_epoch+1):
+        begin = start_epoch
+        end = config.max_epoch+start_epoch
+        for epoch in range(begin, end+1):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
             
@@ -141,9 +143,10 @@ def train(config):
             LOSS_LOGGER.plot(dest=LOG_DIR)
             
             # Save the variables to disk.
-            if epoch % config.save_period == 0:
+            if epoch % config.save_period == 0 or epoch == end:
                 checkpoint_path = os.path.join(config.log_dir, config.snapshot_prefix+str(epoch))
                 saver.save(sess, checkpoint_path)
+            
 
 def train_one_epoch(config, sess, ops,epoch):
     """ ops: dict mapping from string to tf ops """
@@ -194,7 +197,7 @@ def train_one_epoch(config, sess, ops,epoch):
 def eval_one_epoch(config, sess, ops, epoch=0):
     is_training = False
     num_votes = config.num_votes
-    total_correct = 0
+
     total_seen = 0
     loss_sum = 0
     predictions = []
@@ -243,18 +246,18 @@ def eval_one_epoch(config, sess, ops, epoch=0):
                 batch_loss_sum += (loss_val * cur_batch_size / float(num_votes))
 
             pred_val = np.argmax(batch_pred_sum, 1)
-            correct = np.sum(pred_val == current_label[start_idx:end_idx])
-            
             predictions += pred_val.tolist()[0:cur_batch_size]
             labels += current_label[start_idx:end_idx].tolist()
             
-            total_correct += correct
             total_seen += cur_batch_size
             loss_sum += batch_loss_sum
                 
                 
-    loss = loss_sum / float(len(TEST_FILES))
-    acc = total_correct / float(total_seen)
+    loss = loss_sum / float(total_seen)
+    acc = sum([1 if predictions[i]==labels[i] else 0 for i in range(len(predictions))]) / float(len(predictions))
+    print(loss)
+    print(acc)
+    
     if config.test:
         import Evaluation_tools as et
         eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
@@ -284,7 +287,7 @@ def test(config):
     tf_config.log_device_placement = True
     sess = tf.Session(config=tf_config)
     ld = config.log_dir
-    ckptfile = os.path.join(ld,config.snapshot_prefix+str(WEIGHTS))
+    ckptfile = os.path.join(ld,config.snapshot_prefix+str(config.weights))
     saver.restore(sess, ckptfile)
     log_string("Model restored.")
 
@@ -298,11 +301,16 @@ def test(config):
     
     
 if __name__ == "__main__":
-    if config.test:
-        test(config)        
-    else:
+    if not config.test:
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(config)
-        LOG_FOUT.close()
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)
+    print(config)
+    test(config)    
+    LOG_FOUT.close()
 

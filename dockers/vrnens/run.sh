@@ -2,7 +2,7 @@
 # Set required variables
 
 name='vrnens2'
-dataset_path="/local/krabec/ModelNet40A_vrnens"
+dataset_path="/local/krabec/ModelNet40A/vrnens"
 out_path="/home/krabec/dockers/vrnens2/out/"
 GPU=1
 docker_hidden=t

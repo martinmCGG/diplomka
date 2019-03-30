@@ -2,10 +2,10 @@
 # Set required variables
 
 name='pnet'
-dataset_path="/local/krabec/ModelNet40A_pnet"
-out_path="/home/krabec/dockers/pointnet/out/"
+dataset_path="/local/krabec/ModelNet40A/pnet"
+out_path="/home/krabec/dockers/pointnet/out2/"
 GPU=2
-docker_hidden=d	
+docker_hidden=t
 
 ##########################################################################################################
 

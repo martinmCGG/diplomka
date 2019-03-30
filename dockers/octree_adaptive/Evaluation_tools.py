@@ -51,7 +51,6 @@ def make_table(out, dataset_dir='.', folder='.'):
     with open(out,'a') as f:
         write_all(f,['</table>','</body>','</html>'])
        
-
 def add_accuracies_to_table(misses, counts, categories,class_accs,out, name):
 
     accuracy = round(count_accuracy(misses, counts, categories),2)
@@ -65,7 +64,6 @@ def make_subtable(class_accs, out, name):
         write_row(f, [name] + [round(x,2) for x in class_accs] , separator = 'td')
     return class_accs
     
-
 def get_class_acs(misses, counts, categories):
     mistakes = [0] * len(categories)
     for i in range(len(categories)):
@@ -80,7 +78,7 @@ def make_matrix(dataset_dir, file, outdir):
     categories = get_categories(dataset_dir)
     outfile = os.path.basename(file).split('.')[0] + '.html'
     outfile = os.path.join(os.path.dirname(file),outfile)
-    misses, counts = count_misses(file, categories)
+    misses, counts, name = count_misses(file, categories)
     
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
@@ -90,7 +88,6 @@ def make_matrix(dataset_dir, file, outdir):
             write_row(out, [categories[i]] + misses_i, 'td', colors = True)
         
         write_all(out,['</table>','</body>','</html>'])
-
 
 def write_row(file, column, separator = 'td', colors = False):
     color = 'white'
@@ -113,8 +110,7 @@ def count_accuracy(misses, counts, categories):
         cats = [misses[x] for x in misses.keys() if x[0] == categories[i]]
         mistakes[i] = sum(cats)
     return 100 * (sum(counts)- sum(mistakes)) / sum(counts)
-    
-    
+        
 def count_misses(file, categories):
     misses = {}
     counts = {}
@@ -154,7 +150,6 @@ def collect_files(dir):
     all_files = [file for file in all_files if is_correct_file(file)]
     return all_files
     
-
 def sort_dict_by_value(d, reverse=True):
     return [(k, d[k]) for k in sorted(d, key=d.get, reverse=reverse)]
 

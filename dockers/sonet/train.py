@@ -16,7 +16,7 @@ import random
 import numpy as np
 
 from Logger import Logger
-from config import get_config
+from config import get_config, add_to_config
 from models.classifier import Model
 from data.modelnet_shrec_loader import ModelNet_Shrec_Loader
 
@@ -43,7 +43,10 @@ def train(model, config):
     accs = []
     if config.num_classes == 10:
         config.dropout = config.dropout + 0.1
-    for epoch in range(start_epoch, config.max_epoch + start_epoch + 1):
+        
+    begin = start_epoch
+    end = config.max_epoch + start_epoch
+    for epoch in range(begin, end + 1):
         epoch_iter = 0
         for i, data in enumerate(trainloader):
             epoch_iter += config.batch_size
@@ -71,19 +74,15 @@ def train(model, config):
 
         best_accuracy = test(model, config, best_accuracy=best_accuracy, epoch=epoch)
 
-        if epoch % config.save_each == 0:
+        if epoch % config.save_each == 0 or epoch == end:
             print("Saving network...")
             save_path = os.path.join(config.log_dir,config.snapshot_prefix +'_encoder_'+str(epoch))
             model.save_network(model.encoder, save_path, 0)
             save_path = os.path.join(config.log_dir,config.snapshot_prefix +'_classifier_'+str(epoch))
             model.save_network(model.classifier, save_path, 0)
 
-        
-        if config.num_classes == 10:
-            lr_decay_step = 40
-        else:
-            lr_decay_step = 20
-        if epoch%lr_decay_step==0 and epoch > 0:
+
+        if epoch %config.lr_decay_step==0 and epoch > 0:
             model.update_learning_rate(0.5)
         # batch normalization momentum decay:
         next_epoch = epoch + 1
@@ -149,17 +148,32 @@ if __name__=='__main__':
     testset = ModelNet_Shrec_Loader(os.path.join(config.data, 'test_files.txt'), 'test',config.data, config)
     testloader = torch.utils.data.DataLoader(testset, batch_size=config.batch_size, shuffle=False, num_workers=config.num_threads)
     
-    model = Model(config)
-    if config.weights != -1:
-        weights = os.path.join(config.log_dir,config.snapshot_prefix +'_encoder_'+str(config.weights))
-        model.encoder.load_state_dict(torch.load(weights))
-        weights = os.path.join(config.log_dir,config.snapshot_prefix +'_classifier_'+str(config.weights))
-        model.classifier.load_state_dict(torch.load(weights))
 
-    if config.test:
-        test(model, config)
-    else:
+    if not config.test:
+        model = Model(config)
+        if config.weights != -1:
+            weights = os.path.join(config.log_dir,config.snapshot_prefix +'_encoder_'+str(config.weights))
+            model.encoder.load_state_dict(torch.load(weights))
+            weights = os.path.join(config.log_dir,config.snapshot_prefix +'_classifier_'+str(config.weights))
+            model.classifier.load_state_dict(torch.load(weights))
         train(model, config)
+    
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)
+    
+    model = Model(config)
+    weights = os.path.join(config.log_dir,config.snapshot_prefix +'_encoder_'+str(config.weights))
+    model.encoder.load_state_dict(torch.load(weights))
+    weights = os.path.join(config.log_dir,config.snapshot_prefix +'_classifier_'+str(config.weights))
+    model.classifier.load_state_dict(torch.load(weights))
+
+    test(model, config)
+
+
+        
 
 
             

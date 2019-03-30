@@ -9,7 +9,7 @@ import sklearn.metrics as metrics
 
 from input import Dataset
 from Logger import Logger
-from config import get_config
+from config import get_config, add_to_config
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -76,7 +76,9 @@ def train(dataset_train, dataset_test, caffemodel=''):
             total_loss = 0
             
             step = 0
-            for epoch in xrange(startepoch, config.max_epoch + startepoch + 1):
+            begin = startepoch
+            end = config.max_epoch + startepoch
+            for epoch in xrange(begin, end + 1):
                 acc, eval_loss, predictions, labels = _test(dataset_test, config, sess, placeholders)
                 print ('epoch %d: step %d, validation loss=%.4f, acc=%f' % (epoch, step, eval_loss, acc*100.))
                 
@@ -118,7 +120,7 @@ def train(dataset_train, dataset_test, caffemodel=''):
                         total_correct = 0
                         total_loss = 0
                         
-                if epoch % config.save_period == 0:
+                if epoch % config.save_period == 0 or epoch == end:
                     checkpoint_path = os.path.join(config.log_dir, config.snapshot_prefix+str(epoch))
                     saver.save(sess, checkpoint_path)
                             
@@ -192,20 +194,23 @@ def read_lists(list_of_lists_file):
     
 if __name__ == '__main__':
     config = get_config()
-    print(config)
 
     print ('start loading data')
     data_path = config.data
     listfiles_test, labels_test = read_lists(os.path.join(data_path, 'test.txt'))
     dataset_test = Dataset(listfiles_test, labels_test, subtract_mean=False, V=config.num_views)
         
-    if config.test:
-        test(dataset_test, config)
-    else:
+    if not config.test:
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         listfiles_train, labels_train = read_lists(os.path.join(data_path, 'train.txt'))
         dataset_train = Dataset(listfiles_train, labels_train, subtract_mean=False, V=config.num_views)       
         train(dataset_train, dataset_test, config.pretrained_network_file)
-
-
+        
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)  
+            
+    test(dataset_test, config)

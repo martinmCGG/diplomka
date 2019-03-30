@@ -5,7 +5,7 @@ from Logger import Logger
 from seq_rnn_model import SequenceRNNModel
 import model_data
 import csv
-from config import get_config
+from config import get_config, add_to_config
 
 config = get_config()
 
@@ -55,7 +55,9 @@ def train():
         
         accs = []
         losses = []
-        for epoch in xrange(start_epoch, config.max_epoch + start_epoch + 1):
+        begin = start_epoch
+        end = config.max_epoch + start_epoch
+        for epoch in xrange(begin, end + 1):
             batch = 1
             while batch * config.batch_size <= data.train.size():
                 batch_encoder_inputs, batch_decoder_inputs = data.train.next_batch(config.batch_size)
@@ -78,7 +80,7 @@ def train():
                     losses = []
                 batch += 1
 
-            if epoch % config.save_period == 0:
+            if epoch % config.save_period == 0 or epoch == end:
                 saver.save(sess, get_modelpath(epoch))
             
             weights = seq_rnn_model.get_weights(sess)
@@ -181,10 +183,14 @@ def get_modelpath(epoch):
 
 def main(argv):
     
-    if config.test:
-        eval_alone()
-    else:
+    if not config.test:
         train()
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)
+    eval_alone()
 
 if __name__ == '__main__':
     LOSS_LOGGER = Logger("{}_loss".format(config.name))

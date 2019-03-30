@@ -3,7 +3,7 @@
 
 name='mvcnn2'
 dataset_path="/local/krabec/ModelNet40A/depth"
-out_path="/home/krabec/dockers/mvcnn2/a/"
+out_path="/home/krabec/dockers/mvcnn2/out/"
 GPU=0
 docker_hidden=t
 

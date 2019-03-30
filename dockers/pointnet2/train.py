@@ -20,7 +20,7 @@ import tf_util
 import modelnet_dataset
 import modelnet_h5_dataset
 from Logger import Logger
-from config import get_config
+from config import get_config, add_to_config
 config = get_config()
 
 MODEL = importlib.import_module(config.model) # import network module
@@ -33,8 +33,6 @@ BN_INIT_DECAY = 0.5
 BN_DECAY_DECAY_RATE = 0.5
 BN_DECAY_DECAY_STEP = float(config.decay_step)
 BN_DECAY_CLIP = 0.99
-
-NUM_CLASSES = 40
 
 
 # Shapenet official train/test split
@@ -95,7 +93,7 @@ def train(config):
                 initializer=tf.constant_initializer(0), trainable=False)
             bn_decay = get_bn_decay(batch)
             # Get model and loss 
-            pred, end_points = MODEL.get_model(pointclouds_pl, is_training_pl,NUM_CLASSES=NUM_CLASSES, bn_decay=bn_decay)
+            pred, end_points = MODEL.get_model(pointclouds_pl, is_training_pl,NUM_CLASSES=config.num_classes, bn_decay=bn_decay)
             MODEL.get_loss(pred, labels_pl, end_points)
             losses = tf.get_collection('losses')
             total_loss = tf.add_n(losses, name='total_loss')
@@ -142,8 +140,9 @@ def train(config):
                'step': batch,
                'end_points': end_points}
 
-        best_acc = -1
-        for epoch in range(start_epoch, start_epoch+config.max_epoch + 1):
+        begin = start_epoch
+        end = config.max_epoch+start_epoch
+        for epoch in range(begin, end + 1):
             log_string('**** EPOCH %03d ****' % (epoch))
             sys.stdout.flush()
             eval_one_epoch(config,sess, ops, epoch = epoch)             
@@ -155,16 +154,15 @@ def train(config):
             LOSS_LOGGER.plot(dest=config.log_dir)
             
             # Save the variables to disk.
-            if epoch % config.save_period == 0:
+            if epoch % config.save_period == 0 or epoch == end:
                 checkpoint_path = os.path.join(config.log_dir, config.snapshot_prefix+str(epoch))
                 saver.save(sess, checkpoint_path)
 
 
 
-def train_one_epoch(config,sess, ops, epoch=0):
+def train_one_epoch(config, sess, ops, epoch=0):
     """ ops: dict mapping from string to tf ops """
     is_training = True
-    
     log_string(str(datetime.now()))
 
     # Make sure batch data is of same size
@@ -308,11 +306,15 @@ def eval_one_epoch(config, sess, ops, topk=1, epoch=0):
         return total_correct/float(total_seen)
 
 if __name__ == "__main__":
-    if config.test:
-        test(config)        
-    else:
+    if not config.test:
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(config)
-        LOG_FOUT.close()
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)   
+    test(config)   
+    LOG_FOUT.close()
 

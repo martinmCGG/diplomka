@@ -8,7 +8,7 @@ import vgg19_trainable
 import utils
 from Logger import Logger
 import skimage
-from config import get_config
+from config import get_config, add_to_config
 
 def read_lists(file, views=12):
     images = []
@@ -134,7 +134,9 @@ def train(train_data, test_data, config):
         sess.run(tf.global_variables_initializer())
         
         it_per_epoch =  train_data.size / config.batch_size
-        for epoch in range(start_epoch, config.max_epoch+start_epoch +1):
+        begin = start_epoch
+        end = config.max_epoch+start_epoch
+        for epoch in range(begin, end + 1):
             _evaluate(net, sess, test_data, config, epoch=epoch)
             accs = []
             losses = []
@@ -158,7 +160,7 @@ def train(train_data, test_data, config):
                     ACC_LOGGER.plot(dest=config.log_dir)
                     LOSS_LOGGER.plot(dest=config.log_dir)
                     
-            if epoch%config.save_period == 0:
+            if epoch % config.save_period == 0 or epoch == end:
                 net.save_npy(sess, os.path.join(config.log_dir, config.snapshot_prefix + str(epoch)))
            
             
@@ -224,5 +226,11 @@ if __name__ == '__main__':
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(train_data, test_data, config)
-    
+        
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)
+        evaluate(test_data, config)
     

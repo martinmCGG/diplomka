@@ -98,6 +98,7 @@ def acc_fun(net, vertices, faces, nFaces, labels, **kwargs):
     loss, probs= get_probs(net, vertices, faces, nFaces, labels, config=config, mode=mode)
     return loss, probs.argmax(axis=1)
 
+    
 if __name__ == "__main__":
 
     config = get_config()
@@ -125,7 +126,7 @@ if __name__ == "__main__":
     
     if config.test:
         print("Start testing")
-        _, predictions = acc_fun(net,test_vertices, test_faces, test_nFaces, test_labels, mode='test',config=config) 
+        _, predictions = acc_fun(net, test_vertices, test_faces, test_nFaces, test_labels, mode='test',config=config) 
         acc = 100.*(predictions == test_labels).sum()/len(test_labels)
         
         print('Eval accuracy:  {}'.format(acc))
@@ -146,7 +147,9 @@ if __name__ == "__main__":
             ACC_LOGGER.load((os.path.join(ld,"{}_acc_train_accuracy.csv".format(config.name)),os.path.join(ld,"{}_acc_eval_accuracy.csv".format(config.name))), epoch = WEIGHTS)
             LOSS_LOGGER.load((os.path.join(ld,"{}_loss_train_loss.csv".format(config.name)), os.path.join(ld,'{}_loss_eval_loss.csv'.format(config.name))), epoch = WEIGHTS)
           
-        for epoch in xrange(start_epoch,config.max_epoch+start_epoch):
+        begin = start_epoch
+        end = config.max_epoch+start_epoch
+        for epoch in xrange(begin, end):
             
             loss, predictions = acc_fun(net,test_vertices, test_faces, test_nFaces, test_labels, mode='test',config=config)
             acc = (predictions == test_labels).sum()/float(len(test_labels))
@@ -175,7 +178,18 @@ if __name__ == "__main__":
             LOSS_LOGGER.save(config.log_dir)
             ACC_LOGGER.plot(dest=config.log_dir)
             LOSS_LOGGER.plot(dest=config.log_dir)
-            if epoch % config.save_period == 0:
+            if epoch % config.save_period == 0 or epoch == end:
                 dump_weights(os.path.join(config.log_dir, config.snapshot_prefix+str(epoch)), net.KDNet['output'])
+    
+            
+        print("Start testing")
+        _, predictions = acc_fun(net, test_vertices, test_faces, test_nFaces, test_labels, mode='test',config=config) 
+        acc = 100.*(predictions == test_labels).sum()/len(test_labels)
+        
+        print('Eval accuracy:  {}'.format(acc))
+        import Evaluation_tools as et
+        eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
+        et.write_eval_file(config.data, eval_file, predictions, test_labels, config.name)
+        et.make_matrix(config.data, eval_file, config.log_dir) 
                 
                 

@@ -5,7 +5,13 @@ import numpy as np
 import os
 import lmdb
 from Logger import Logger
-from config import get_config, prepare_solver_file
+from config import get_config, prepare_solver_file, add_to_config
+
+def get_highest_model(config):
+    files = os.listdir(config.log_dir)
+    files = [os.path.join(config.log_dir,file) for file in files if os.path.splitext(file)[1] == '.solverstate']
+    latest_file = max(files, key=os.path.getctime)
+    return latest_file
 
 def get_dataset_size(config, name):
     file = os.path.join(config.data, '{}.txt'.format(name))
@@ -25,22 +31,22 @@ def eval(config, solver, epoch=0):
     test_iters = test_count / batch_size
 
     for i in range(test_iters):
-        
         solver.test_nets[0].forward()
            
         acc += solver.test_nets[0].blobs['accuracy'].data
         loss += solver.test_nets[0].blobs['loss'].data
-        
+       
         probs = solver.test_nets[0].blobs['ip2'].data
         predictions += list(np.argmax(np.array(probs), axis=1))
         labels += list(solver.test_nets[0].blobs['label'].data) 
+
     solver.test_nets[0].forward()
     acc += solver.test_nets[0].blobs['accuracy'].data
     loss += solver.test_nets[0].blobs['loss'].data
     probs = solver.test_nets[0].blobs['ip2'].data
     predictions += list(np.argmax(np.array(probs), axis=1))[0:test_count%batch_size]
     labels += list(solver.test_nets[0].blobs['label'].data)[0:test_count%batch_size]
-        
+       
     acc /= test_iters + 1
     loss  /= test_iters + 1
     
@@ -50,6 +56,7 @@ def eval(config, solver, epoch=0):
         LOSS_LOGGER.log(loss, epoch, "eval_loss")
         ACC_LOGGER.log(acc, epoch, "eval_accuracy")
     else:
+        print("----------------------") 
         import Evaluation_tools as et
         labels = [int(l) for l in labels]
         eval_file = os.path.join(config.log_dir, '{}.txt'.format(config.name))
@@ -57,7 +64,7 @@ def eval(config, solver, epoch=0):
         et.make_matrix(config.data, eval_file, config.log_dir) 
 
 def train(config, solver):
-    
+        
     if config.weights == -1:
         startepoch = 0
     else:
@@ -93,6 +100,8 @@ def train(config, solver):
                 LOSS_LOGGER.save(config.log_dir)
                 losses = []
                 accs = []
+                global highest_model_saved
+                highest_model_saved = it
                 
         ACC_LOGGER.plot(dest=config.log_dir)
         LOSS_LOGGER.plot(dest=config.log_dir)        
@@ -102,6 +111,7 @@ def train(config, solver):
 
 if __name__ == '__main__':
     config = get_config()
+    
     caffe.set_device(0)
     caffe.set_mode_gpu()
     data_size = get_dataset_size(config, 'train')
@@ -112,12 +122,15 @@ if __name__ == '__main__':
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(config, solver)
-    else:
-        weights = config.weights
-        snapshot = os.path.join(config.snapshot_prefix[1:-1]+'_iter_'+str(weights))  
-        solver.restore(snapshot + '.solverstate')
-        solver.net.copy_from(snapshot + '.caffemodel')
-        solver.test_nets[0].copy_from(snapshot + '.caffemodel')
-        print('Model restored')
-        eval(config, solver)
+        config = add_to_config(config, 'weights', highest_model_saved)
+        config = add_to_config(config, 'test', True)
+    
+    snapshot = get_highest_model(config)
+
+    solver.restore(snapshot)
+    caffemodel = os.path.splitext(snapshot)[0] + '.caffemodel'
+    solver.net.copy_from(caffemodel)
+    solver.test_nets[0].copy_from(caffemodel)
+    print('Model restored')
+    eval(config, solver)
         

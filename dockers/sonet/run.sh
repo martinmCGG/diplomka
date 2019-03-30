@@ -2,10 +2,10 @@
 # Set required variables
 
 name='sonet'
-dataset_path="/local/krabec/ModelNet40A/sonet"
-out_path="/home/krabec/dockers/sonet/out/"
+dataset_path="/local/krabec/ModelNet40A/sonet5000"
+out_path="/home/krabec/dockers/sonet/out5000/"
 GPU=1
-docker_hidden=t
+docker_hidden=d
 
 ##########################################################################################################
 

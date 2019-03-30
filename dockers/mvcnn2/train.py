@@ -8,7 +8,7 @@ from Logger import Logger
 from tools.Trainer import ModelNetTrainer
 from tools.ImgDataset import MultiviewImgDataset, SingleImgDataset
 from models.MVCNN import MVCNN, SVCNN
-from config import get_config
+from config import get_config, add_to_config
 
 def create_folder(log_dir):
     # make summary folder
@@ -90,10 +90,17 @@ def test(config):
     
 if __name__ == '__main__':
     config = get_config()
-    if config.test:
-        test(config)
-    else:
+    if not config.test:
         train(config)
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)        
+        
+    test(config)
+
+        
 
 
 

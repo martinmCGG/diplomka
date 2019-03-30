@@ -14,7 +14,7 @@ import theano.tensor as T
 import lasagne
 
 import sys
-from config import get_config
+from config import get_config, add_to_config
 sys.path.insert(0, '/vrnens')
 from utils import checkpoints, metrics_logging
 from collections import OrderedDict
@@ -232,8 +232,10 @@ def train(config):
     # Get current learning rate
     new_lr = np.float32(tvars['learning_rate'].get_value())
     # Loop across training epochs!
-    for epoch in xrange(startepoch,cfg['max_epochs']+startepoch + 1):
-       
+    
+    begin = start_epoch
+    end = cfg['max_epochs']+start_epoch
+    for epoch in xrange(begin, end + 1):    
         #EVAL
         evaluate(x_test, y_test, cfg, tfuncs, tvars, config, epoch=epoch)
         ACC_LOGGER.save(config.log_dir)
@@ -294,7 +296,7 @@ def train(config):
                     lvs, accs = [],[] 
                     print('epoch: {0:^3d}, itr: {1:d}, c_loss: {2:.6f}, class_acc: {3:.5f}'.format(epoch, itr, closs, c_acc))       
                     
-        if not (epoch%cfg['checkpoint_every_nth']):
+        if not (epoch % cfg['checkpoint_every_nth']) or epoch == end:
             weights_fname = os.path.join(config.log_dir,config.snapshot_prefix+str(epoch))
             checkpoints.save_weights(weights_fname, model['l_out'],
                                                 {'itr': itr, 'ts': time.time(),
@@ -365,13 +367,17 @@ def evaluate(x_test, y_test, cfg, tfuncs, tvars, config, epoch=0):
         et.make_matrix(config.data, eval_file, config.log_dir)  
     
 if __name__=='__main__':
-    
     config = get_config()
-    if config.test:
-        test(config)
-    else:
+    if not config.test:
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(config)
+
+        if config.weights == -1:
+            config = add_to_config(config, 'weights', config.max_epoch)
+        else:
+            config = add_to_config(config, 'weights', config.max_epoch + config.weights)
+        config = add_to_config(config, 'test', True)
+    test(config)  
         
 

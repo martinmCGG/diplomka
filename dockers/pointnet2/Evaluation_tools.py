@@ -80,7 +80,7 @@ def make_matrix(dataset_dir, file, outdir):
     categories = get_categories(dataset_dir)
     outfile = os.path.basename(file).split('.')[0] + '.html'
     outfile = os.path.join(os.path.dirname(file),outfile)
-    misses, counts = count_misses(file, categories)
+    misses, counts, name = count_misses(file, categories)
     
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])

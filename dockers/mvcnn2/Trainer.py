@@ -92,7 +92,7 @@ class ModelNetTrainer(object):
             self.LOSS_LOGGER.plot(dest=self.log_dir)        
 
             # save model
-            if epoch%config.save_period == 0:
+            if epoch % config.save_period == 0 or epoch == config.max_epoch:
                 best_acc = val_overall_acc
                 self.model.save(os.path.join(self.log_dir, config.snapshot_prefix + str(epoch)))
  

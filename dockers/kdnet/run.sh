@@ -2,10 +2,10 @@
 # Set required variables
 
 name='kdnet'
-dataset_path="/local/krabec/ModelNet40A_kdnet"
-out_path="/home/krabec/dockers/kdnet/out/a"
+dataset_path="/local/krabec/ModelNet40A/kdnet"
+out_path="/home/krabec/dockers/kdnet/out2/"
 GPU=1
-docker_hidden=t
+docker_hidden=d
 
 ##########################################################################################################
 

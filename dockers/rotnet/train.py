@@ -7,7 +7,13 @@ import numpy as np
 import os
 from Logger import Logger
 from config import get_config, prepare_solver_file
-from prepare_data import prepare_data
+from prepare_data import prepare_data, add_to_config
+
+def get_highest_model(config):
+    files = os.listdir(config.log_dir)
+    files = [os.path.join(config.log_dir,file) for file in files if os.path.splitext(file)[1] == '.solverstate']
+    latest_file = max(files, key=os.path.getctime)
+    return latest_file
 
 def get_dataset_size(config, name):
     file = os.path.join(config.data, '{}.txt'.format(name))
@@ -87,6 +93,7 @@ def train(config, solver):
                 LOSS_LOGGER.save(config.log_dir)
                 losses = []
                 accs = []
+                highest_model_saved = it
                 
         ACC_LOGGER.plot(dest=config.log_dir)
         LOSS_LOGGER.plot(dest=config.log_dir)        
@@ -111,11 +118,15 @@ if __name__ == '__main__':
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(config, solver)
-    else:
-        weights = config.weights
-        snapshot = os.path.join(config.snapshot_prefix[1:-1]+'_iter_'+str(weights)) 
-        solver.restore(snapshot + '.solverstate')
-        solver.net.copy_from(snapshot + '.caffemodel')
-        solver.test_nets[0].copy_from(snapshot + '.caffemodel')
-        eval(config, solver)
+        config = add_to_config(config, 'weights', highest_model_saved)
+        config = add_to_config(config, 'test', True)
         
+    snapshot = get_highest_model(config)
+
+    solver.restore(snapshot)
+    caffemodel = os.path.splitext(snapshot)[0] + '.caffemodel'
+    solver.net.copy_from(caffemodel)
+    solver.test_nets[0].copy_from(caffemodel)
+    print('Model restored')
+    eval(config, solver)
+    

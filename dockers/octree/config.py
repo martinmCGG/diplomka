@@ -1,12 +1,17 @@
 from __future__ import print_function
 from collections import namedtuple
-import ConfigParser
+try:
+    import ConfigParser as cp
+except:
+    import configparser as cp
 
 def Parse(value):
     if value in ['False','false']:
         return False
     if value in ['True','true']:
         return True
+    if value == 'None':
+        return None
     try:
         return int(value)
     except ValueError:
@@ -20,7 +25,7 @@ def Parse(value):
 class config:
     
     def __init__(self, ini_file, data_size=0):
-        self.cp = ConfigParser.RawConfigParser()
+        self.cp = cp.RawConfigParser()
         self.cp.read(ini_file) 
         self.config_to_dict(data_size=data_size)
     
@@ -31,12 +36,11 @@ class config:
                 self.dictionary[key] = Parse(value)
                 if section == 'ITER_PARAMETERS' and data_size:
                     value = epoch_to_iters(Parse(value), self.dictionary['batch_size'], data_size )
-                    print(key, value)
                     self.dictionary[key] = value
         print(self.dictionary)
     
     def get_named_tuple(self):
-        return namedtuple("config", self.dictionary.keys())(*self.dictionary.values())
+        return dict_to_tuple(self.dictionary)
     
     def prepare_caffe_files(self,file):
         newfile = []
@@ -62,13 +66,13 @@ def prepare_solver_file(ini_file = 'config.ini', data_size=0):
     solver = cfg.get_named_tuple().solver
     cfg.prepare_caffe_files(solver)
     
+def dict_to_tuple(dict):
+    return namedtuple("config", dict.keys())(*dict.values())
+ 
+def add_to_config(config, key, value):
+    new_dict = config._asdict()
+    new_dict[key] = value
+    return namedtuple("config", new_dict.keys())(*new_dict.values())
+
 def epoch_to_iters(epochs, batch_size, data_size):
     return epochs * data_size / batch_size
-
-if __name__ == "__main__":
-    cfg = config('config.ini')
-    solver = cfg.get_named_tuple().solver
-    print(solver)
-    cfg.prepare_caffe_files(solver)
-    
-    
