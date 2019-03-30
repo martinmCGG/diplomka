@@ -130,7 +130,7 @@ def train(train_data, test_data, config):
         net = vgg19_trainable.Vgg19(vgg19_npy_path=load_weights(config), trainable = True)    
 
         print("Weights loaded")
-        net.build()
+        net.build(lr=config.lr)
         sess.run(tf.global_variables_initializer())
         
         it_per_epoch =  train_data.size / config.batch_size
@@ -148,7 +148,7 @@ def train(train_data, test_data, config):
                 accs.append(acc)
                 losses.append(loss)
                 
-                if i % max(config.train_log_frq/config.batch_size,1) == 0:
+                if it % max(config.train_log_frq/config.batch_size,1) == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accs)
                     print("TRAINING epoch: {} it: {}  loss: {} acc: {} ".format(epoch,it, loss, acc))
@@ -162,6 +162,10 @@ def train(train_data, test_data, config):
                     
             if epoch % config.save_period == 0 or epoch == end:
                 net.save_npy(sess, os.path.join(config.log_dir, config.snapshot_prefix + str(epoch)))
+                
+            if epoch % config.lr_decay_step:
+                net.update_lr(config.lr_decay)
+                print("Updated learning rate to {}".format(net.lr))
            
             
 
@@ -223,14 +227,16 @@ if __name__ == '__main__':
         test_data = Dataset(test_images, test_labels, shuffle=False)
         train_images, train_labels = read_lists(os.path.join(config.data,'train.txt'))
         train_data = Dataset(train_images, train_labels, shuffle=True)
+        print('loaded data')
         LOSS_LOGGER = Logger("{}_loss".format(config.name))
         ACC_LOGGER = Logger("{}_acc".format(config.name))
         train(train_data, test_data, config)
-        
+        print('training done')
         if config.weights == -1:
             config = add_to_config(config, 'weights', config.max_epoch)
         else:
             config = add_to_config(config, 'weights', config.max_epoch + config.weights)
         config = add_to_config(config, 'test', True)
         evaluate(test_data, config)
+        extract_features(config, train_data, test_data)
     

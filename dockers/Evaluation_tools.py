@@ -80,7 +80,7 @@ def make_matrix(dataset_dir, file, outdir):
     categories = get_categories(dataset_dir)
     outfile = os.path.basename(file).split('.')[0] + '.html'
     outfile = os.path.join(os.path.dirname(file),outfile)
-    misses, counts, name = count_misses(file, categories)
+    misses, counts = count_misses(file, categories)
     
     with open(outfile, 'w') as out:
         write_all(out,['<!DOCTYPE html>','<html>','<body>','<table style="width:100%">',])
@@ -124,6 +124,7 @@ def count_misses(file, categories):
             misses[(cat1,cat2)] = 0
     with open(file, 'r') as f:
         name = f.readline()
+        name = "{} ({})".format(name, file.split(os.sep)[-2])
         for line in f:
             splited = line.split()
             truth = splited[0]

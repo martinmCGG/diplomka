@@ -25,14 +25,14 @@ class Vgg19:
         self.true_out = tf.placeholder(tf.int32, [None])
         self.train_mode = tf.placeholder(tf.bool)
 
-    def build(self, train_mode=None, num_cats=40):
+    def build(self, train_mode=None, num_cats=40, lr=0.0001):
         """
         load variable from npy to build the VGG
 
         :param rgb: rgb image [batch, height, width, 3] values scaled [0, 1]
         :param train_mode: a bool tensor, usually a placeholder: if True, dropout will be turned on
         """
-        
+        self.lr = lr
         
         rgb_scaled = self.images * 255.0
 
@@ -47,6 +47,8 @@ class Vgg19:
             red - VGG_MEAN[2],
         ])
         assert bgr.get_shape().as_list()[1:] == [224, 224, 3]'''
+        
+        
         bgr = rgb_scaled   
         self.conv1_1my = self.conv_layer(bgr, 1, 64, "conv1_1my")
         self.conv1_2 = self.conv_layer(self.conv1_1my, 64, 64, "conv1_2")
@@ -95,13 +97,16 @@ class Vgg19:
 
         self.loss = tf.losses.sparse_softmax_cross_entropy(self.true_out,self.logits)
         self.prob = tf.nn.softmax(self.fc8my, name="prob")
-        self.training = tf.train.AdamOptimizer(0.0001).minimize(self.loss)
+        self.training = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
         
         self.data_dict = None
     
     
-    
     ######### My functions ###########
+    def update_lr(self, decay):
+        self.lr *= decay
+        self.training = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
+    
     def train(self, images, labels, sess):
         return sess.run([self.training, self.loss, self.logits], {self.images: images, self.true_out: labels, self.train_mode:True})
     
@@ -110,9 +115,6 @@ class Vgg19:
     
     def extract(self,images,sess):
         return sess.run(self.relu7, {self.images: images, self.train_mode:False})
-    
-    
-    
     
     def avg_pool(self, bottom, name):
         return tf.nn.avg_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)

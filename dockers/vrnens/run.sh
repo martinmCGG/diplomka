@@ -1,11 +1,11 @@
 ##########################################################################################################
 # Set required variables
 
-name='vrnens2'
-dataset_path="/local/krabec/ModelNet40A/vrnens"
-out_path="/home/krabec/dockers/vrnens2/out/"
-GPU=1
-docker_hidden=t
+name='vrnens'
+dataset_path="/local/krabec/ShapeNet/vrnens"
+out_path="/home/krabec/dockers/vrnens2/shapenet/"
+GPU=3
+docker_hidden=d
 
 ##########################################################################################################
 

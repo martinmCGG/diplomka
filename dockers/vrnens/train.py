@@ -198,7 +198,7 @@ def train(config):
     
     weights = config.weights
     if weights == -1:
-        startepoch = 0
+        start_epoch = 0
     else:
         ld = config.log_dir
         WEIGHTS = config.weights

@@ -2,10 +2,10 @@
 # Set required variables
 
 name='vgg'
-dataset_path="/local/krabec/ModelNet40A_mvcnn_shaded"
+dataset_path="/local/krabec/ModelNet40A/shaded"
 out_path="/home/krabec/dockers/vgg/out/"
-GPU=0
-docker_hidden=t
+GPU=2
+docker_hidden=d
 
 ##########################################################################################################
 
