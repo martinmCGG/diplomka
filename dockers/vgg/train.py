@@ -163,7 +163,7 @@ def train(train_data, test_data, config):
             if epoch % config.save_period == 0 or epoch == end:
                 net.save_npy(sess, os.path.join(config.log_dir, config.snapshot_prefix + str(epoch)))
                 
-            if epoch % config.lr_decay_step:
+            if epoch > 0 and epoch % config.lr_decay_step == 0:
                 net.update_lr(config.lr_decay)
                 print("Updated learning rate to {}".format(net.lr))
            

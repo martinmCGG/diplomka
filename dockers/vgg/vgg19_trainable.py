@@ -24,6 +24,8 @@ class Vgg19:
         self.images = tf.placeholder(tf.float32, [None, 224, 224, 1])
         self.true_out = tf.placeholder(tf.int32, [None])
         self.train_mode = tf.placeholder(tf.bool)
+        self.tf_lr = tf.placeholder(tf.float32)
+        
 
     def build(self, train_mode=None, num_cats=40, lr=0.0001):
         """
@@ -33,7 +35,6 @@ class Vgg19:
         :param train_mode: a bool tensor, usually a placeholder: if True, dropout will be turned on
         """
         self.lr = lr
-        
         rgb_scaled = self.images * 255.0
 
         # Convert RGB to BGR
@@ -97,7 +98,7 @@ class Vgg19:
 
         self.loss = tf.losses.sparse_softmax_cross_entropy(self.true_out,self.logits)
         self.prob = tf.nn.softmax(self.fc8my, name="prob")
-        self.training = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
+        self.training = tf.train.AdamOptimizer(self.tf_lr).minimize(self.loss)
         
         self.data_dict = None
     
@@ -105,10 +106,9 @@ class Vgg19:
     ######### My functions ###########
     def update_lr(self, decay):
         self.lr *= decay
-        self.training = tf.train.AdamOptimizer(self.lr).minimize(self.loss)
     
     def train(self, images, labels, sess):
-        return sess.run([self.training, self.loss, self.logits], {self.images: images, self.true_out: labels, self.train_mode:True})
+        return sess.run([self.training, self.loss, self.logits], {self.images: images, self.true_out: labels, self.train_mode:True, self.tf_lr:self.lr})
     
     def test(self, images, labels, sess):
         return sess.run([self.logits, self.loss], {self.images: images, self.true_out: labels, self.train_mode:False})
