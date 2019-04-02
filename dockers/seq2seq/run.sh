@@ -2,10 +2,10 @@
 # Set required variables
 
 name='seq2seq'
-dataset_path="/local/krabec/ModelNet40A_mvcnn_shaded"
-out_path="/home/krabec/dockers/seq2seq/out/"
-GPU=1
-docker_hidden=t
+dataset_path="/local/krabec/ModelNet40A/shaded"
+out_path="/home/krabec/dockers/seq2seq/out/shaded2"
+GPU=0
+docker_hidden=d
 
 ##########################################################################################################
 

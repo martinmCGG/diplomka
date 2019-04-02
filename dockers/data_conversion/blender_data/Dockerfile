@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -yq \
 		libgl1-mesa-dev \
 		libglu1-mesa \
 		libxi6 \
+		git \
 		libxrender1 \
 		python2.7  && \
 	apt-get -y autoremove && \
@@ -29,6 +30,8 @@ RUN mkdir /usr/local/blender && \
 # Copy changed files
 RUN mkdir /blender_scripts
 WORKDIR /blender_scripts
+RUN git clone https://github.com/WeiTang114/BlenderPhong
+RUN mv BlenderPhong/phong.blend ./render_phong.blend
 RUN touch __init__.py
 ENV PATH="/usr/local/blender/blender:${PATH}"
 

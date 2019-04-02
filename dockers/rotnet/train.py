@@ -6,8 +6,8 @@ from my_classify_modelnet import get_mean
 import numpy as np
 import os
 from Logger import Logger
-from config import get_config, prepare_solver_file
-from prepare_data import prepare_data, add_to_config
+from config import get_config, prepare_solver_file,  add_to_config
+from prepare_data import prepare_data
 
 def get_highest_model(config):
     files = os.listdir(config.log_dir)

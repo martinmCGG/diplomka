@@ -3,9 +3,9 @@
 
 name='vgg'
 dataset_path="/local/krabec/ModelNet40A/shaded"
-out_path="/home/krabec/dockers/vgg/out/"
-GPU=2
-docker_hidden=d
+out_path="/home/krabec/dockers/vgg/shaded/"
+GPU=0
+docker_hidden=t
 
 ##########################################################################################################
 

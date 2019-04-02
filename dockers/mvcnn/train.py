@@ -107,15 +107,12 @@ def train(dataset_train, dataset_test, caffemodel=''):
                     
                     assert not np.isnan(loss_value), 'Model diverged with loss = NaN'
     
-
                     if step % max(config.train_log_frq/config.batch_size,1) == 0:
-                        print ('epoch %d step %d, loss=%.2f' %(epoch, step, loss_value,))
-                        
-                        acc = total_correct / float(total_seen)
-                        ACC_LOGGER.log(acc, epoch, "train_accuracy")
-                        loss_ = total_loss / float(log_period) 
-                        LOSS_LOGGER.log(loss_, epoch,"train_loss")                   
-                        
+                        acc_ = total_correct / float(total_seen)
+                        ACC_LOGGER.log(acc_, epoch, "train_accuracy")
+                        loss_ = total_loss / float(total_seen/batch_size) 
+                        LOSS_LOGGER.log(loss_, epoch,"train_loss")           
+                        print ('epoch %d step %d, loss=%.2f, acc=%.2f' %(epoch, step, loss_, acc_))
                         total_seen = 0
                         total_correct = 0
                         total_loss = 0

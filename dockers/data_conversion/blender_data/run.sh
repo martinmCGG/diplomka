@@ -2,17 +2,17 @@
 # Set required variables
 
 name="shaded"
-dataset_path="/local/krabec/ShapeNet/ShapeNet"
-output_dir="/local/krabec/ShapeNet"
+dataset_path="/local/krabec/ShapeNet"
+output_dir="/home/krabec/"
 docker_hidden=d
 
-#This must be one of shaded or depth
+#This must be one of phong, shaded or depth
 render=shaded
 
 ##########################################################################################################
 
-image_name="blender"
-
+image_name="blender2"
+echo "$output_dir/$name"
 output_dir="$output_dir/$name"
 mkdir -m 777 $output_dir
 docker build -t "$image_name" .

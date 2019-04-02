@@ -2,9 +2,9 @@
 # Set required variables
 
 name="octree_adaptive"
-dataset_path="/local/krabec/ShapeNet/ShapeNet"
-output_dir="/local/krabec/ShapeNet"
-docker_hidden=t
+dataset_path="/local/krabec/ShapeNet/"
+output_dir="/home/krabec/"
+docker_hidden=d
 
 ##########################################################################################################
 
@@ -17,6 +17,6 @@ docker kill "$image_name"
 docker rm "$image_name"
 
 docker run --rm -id --name "$image_name" -v "$dataset_path":/dataset -v "$output_dir":/data "$image_name"
-docker exec -i -"$docker_hidden" "$image_name" sh -c "python octree_data.py"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "python octree_data.py > /dataset/log.txt"
 
 ##########################################################################################################

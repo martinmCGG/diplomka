@@ -1,11 +1,10 @@
 ##########################################################################################################
 # Set required variables
 name='rotnet'
-#dataset_path="/local/krabec/ModelNet40A_mvcnn_pbrt"
-dataset_path="/local/krabec/Small_converted"
-out_path="/home/krabec/dockers/rotnet/outa/"
-GPU=0
-docker_hidden=t
+dataset_path="/local/krabec/ModelNet40A/phong"
+out_path="/home/krabec/dockers/rotnet/out/phong"
+GPU=2
+docker_hidden=d
 
 ##########################################################################################################
 

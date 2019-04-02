@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append("/blender_scripts")
-from multiprocessing import Process, Pool, Lock
+from multiprocessing import Process, Pool
 
 from mesh_files import *
 from blender_scripts import *
@@ -17,11 +17,14 @@ coding = {
 def get_name_of_txt_file(output_dir, cat_name, dataset, file_id):
     return os.path.join(output_dir , cat_name, dataset, file_id, file_id + ".txt")
     
-def render_model(obj_file, id, file_id, views, output_dir, cat, dataset, cat_name):
+def render_model(obj_file, file_id, views, output_dir, cat, dataset, cat_name):
     
     whole_path = os.path.join(output_dir, cat_name, dataset, file_id)
     os.system("mkdir -m 777 \"{}\"".format(whole_path))
-    render_one_model(obj_file, file_id, whole_path, nviews=views)
+    if config.blender_script == 'phong':
+        render_phong(obj_file, file_id, whole_path, nviews=views)
+    else:
+        render_one_model(obj_file, file_id, whole_path, nviews=views)
     
     with open(get_name_of_txt_file(output_dir ,cat_name, dataset, file_id), 'w') as f:
         print(cat, file=f)
@@ -30,45 +33,54 @@ def render_model(obj_file, id, file_id, views, output_dir, cat, dataset, cat_nam
             print(get_name_of_image_file(whole_path, file_id, view), file=f)
        
 
-def files_to_images(files, id, config, categories, split, lock):
+def files_to_images(files, config, categories, split):
     views = config.num_views
     output_dir = config.output
-    log("Starting thread {} on {} files.".format(id, len(files)),lock, config.log_file)
     for i in range(len(files)):
         file = files[i]
-        if i%100 == 0:
-            log("Thread {} is {:.2f}% done.".format(id,float(i)/len(files)*100), lock, config.log_file)
         file_id = get_file_id(file)
         cat = categories[file_id]
         cat_name = config.cat_names[cat]
-        render_model(file, id, file_id, views, output_dir, cat, coding[split[file_id]], cat_name)
-    log("Ending thread {}.".format(id), lock, config.log_file)
+        render_model(file, file_id, views, output_dir, cat, coding[split[file_id]], cat_name)
+
     
-    
-def save_for_mvcnn(config, files, categories, split):
-    size = len(files) // config.num_threads
+def run_multithread(files, config, categories, split, size_thread):
     pool = []
-    lock = Lock()
+    for i in range(config.num_threads):
+        p = Process(target=files_to_images, args=(files[i* size_thread:(i+1)* size_thread], config, categories, split))
+        p.start()
+        pool.append(p)
+    for p in pool:
+        p.join()
+
+    
+def save_for_mvcnn(config, all_files, categories, split):
+    
+    counter = 0
     
     for cat in config.cat_names:
         os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
         for dataset in coding.values():
             os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
             
-    log("Starting {} threads on {} files.".format(config.num_threads, len(files)),lock, config.log_file)
-    if len(files) > 20:
-        for i in range(config.num_threads-1):
-            p = Process(target=files_to_images, args=(files[i*size:(i+1)*size], i, config, categories, split, lock))
-            p.start()
-            pool.append(p)
-        p = Process(target=files_to_images, args=(files[(config.num_threads-1)*size:], config.num_threads-1, config, categories,split, lock))
-        p.start()
-        pool.append(p)
-        for p in pool:
-            p.join()
+    log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
+    size_thread = 100
+    size  = size_thread * config.num_threads
+    log(str(size), config.log_file)
+    if len(all_files) > size_thread:
+        for j in range(len(all_files)//size):
+            files = all_files[j*size:(j+1)*size]
+            counter += len(files)
+            run_multithread(files, config, categories, split, size_thread)
+            log("Finished {} %".format(j*size/len(all_files)), config.log_file) 
+        files = all_files[len(all_files)//size*size:]
+        counter += len(files)
+        run_multithread(files, config, categories, split, size_thread)
+           
     else:
-        files_to_images(files, 0, config, categories,split, lock)
-    log("Ending...",lock, config.log_file)
+        files_to_images(all_files, config, categories,split)
+    log("Proccessed {}".format(counter), config.log_file)
+    log("Finished conversion", config.log_file)
 
 def collect_files(files, split, cats, config):
     print("COLLECTING")
@@ -81,12 +93,9 @@ def collect_files(files, split, cats, config):
                 if coding[split[file_id]] == dataset:
                     print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat] , dataset , file_id), cat), file = f)
 
-    
-def log(message, lock, log):
-    lock.acquire()
+def log(message, log):
     with open(log, 'a') as f:
-        print(message, file = f)
-    lock.release()            
+        print(message, file = f)          
                
 if __name__ == '__main__':
     
@@ -120,10 +129,32 @@ if __name__ == '__main__':
             print("Exception {}".format(e), file=f)
         sys.exit(1)
     
+    def exists(file):
+        id = get_file_id(file)
+        cat = categories[id]
+        cat_name = cat_names[cat]
+        dataset = coding[split[id]]
+        whole_path = os.path.join(config.output, cat_name, dataset, id)
+        truth = True
+        for view in range(config.num_views):
+            if not os.path.exists(get_name_of_image_file(whole_path, id, 0)):
+                return False
+        return True
+        
+    #files = [x for x in files if not exists(x)]
     
     save_for_mvcnn(config, files, categories, split)
     collect_files(files, split,categories, config)
+    log("Ending and cleaning", config.log_file)
     if config.dataset_type == 'modelnet' and config.remove_obj:
         os.system('find {} -name *.obj -delete'.format(config.data))
+    
+    all_txt_files = 0
+    for root, dirs, files in os.walk(config.output):
+        for file in files:
+            if file.endswith(".txt"):
+                 all_txt_files+=1
+    print(all_txt_files)
+        
     
     

@@ -1,3 +1,4 @@
+from __future__ import print_function
 import tensorflow as tf
 import numpy as np
 import os
@@ -6,10 +7,10 @@ from seq_rnn_model import SequenceRNNModel
 import model_data
 import csv
 from config import get_config, add_to_config
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 config = get_config()
 
-def train():
+def train(config):
     data =  model_data.read_data(config.data, config)
     test_data = data.test
     seq_rnn_model = SequenceRNNModel(config.n_input_fc, config.num_views, config.n_hidden, config.decoder_embedding_size, config.num_classes+1, config.n_hidden,
@@ -53,11 +54,12 @@ def train():
             LOSS_LOGGER.load((os.path.join(ld,"{}_loss_train_loss.csv".format(config.name)),
                                os.path.join(ld,'{}_loss_eval_loss.csv'.format(config.name))), epoch = WEIGHTS)
         
+
+        begin = start_epoch
         accs = []
         losses = []
-        begin = start_epoch
         end = config.max_epoch + start_epoch
-        for epoch in xrange(begin, end + 1):
+        for epoch in xrange(begin, end + 1): 
             batch = 1
             while batch * config.batch_size <= data.train.size():
                 batch_encoder_inputs, batch_decoder_inputs = data.train.next_batch(config.batch_size)
@@ -70,7 +72,7 @@ def train():
                 accs.append(acc)
                 losses.append(loss)
                 
-                if batch % max(config.train_log_frq/config.batch_size,1) == 0:
+                if batch % max(config.train_log_frq/config.batch_size, 1) == 0:
                     loss = np.mean(losses)
                     acc = np.mean(accs)
                     LOSS_LOGGER.log(loss, epoch, "train_loss")
@@ -100,7 +102,6 @@ def _test(data, seq_rnn_model, sess):
     test_encoder_inputs = test_encoder_inputs.reshape((-1, config.num_views, config.n_input_fc))
     test_encoder_inputs, test_decoder_inputs, test_target_weights = seq_rnn_model.get_batch(test_encoder_inputs,
                                                                                             test_decoder_inputs,batch_size=data.size())
-    
     logits, loss = seq_rnn_model.step(sess, test_encoder_inputs, test_decoder_inputs, test_target_weights, forward_only=True)  # don't do optimize
 
     predict_labels = seq_rnn_model.predict(logits, all_min_no=False)
@@ -117,13 +118,13 @@ def eval_during_training(weights, model, epoch):
         init = tf.global_variables_initializer()
         sess.run(init)
         model.assign_weights(sess, weights, "eval")
-        acc,loss, _, _ = _test(data, model, sess)
+        acc, loss, _, _ = _test(data, model, sess)
     print("evaluation, acc=%f" %(acc[0]))
     LOSS_LOGGER.log(loss, epoch,"eval_loss")
     ACC_LOGGER.log(acc[0],epoch, "eval_accuracy")
     
     
-def eval_alone():
+def eval_alone(config):
     data = model_data.read_data(config.data, config, read_train=False)
     data = data.test
     seq_rnn_model = SequenceRNNModel(config.n_input_fc, config.num_views, config.n_hidden, config.decoder_embedding_size, config.num_classes+1, config.n_hidden,
@@ -182,15 +183,15 @@ def get_modelpath(epoch):
     return os.path.join(config.log_dir, config.snapshot_prefix + str(epoch))
 
 def main(argv):
-    
+    global config
     if not config.test:
-        train()
+        train(config)
         if config.weights == -1:
             config = add_to_config(config, 'weights', config.max_epoch)
         else:
             config = add_to_config(config, 'weights', config.max_epoch + config.weights)
         config = add_to_config(config, 'test', True)
-    eval_alone()
+    eval_alone(config)
 
 if __name__ == '__main__':
     LOSS_LOGGER = Logger("{}_loss".format(config.name))

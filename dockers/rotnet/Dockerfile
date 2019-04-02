@@ -59,12 +59,11 @@ WORKDIR /rotationnet
 #RUN bash get_modelnet_png.sh 
 
 # Install dtrx - tool for extracting archives
-RUN apt-get install -y --no-install-recommends dtrx libdc1394-22-dev
+RUN apt-get install -y --no-install-recommends libdc1394-22-dev
 
 # downaload ilsvrc mean file
 WORKDIR /opt/caffe/caffe-rotationnet2
 RUN /opt/caffe/caffe-rotationnet2/data/ilsvrc12/get_ilsvrc_aux.sh
-
 
 WORKDIR /rotationnet
 RUN mkdir logs
