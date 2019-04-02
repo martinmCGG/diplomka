@@ -191,9 +191,19 @@ def read_lists(list_of_lists_file):
     
 if __name__ == '__main__':
     config = get_config()
-
-    print ('start loading data')
+    
     data_path = config.data
+    test = 0
+    with open(os.path.join(data_path, 'test.txt'), 'r') as f:
+        for line in f:
+            if os.path.exists(line.split()[0]):
+                pass
+            else:
+                test+=1
+                print(line)
+   
+    print ('start loading data')
+    
     listfiles_test, labels_test = read_lists(os.path.join(data_path, 'test.txt'))
     dataset_test = Dataset(listfiles_test, labels_test, subtract_mean=False, V=config.num_views)
         

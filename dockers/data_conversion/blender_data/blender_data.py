@@ -82,6 +82,8 @@ def save_for_mvcnn(config, all_files, categories, split):
     log("Proccessed {}".format(counter), config.log_file)
     log("Finished conversion", config.log_file)
 
+
+                            
 def collect_files(files, split, cats, config):
     print("COLLECTING")
     datasets = ['train', 'test']
@@ -91,16 +93,21 @@ def collect_files(files, split, cats, config):
                 file_id = get_file_id(file)
                 cat = categories[file_id]
                 if coding[split[file_id]] == dataset:
-                    print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat] , dataset , file_id), cat), file = f)
+                    print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat] , dataset , file_id), cat), file = f)                           
+
+
 
 def log(message, log):
     with open(log, 'a') as f:
         print(message, file = f)          
                
 if __name__ == '__main__':
-    
+
     config = get_config()
     
+    with open(os.path.join(config.output,'tt.txt'), 'w') as f:
+        print("STARTING CONVERSION", file = f)
+
     with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
     try:
@@ -135,26 +142,21 @@ if __name__ == '__main__':
         cat_name = cat_names[cat]
         dataset = coding[split[id]]
         whole_path = os.path.join(config.output, cat_name, dataset, id)
-        truth = True
         for view in range(config.num_views):
-            if not os.path.exists(get_name_of_image_file(whole_path, id, 0)):
+            if not os.path.exists(get_name_of_image_file(whole_path, id, view)):
                 return False
         return True
-        
-    #files = [x for x in files if not exists(x)]
+    
+    all_files = files
+    files = [x for x in files if not exists(x)]
+    print(len(files))
     
     save_for_mvcnn(config, files, categories, split)
-    collect_files(files, split,categories, config)
+    collect_files(all_files, split,categories, config)
     log("Ending and cleaning", config.log_file)
     if config.dataset_type == 'modelnet' and config.remove_obj:
         os.system('find {} -name *.obj -delete'.format(config.data))
     
-    all_txt_files = 0
-    for root, dirs, files in os.walk(config.output):
-        for file in files:
-            if file.endswith(".txt"):
-                 all_txt_files+=1
-    print(all_txt_files)
         
     
     
