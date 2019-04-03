@@ -36,12 +36,12 @@
 \contentsline {subsection}{\numberline {4.2.3}Mesh to Point Cloud}{25}{subsection.4.2.3}% 
 \contentsline {section}{\numberline {4.3}Technical Setup}{26}{section.4.3}% 
 \contentsline {chapter}{\numberline {5}Experiments and Results}{27}{chapter.5}% 
-\contentsline {chapter}{\numberline {6}Conclusions}{30}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}Summary}{30}{section.6.1}% 
-\contentsline {section}{\numberline {6.2}Further Work}{30}{section.6.2}% 
-\contentsline {chapter}{Bibliography}{31}{chapter*.19}% 
-\contentsline {chapter}{List of Figures}{36}{chapter*.20}% 
-\contentsline {chapter}{List of Tables}{37}{chapter*.21}% 
-\contentsline {chapter}{List of Abbreviations}{38}{chapter*.22}% 
-\contentsline {chapter}{\numberline {A}Attachments}{39}{appendix.A}% 
-\contentsline {section}{\numberline {A.1}First Attachment}{39}{section.A.1}% 
+\contentsline {chapter}{\numberline {6}Conclusions}{31}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Summary}{31}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Further Work}{31}{section.6.2}% 
+\contentsline {chapter}{Bibliography}{32}{chapter*.20}% 
+\contentsline {chapter}{List of Figures}{37}{chapter*.21}% 
+\contentsline {chapter}{List of Tables}{38}{chapter*.22}% 
+\contentsline {chapter}{List of Abbreviations}{39}{chapter*.23}% 
+\contentsline {chapter}{\numberline {A}Attachments}{40}{appendix.A}% 
+\contentsline {section}{\numberline {A.1}First Attachment}{40}{section.A.1}% 

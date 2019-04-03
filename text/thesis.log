@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  1 APR 2019 17:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  3 APR 2019 16:50
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -1170,16 +1170,26 @@ Overfull \hbox (27.76457pt too wide) in paragraph at lines 2--21
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `tbp') on input line 1.
 
+) (tables/cataccuracies.tex
+
+LaTeX Warning: No positions in optional float specifier.
+               Default added (so using `tbp') on input line 1.
+
+
+Overfull \hbox (4.83673pt too wide) in paragraph at lines 2--51
+[][] [] |
+ []
+
 )) [27
 
 
 
-] [28] [29]
+] [28] [29] [30]
 \openout2 = `chap06.aux'.
 
  (chap06.tex
 Chapter 6.
-) [30
+) [31
 
 
 
@@ -1204,11 +1214,11 @@ Underfull \hbox (badness 2762) in paragraph at lines 104--109
 Neu-ral Net-
  []
 
-[31
+[32
 
 
 
-] [32]
+] [33]
 Underfull \hbox (badness 10000) in paragraph at lines 205--208
 []\OT1/lmr/m/n/12 machrisaa.  tensorflow-vgg.  URL []$\OT1/lmtt/m/n/12 https : 
 / / github . com / machrisaa /
@@ -1226,30 +1236,30 @@ Underfull \hbox (badness 2582) in paragraph at lines 301--306
 p : / / arxiv . org / abs / 1604 . 03351$[]\OT1/lmr/m/n/12 .  arXiv:
  []
 
-[33]
+[34]
 Underfull \hbox (badness 3058) in paragraph at lines 344--350
 \OT1/lmr/m/n/12 Multi-view Con-vo-lu-tional Neu-ral Net-works for 3d Shape Reco
 g-ni-tion.
  []
 
-[34])) [35] (thesis.lof)
+[35])) [36] (thesis.lof)
 \tf@lof=\write9
 \openout9 = `thesis.lof'.
 
- [36
+ [37
 
 
 ] (thesis.lot)
 \tf@lot=\write10
 \openout10 = `thesis.lot'.
 
- [37
+ [38
 
-] [38
+] [39
 
 ]
 Appendix A.
-[39
+[40
 
 ]
 Package atveryend Info: Empty hook `BeforeClearDocument' on input line 165.
@@ -1259,7 +1269,7 @@ hap05.aux) (chap06.aux) (bibliography.aux))
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 165.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 165.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 7B1371E6E33B8A8699CB8BBBCCECD2E7;7350.
+(rerunfilecheck)             Checksum: D0720D0BF738C4689B68E37A0CC91778;7350.
 
 
 LaTeX Warning: There were multiply-defined labels.
@@ -1267,10 +1277,10 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 165.
  ) 
 Here is how much of TeX's memory you used:
- 29296 strings out of 492946
- 532751 string characters out of 3135527
- 640586 words of memory out of 3000000
- 32431 multiletter control sequences out of 15000+200000
+ 29302 strings out of 492946
+ 532883 string characters out of 3135527
+ 640667 words of memory out of 3000000
+ 32432 multiletter control sequences out of 15000+200000
  58092 words of font info for 51 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,10n,71p,1175b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1288,9 +1298,9 @@ ype1/public/lm/lmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr
 Files/MiKTeX 2.9/fonts/type1/public/lm/lmri12.pfb><C:/Program Files/MiKTeX 2.9/
 fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
 c/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmtt12.pfb>
-Output written on thesis.pdf (43 pages, 1380062 bytes).
+Output written on thesis.pdf (44 pages, 1381899 bytes).
 PDF statistics:
- 857 PDF objects out of 1000 (max. 8388607)
- 164 named destinations out of 1000 (max. 500000)
+ 863 PDF objects out of 1000 (max. 8388607)
+ 166 named destinations out of 1000 (max. 500000)
  446 words of extra memory for PDF output out of 10000 (max. 10000000)
 
