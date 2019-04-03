@@ -26,6 +26,7 @@ class ModelNetTrainer(object):
 
         self.LOSS_LOGGER = Logger("{}_loss".format(config.name))
         self.ACC_LOGGER = Logger("{}_acc".format(config.name))
+        
     def train(self, config, batch_size):
 
         self.model.train()
@@ -142,7 +143,6 @@ class ModelNetTrainer(object):
             all_points += results.size()[0]
             all_target += target.tolist()
             all_pred += pred.tolist()
-            print("accuracy so far ", float(all_correct_points) / all_points)
 
         print ('Total # of test models: ', all_points)
         val_mean_class_acc = np.mean((samples_class-wrong_class)/samples_class)

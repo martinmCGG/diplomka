@@ -29,14 +29,14 @@ def train(config):
     log_dir = os.path.join(config.log_dir,config.name+'_stage_1')
     create_folder(log_dir)
     cnet = SVCNN(config.name, nclasses=config.num_classes, pretraining=pretraining, cnn_name=config.cnn_name)
-
+    
     optimizer = optim.Adam(cnet.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
     train_path = os.path.join(config.data, "*/train")  
-    train_dataset = SingleImgDataset(train_path, scale_aug=False, rot_aug=False, num_views=config.num_views)
+    train_dataset = SingleImgDataset(train_path, config, scale_aug=False, rot_aug=False)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config.stage1_batch_size, shuffle=True, num_workers=0)
     
     val_path = os.path.join(config.data, "*/test")
-    val_dataset = SingleImgDataset(val_path, scale_aug=False, rot_aug=False, test_mode=True)
+    val_dataset = SingleImgDataset(val_path, config, scale_aug=False, rot_aug=False, test_mode=True)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=config.stage1_batch_size, shuffle=False, num_workers=0)
     
     print('num_train_files: '+str(len(train_dataset.filepaths)))
@@ -44,7 +44,8 @@ def train(config):
     
     trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(),config, log_dir, num_views=1)
     trainer.train(config,config.stage1_batch_size)
-
+    #cnet.load(os.path.join(log_dir, config.snapshot_prefix + str(30)))
+    
     # STAGE 2
     print('--------------stage 2--------------')
     log_dir = os.path.join(config.log_dir,config.name+'_stage_2')
@@ -54,16 +55,17 @@ def train(config):
 
     optimizer = optim.Adam(cnet_2.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay, betas=(0.9, 0.999))
     
-    train_dataset = MultiviewImgDataset(train_path, scale_aug=False, rot_aug=False, num_views=config.num_views)
+    train_dataset = MultiviewImgDataset(train_path,config, scale_aug=False, rot_aug=False)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config.stage2_batch_size, shuffle=False, num_workers=0)# shuffle needs to be false! it's done within the trainer
 
-    val_dataset = MultiviewImgDataset(val_path, scale_aug=False, rot_aug=False, num_views=config.num_views)
+    val_dataset = MultiviewImgDataset(val_path,config, scale_aug=False, rot_aug=False)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=config.stage2_batch_size, shuffle=False, num_workers=0)
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))
     trainer = ModelNetTrainer(cnet_2, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), config, log_dir, num_views=config.num_views)
     trainer.train(config,config.stage2_batch_size)
-
+    
+    
 def test(config):
     log_dir = os.path.join(config.log_dir, config.name+'_stage_2')
   
@@ -76,7 +78,7 @@ def test(config):
     cnet = SVCNN(config.name, nclasses=config.num_classes, cnn_name=config.cnn_name, pretraining=pretraining)
     
     cnet_2 = MVCNN(config.name, cnet, nclasses=config.num_classes, cnn_name=config.cnn_name, num_views=config.num_views)
-    cnet_2.load(log_dir, modelfile = os.path.join(log_dir, config.snapshot_prefix + str(config.weights)))
+    cnet_2.load(os.path.join(log_dir, config.snapshot_prefix + str(config.weights)))
     optimizer = optim.Adam(cnet_2.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay, betas=(0.9, 0.999))
     
     trainer = ModelNetTrainer(cnet_2, None, val_loader, optimizer, nn.CrossEntropyLoss(), config, log_dir, num_views=config.num_views)

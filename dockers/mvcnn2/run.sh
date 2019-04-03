@@ -2,10 +2,10 @@
 # Set required variables
 
 name='mvcnn2'
-dataset_path="/local/krabec/ModelNet40A/depth"
-out_path="/home/krabec/dockers/mvcnn2/out/"
+dataset_path="/local/krabec/ModelNet40A/phong"
+out_path="/home/krabec/dockers/mvcnn2/out/phong"
 GPU=0
-docker_hidden=t
+docker_hidden=d
 
 ##########################################################################################################
 

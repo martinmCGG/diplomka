@@ -2,9 +2,10 @@
 # Set required variables
 
 name="kdnet"
-dataset_path="/local/krabec/ShapeNet/ShapeNet"
-output_dir="/local/krabec/ShapeNet"
-docker_hidden=d
+#dataset_path="/home/krabec/Ssmall"
+dataset_path="/local/krabec/ShapeNet"
+output_dir="/home/krabec"
+docker_hidden=t
 
 ##########################################################################################################
 
@@ -17,6 +18,6 @@ docker kill "$image_name"
 docker rm "$image_name"
 
 docker run --rm -id --name "$image_name" -v "$dataset_path":/dataset -v "$output_dir":/data "$image_name"
-docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 kdnet_data.py > /data/log.txt"
+docker exec -i -"$docker_hidden" "$image_name" sh -c "python3 kdnet_data.py"
 
 ##########################################################################################################

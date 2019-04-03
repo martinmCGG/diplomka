@@ -12,18 +12,18 @@ import random
 
 class MultiviewImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, root_dir, scale_aug=False, rot_aug=False, test_mode=False, \
-                 num_models=0, num_views=12, shuffle=True):
-        self.classnames=['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair',
-                         'cone','cup','curtain','desk','door','dresser','flower_pot','glass_box',
-                         'guitar','keyboard','lamp','laptop','mantel','monitor','night_stand',
-                         'person','piano','plant','radio','range_hood','sink','sofa','stairs',
-                         'stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
+    def __init__(self, root_dir, config, scale_aug=False, rot_aug=False, test_mode=False, \
+                 num_models=0, shuffle=True):
+#
+                         
+        with open(os.path.join(config.data, 'cat_names.txt'), 'r') as f:
+            self.classnames = [line.strip() for line in f.readlines()]
+        
         self.root_dir = root_dir
         self.scale_aug = scale_aug
         self.rot_aug = rot_aug
         self.test_mode = test_mode
-        self.num_views = num_views
+        self.num_views = config.num_views
 
         set_ = root_dir.split('/')[-1]
         parent_dir = root_dir.rsplit('/',2)[0]
@@ -42,10 +42,10 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
 
         if shuffle==True:
             # permute
-            rand_idx = np.random.permutation(int(len(self.filepaths)/num_views))
+            rand_idx = np.random.permutation(int(len(self.filepaths)/self.num_views))
             filepaths_new = []
             for i in range(len(rand_idx)):
-                filepaths_new.extend(self.filepaths[rand_idx[i]*num_views:(rand_idx[i]+1)*num_views])
+                filepaths_new.extend(self.filepaths[rand_idx[i]*self.num_views:(rand_idx[i]+1)*self.num_views])
             self.filepaths = filepaths_new
 
 
@@ -70,7 +70,7 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         path = self.filepaths[idx*self.num_views]
-        class_name = path.split('/')[-3]
+        class_name = path.split('/')[-4]
         class_id = self.classnames.index(class_name)
         # Use PIL instead
         imgs = []
@@ -86,13 +86,11 @@ class MultiviewImgDataset(torch.utils.data.Dataset):
 
 class SingleImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, root_dir, scale_aug=False, rot_aug=False, test_mode=False, \
-                 num_models=0, num_views=12):
-        self.classnames=['airplane','bathtub','bed','bench','bookshelf','bottle','bowl','car','chair',
-                         'cone','cup','curtain','desk','door','dresser','flower_pot','glass_box',
-                         'guitar','keyboard','lamp','laptop','mantel','monitor','night_stand',
-                         'person','piano','plant','radio','range_hood','sink','sofa','stairs',
-                         'stool','table','tent','toilet','tv_stand','vase','wardrobe','xbox']
+    def __init__(self, root_dir, config, scale_aug=False, rot_aug=False, test_mode=False, \
+                 num_models=0):
+        with open(os.path.join(config.data, 'cat_names.txt'), 'r') as f:
+            self.classnames = [line.strip() for line in f.readlines()]
+        
         self.root_dir = root_dir
         self.scale_aug = scale_aug
         self.rot_aug = rot_aug

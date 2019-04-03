@@ -1,24 +1,52 @@
 from __future__ import print_function
 import os
 import numpy as np
-import pandas as pd
 import h5py as h5
-import Shapenet
 import re
 from mesh_files import *
+from Shapenet import *
+from MultiProcesor import MultiProcesor
+from npz_join import join_h5
 
-def get_file_id(file):
-    return file.split('/')[-3]
 
+def write_for_kdnet(buffer, buffer_cats, dataset, id, config):
+    nFaces = []
+    nfaces = []
+    nvertices = []
+    for vertices, faces in buffer:
+        nFaces.append(len(faces))
+        nfaces += list(faces)
+        nvertices+=list(vertices)
+    names = ['{}_nFaces','{}_faces','{}_vertices','{}_labels']
+    data = [nFaces, nfaces, nvertices, buffer_cats]
+    data = [np.array(dato) for dato in data]
+    hf = h5.File(os.path.join(config.output, dataset + '_data_' + str(id) +'.h5') , 'w')
+    for dato, name in zip(data, names):
+        name = name.format(dataset)
+        hf.create_dataset(name, data=dato)
+    hf.close()
+    
+    
+def load_mesh(filename, type, args):
+    shape_vertices, shape_faces, _ = read_obj_file(filename)
+    return [shape_vertices, shape_faces]
 
-def  save_for_kdnet(files, config, categories, split):
+      
+def merge_h5_files(directory):
+    join_h5(directory, '.*\.h5', 'data.h5')
+    
+       
+def save_for_kdnet_multi(files,config, categories, split):
+    procesor = MultiProcesor(files, config.num_threads, config.log_file, categories, split, config.dataset_type, load_mesh, write_for_kdnet)
+    procesor.run(config._asdict())
 
+def save_for_kdnet(files, config, categories, split):
     path2data = config.data
     path2save = config.output
-
+    
     train_filenames =  [file for file in files if get_file_id(file) not in split or split[get_file_id(file)] == 0]
     test_filenames = [file for file in files if get_file_id(file) in split and split[get_file_id(file)] == 1]
-    
+
     train_vertices_cnt = 0
     train_faces_cnt = 0
 
@@ -52,7 +80,7 @@ def  save_for_kdnet(files, config, categories, split):
     test_faces = np.zeros((test_faces_cnt, 3), dtype=np.int32)
     test_vertices = np.zeros((test_vertices_cnt, 3), dtype=np.int32)
     test_labels = np.zeros((len(test_filenames),), dtype=np.int8)
-    data = [train_nFaces,train_faces,train_vertices,train_labels,test_nFaces,test_faces,test_vertices,test_labels]
+    data = [train_nFaces, train_faces, train_vertices, train_labels, test_nFaces, test_faces, test_vertices, test_labels]
     
     train_nFaces[0] = 0
     test_nFaces[0] = 0
@@ -83,6 +111,7 @@ def  save_for_kdnet(files, config, categories, split):
 
     vertices_pos = 0
     faces_pos = 0
+    
     for i, shapefile in enumerate(test_filenames):
         print(shapefile)
         shape_name = get_file_id(shapefile)
@@ -116,14 +145,15 @@ def  save_for_kdnet(files, config, categories, split):
     print('ENDING')
 
 def prepare(config):
-    print('Starting')
+    with open(config.log_file, 'w') as f:
+        print('Starting', file = f)
     path2data = config.data
     path2save = config.output
-    categories, split = Shapenet.get_metadata(path2data)
-    files = find_files(path2data, 'obj')
-    categories, split = Shapenet.get_metadata(path2data)
-    Shapenet.write_cat_names(path2data, path2save)
-    save_for_kdnet(files,config, categories, split)
+    categories, split, cat_names = get_metadata(path2data)
+    files = get_files_list(path2data, categories)
+    write_cat_names(path2data, path2save)
+    save_for_kdnet_multi(files, config, categories, split)
+    merge_h5_files(config.output)
 
 
         
