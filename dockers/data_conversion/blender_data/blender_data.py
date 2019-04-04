@@ -56,8 +56,7 @@ def run_multithread(files, config, categories, split, size_thread):
     
 def save_for_mvcnn(config, all_files, categories, split):
     
-    counter = 0
-    
+
     for cat in config.cat_names:
         os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
         for dataset in coding.values():
@@ -70,16 +69,12 @@ def save_for_mvcnn(config, all_files, categories, split):
     if len(all_files) > size_thread:
         for j in range(len(all_files)//size):
             files = all_files[j*size:(j+1)*size]
-            counter += len(files)
             run_multithread(files, config, categories, split, size_thread)
             log("Finished {} %".format(j*size/len(all_files)), config.log_file) 
         files = all_files[len(all_files)//size*size:]
-        counter += len(files)
         run_multithread(files, config, categories, split, size_thread)
-           
     else:
         files_to_images(all_files, config, categories,split)
-    log("Proccessed {}".format(counter), config.log_file)
     log("Finished conversion", config.log_file)
 
 

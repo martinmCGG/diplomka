@@ -10,15 +10,17 @@ from npz_join import join_h5
 
 
 def write_for_kdnet(buffer, buffer_cats, dataset, id, config):
-    nFaces = []
-    nfaces = []
-    nvertices = []
+    nFaces = [0]
+    all_faces = []
+    all_vertices = []
+    offset = 0
     for vertices, faces in buffer:
-        nFaces.append(len(faces))
-        nfaces += list(faces)
-        nvertices+=list(vertices)
+        offset+= len(faces)
+        nFaces.append(offset)
+        all_faces += list(faces)
+        all_vertices+=list(vertices)
     names = ['{}_nFaces','{}_faces','{}_vertices','{}_labels']
-    data = [nFaces, nfaces, nvertices, buffer_cats]
+    data = [nFaces, all_faces, all_vertices, buffer_cats]
     data = [np.array(dato) for dato in data]
     hf = h5.File(os.path.join(config.output, dataset + '_data_' + str(id) +'.h5') , 'w')
     for dato, name in zip(data, names):
@@ -147,13 +149,15 @@ def save_for_kdnet(files, config, categories, split):
 def prepare(config):
     with open(config.log_file, 'w') as f:
         print('Starting', file = f)
-    path2data = config.data
-    path2save = config.output
-    categories, split, cat_names = get_metadata(path2data)
-    files = get_files_list(path2data, categories)
-    write_cat_names(path2data, path2save)
+
+    categories, split, cat_names = get_metadata(config.data)
+    files = get_files_list(config.data, categories)
+    write_cat_names(config.data, config.output)
     save_for_kdnet_multi(files, config, categories, split)
     merge_h5_files(config.output)
-
-
+    
+    filename = os.path.join(config.output,'data.h5')
+    hf = h5.File(filename,'r')
+    print(list(hf.keys()))
+    hf.close()
         

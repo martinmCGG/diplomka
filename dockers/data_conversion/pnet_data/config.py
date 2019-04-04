@@ -76,6 +76,3 @@ def add_to_config(config, key, value):
 
 def epoch_to_iters(epochs, batch_size, data_size):
     return epochs * data_size / batch_size
-
-    
-    

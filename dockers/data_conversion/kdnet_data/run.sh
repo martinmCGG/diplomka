@@ -1,11 +1,10 @@
 ##########################################################################################################
 # Set required variables
 
-name="kdnet"
-#dataset_path="/home/krabec/Ssmall"
+name="kdnetsmall"
 dataset_path="/local/krabec/ShapeNet"
 output_dir="/home/krabec"
-docker_hidden=t
+docker_hidden=d
 
 ##########################################################################################################
 

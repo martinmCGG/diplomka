@@ -21,7 +21,6 @@ def join_npz(directory, regex, output):
             if key not in dict:
                 dict[key] = []
             dict[key].append(arch[key])
-            #print(arch[key].shape)
     bigdict = {}
     for key in dict.keys():
         arr = np.concatenate(dict[key])
@@ -42,13 +41,14 @@ def join_h5(directory, regex, output):
             dataset = arch.get(key)
             copy = np.copy(np.array(dataset))
             dict[key].append(copy)
+        arch.close()
     if files:
         hf = h5py.File(os.path.join(directory, output), 'w')
         for key in dict.keys():
             arr = np.concatenate(dict[key])
             hf.create_dataset(key, data=arr)
-            delete_files(files)
         hf.close()
+        delete_files(files)
     
         
         

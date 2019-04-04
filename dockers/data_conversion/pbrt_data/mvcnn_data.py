@@ -2,7 +2,7 @@ from __future__ import print_function
 import os
 import sys
 import traceback
-from multiprocessing import Process, Pool, Lock
+from multiprocessing import Process, Pool
 from pathlib import Path
 from mesh_files import *
 from config import get_config, add_to_config
@@ -14,15 +14,15 @@ coding = {
     }
 
 
-def get_name_of_image_file(output_dir, angle, camera_angle, file_id, i):
+def get_name_of_image_file(output_dir, angle, camera_angle, file_id):
     return os.path.join(output_dir, file_id + "_{:.2f}_{:.2f}.png".format(angle, camera_angle))
 
 def get_name_of_txt_file(output_dir, cat_name, dataset, file_id):
     return os.path.join(output_dir , cat_name, dataset, file_id, file_id + ".txt")
 
-def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir, id, file_id, fov, dodecahedron = False):
+def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir, file_id, fov, dodecahedron = False):
 
-    output_file = get_name_of_image_file(output_dir, angle, camera_angle, file_id, id)
+    output_file = get_name_of_image_file(output_dir, angle, camera_angle, file_id)
     
     if dodecahedron:
         formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov, dodecahedron)
@@ -36,7 +36,7 @@ def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir
     os.system(cmd)
 
     
-def render_model(obj_file, id, config, cat, dataset, cat_name):
+def render_model(obj_file, config, cat, dataset, cat_name):
     fov = config.fov
     file_id = get_file_id(obj_file)
     geometry = os.path.join(os.path.split(obj_file)[0] , Path(obj_file).stem + ".pbrt")
@@ -56,9 +56,9 @@ def render_model(obj_file, id, config, cat, dataset, cat_name):
     for view in range(views):
         for camera_rotation in range(config.camera_rotations):
             if config.dodecahedron:
-                render_one_image(geometry, unformated_scene, view*360/views, camera_rotation*360/config.camera_rotations,whole_path, id, file_id,fov, dodecahedron=config.d_vertices[view])
+                render_one_image(geometry, unformated_scene, view*360/views, camera_rotation*360/config.camera_rotations,whole_path, file_id,fov, dodecahedron=config.d_vertices[view])
             else:
-                render_one_image(geometry, unformated_scene, view*360/views, camera_rotation*360/config.camera_rotations, whole_path, id, file_id, fov)
+                render_one_image(geometry, unformated_scene, view*360/views, camera_rotation*360/config.camera_rotations, whole_path, file_id, fov)
 
     os.system("rm {}".format(geometry))
     
@@ -69,58 +69,51 @@ def render_model(obj_file, id, config, cat, dataset, cat_name):
             angle = view*360/views
             for camera_rotation in range(config.camera_rotations):
                 camera_angle = camera_rotation*360/config.camera_rotations
-                print(get_name_of_image_file(whole_path, angle, camera_angle, file_id, id), file=f)
+                print(get_name_of_image_file(whole_path, angle, camera_angle, file_id), file=f)
 
-def files_to_images(files, id, config, categories, split, lock):
+def files_to_images(files, config, categories, split):
     views = config.num_views
     
     camera_rotations = config.camera_rotations
-    log("Starting thread {} on {} files.".format(id, len(files)),lock, config.log_file)
+
     for i in range(len(files)):
         file = files[i]
-        if i%100==0:
-            log("Thread {} is {:.2f}% done.".format(id,float(i)/len(files)*100), lock, config.log_file)
         try:
             file_id = get_file_id(file)
             cat = categories[file_id]
             cat_name = config.cat_names[cat]
             dataset = split[file_id]
-            render_model(file, id, config, cat, dataset, cat_name)
+            render_model(file, config, cat, dataset, cat_name)
         except:
             e = sys.exc_info()
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), lock, config.log_file)
-            log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno), lock, config.log_file)   
-    log("Ending thread {}.".format(id), lock, config.log_file)
+            log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), config.log_file)
+            log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno), config.log_file)   
     
     
 def save_for_mvcnn(config, files, categories, split):
-    size = len(files) // config.num_threads
-    pool = []
-    lock = Lock()
-    if config.dodecahedron:
-        config = add_to_config(config,'d_vertices', cat_names)
     
     for cat in config.cat_names:
         os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
         for dataset in coding.values():
             os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
-    
-    if len(files) > 20:
-        log("Starting {} threads on {} files.".format(config.num_threads, len(files)),lock, config.log_file)
-        for i in range(config.num_threads-1):
-            p = Process(target=files_to_images, args=(files[i*size:(i+1)*size], i, config, categories, split, lock))
-            p.start()
-            pool.append(p)
-        p = Process(target=files_to_images, args=(files[(config.num_threads-1)*size:], config.num_threads-1, config, categories,split, lock))
-        p.start()
-        pool.append(p)
-        for p in pool:
-            p.join()
+            
+    log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
+    size_thread = 100
+    size  = size_thread * config.num_threads
+    log(str(size), config.log_file)
+    if len(all_files) > size_thread:
+        for j in range(len(all_files)//size):
+            files = all_files[j*size:(j+1)*size]
+            run_multithread(files, config, categories, split, size_thread)
+            log("Finished {} %".format(j*size/len(all_files)), config.log_file) 
+        files = all_files[len(all_files)//size*size:]
+        run_multithread(files, config, categories, split, size_thread)
+           
     else:
-        files_to_images(files, 0, config, categories,split, lock)
-    log("Ending...",lock, config.log_file)
+        files_to_images(files, 0, config, categories,split)
+    log("Finished conversion", config.log_file)
 
 def collect_files(files, split, cats, config):
     print("COLLECTING")
@@ -134,12 +127,10 @@ def collect_files(files, split, cats, config):
                     print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat], dataset , file_id), cat), file = f)
 
 
-def log(message, lock, log):
-    lock.acquire()
+def log(message, log):
     with open(log, 'a') as f:
         print(message, file = f)
-    lock.release()        
-        
+
 
 def compute_dodecahedron_vertices():
     phi = 1.618
