@@ -49,13 +49,13 @@ def prepare(config):
 
                 vrtcs = np.empty((numVertices, 3), dtype=np.float32)
                 for k, line in enumerate(fobj):
-                    vrtcs[k] = map(np.float32, line.split())
+                    vrtcs[k] = list(map(np.float32, line.split()))
                     if k == numVertices - 1:
                         break
 
                 fcs = np.empty((numFaces, 3), dtype=np.int32)
                 for k, line in enumerate(fobj):
-                    fcs[k] = map(np.int32, line.split())[1:]
+                    fcs[k] = list(map(np.int32, line.split()))[1:]
                     if k == numFaces - 1:
                         break
 
@@ -79,13 +79,13 @@ def prepare(config):
 
                 vrtcs = np.empty((numVertices, 3), dtype=np.float32)
                 for k, line in enumerate(fobj):
-                    vrtcs[k] = map(np.float32, line.split())
+                    vrtcs[k] = list(map(np.float32, line.split()))
                     if k == numVertices - 1:
                         break
 
                 fcs = np.empty((numFaces, 3), dtype=np.int32)
                 for k, line in enumerate(fobj):
-                    fcs[k] = map(np.int32, line.split())[1:]
+                    fcs[k] = list(map(np.int32, line.split()))[1:]
                     if k == numFaces - 1:   
                         break
 
