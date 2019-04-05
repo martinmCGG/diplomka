@@ -101,7 +101,7 @@ if __name__ == '__main__':
         from Modelnet import *
         split = None
         cat_names = get_cat_names(config.data)
-        Modelnet.write_cat_names(config.data, config.output)
+        write_cat_names(config.data, config.output)
         input_categories = sorted([os.path.join(config.data,cat) for cat in cat_names])
         output_categories = sorted([os.path.join(config.output,cat) for cat in cat_names])       
 

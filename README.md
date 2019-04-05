@@ -2,7 +2,7 @@
 
 ## Abstract
 
-We compiled set of publicly available neural networks for classification of 3D models. The code works with ModelNet40 and ShapeNetCore datasets which are also available online. This is a manual explaining how to convert datasets, train and test these networks.  
+We compiled set of publicly available neural networks for classification of 3D models. The code works with ModelNet40 and ShapeNetCore datasets which are also available online. This is a manual explaining how to convert datasets, train and test these networks.
 
 ## Requirements
 
@@ -14,13 +14,13 @@ You will need to install:
 *   Docker version 1.12 or higher ([Installation guide here](https://docs.docker.com/install/))
 *   NVIDIA Container Runtime for Docker ([Installation guide here](https://github.com/NVIDIA/nvidia-docker))
 
-And that is all! Each neural network is an independent Docker image and all its dependencies are installed when building the image. All code is written in python.  
+And that is all! Each neural network is an independent Docker image and all its dependencies are installed when building the image. All code is written in Python.
 
 ## Datasets Setup
 
 The code is made to work with ModelNet40 and ShapeNetCore datasets. The easiest way to run it with custom dataset is to restructure your data so it copies the structure of one of these datasets.
 
-*   ### ModelNet40  
+*   ### ModelNet40
 
     *   Get the dataset [here](http://modelnet.cs.princeton.edu/). For experiments we used manually aligned version which can be downloaded [here](https://github.com/lmb-freiburg/orion).
 
@@ -44,9 +44,9 @@ Each directory contains two important files - config.ini and run.sh, which you w
 run.sh is a runnable script which builds the docker image, runs the docker container and executes the neural network or data conversion. You will need to setup a couple of variables here:
 
 *   name - will be used as a name of the docker image and docker container. You can leave this at default value unless it is in conflict with some already existing image or you want to run more instances of this image at once. With data conversion scripts the name is the name of the converted dataset and directory of the same name will be created. The name of the image can be changed by changing variable image_name in this case.
-*   dataset_path -  contains path to the root directory of the dataset on your filesystem.
+*   dataset_path - contains path to the root directory of the dataset on your filesystem.
 *   out_path - contains path to the directory where training logs and network weights will be saved. This directory will be created automatically.
-*   GPU - index of GPU which will be visible to docker container. Have to be a single integer. We currently do not support multiple GPUs.
+*   GPU - index of GPU which will be visible to docker container. Has to be a single integer. We currently do not support multiple GPUs.
 *   docker_hidden - Must be one of t or d. With t the container will be run in interactive mode, meaning it will run in your console. With d it will in detached mode i.e. in the background. For more information check docker documentation [here](https://docs.docker.com/engine/reference/run/).
 
 config.ini contains most of the relevant parameters of the network or data conversion. The file is split to sections where each section is started by [SECTION] statement. Then on each line a parameter in format key = value. You can find explanation of network parameters in later sections.
@@ -67,7 +67,7 @@ For more detail about individual data conversion scripts, continue [here](conver
 
 ## Neural Networks
 
-Each of the neural networks is implemented in python but in different framework. That is why we used the docker infrastructure. We try to present some unified framework to easily test and train the networks without changing the code. This section will briefly introduce used networks and some of their most important parameters.
+Each of the neural networks is implemented in Python but in different framework. That is why we used the Docker infrastructure. We try to present a unified framework to easily test and train the networks without changing the code. This section will briefly introduce the used networks and some of their most important parameters.
 
 Parameters common to all neural networks:
 
