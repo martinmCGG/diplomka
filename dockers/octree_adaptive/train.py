@@ -108,10 +108,13 @@ def train(config, solver):
         print("LOSS: ", np.mean(losses))
         print("ACCURACY", np.mean(accs))
 
+def set_num_cats(config):
+    import prepare_nets
+    prepare_nets.set_num_cats(config.net[1:-1], config.num_classes)
 
 if __name__ == '__main__':
     config = get_config()
-    
+    set_num_cats(config)
     caffe.set_device(0)
     caffe.set_mode_gpu()
     data_size = get_dataset_size(config, 'train')

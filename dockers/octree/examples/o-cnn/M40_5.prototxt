@@ -255,7 +255,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: 40
+    num_output: $NUMCLASSES
     weight_filler {
       type: "xavier"
     }

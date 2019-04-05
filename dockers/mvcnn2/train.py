@@ -28,7 +28,7 @@ def train(config):
     # STAGE 1
     log_dir = os.path.join(config.log_dir,config.name+'_stage_1')
     create_folder(log_dir)
-    cnet = SVCNN(config.name, nclasses=config.num_classes, pretraining=pretraining, cnn_name=config.cnn_name)
+    cnet = SVCNN(config, pretraining=pretraining)
     
     optimizer = optim.Adam(cnet.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
     train_path = os.path.join(config.data, "*/train")  
@@ -50,7 +50,7 @@ def train(config):
     print('--------------stage 2--------------')
     log_dir = os.path.join(config.log_dir,config.name+'_stage_2')
     create_folder(log_dir)
-    cnet_2 = MVCNN(config.name, cnet, nclasses=config.num_classes, cnn_name=config.cnn_name, num_views=config.num_views)
+    cnet_2 = MVCNN(cnet, config)
     del cnet
 
     optimizer = optim.Adam(cnet_2.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay, betas=(0.9, 0.999))
@@ -58,7 +58,7 @@ def train(config):
     train_dataset = MultiviewImgDataset(train_path,config, scale_aug=False, rot_aug=False)
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=config.stage2_batch_size, shuffle=False, num_workers=0)# shuffle needs to be false! it's done within the trainer
 
-    val_dataset = MultiviewImgDataset(val_path,config, scale_aug=False, rot_aug=False)
+    val_dataset = MultiviewImgDataset(val_path, config, scale_aug=False, rot_aug=False)
     val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=config.stage2_batch_size, shuffle=False, num_workers=0)
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))

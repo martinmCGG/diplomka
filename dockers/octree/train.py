@@ -62,6 +62,10 @@ def eval(config, solver, epoch=0):
         et.write_eval_file(config.data, eval_file, predictions, labels, config.name)
         et.make_matrix(config.data, eval_file, config.log_dir) 
 
+def set_num_cats(config):
+    import prepare_nets
+    prepare_nets.set_num_cats(config.net[1:-1], config.num_classes)
+
 def train(config, solver):
     
     if config.weights == -1:
@@ -111,6 +115,7 @@ def train(config, solver):
 
 if __name__ == '__main__':
     config = get_config()
+    set_num_cats(config)
     caffe.set_device(0)
     caffe.set_mode_gpu()
     data_size = get_dataset_size(config, 'train')
