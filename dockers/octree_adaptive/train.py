@@ -115,11 +115,14 @@ def set_num_cats(config):
 if __name__ == '__main__':
     config = get_config()
     set_num_cats(config)
-    caffe.set_device(0)
-    caffe.set_mode_gpu()
+
     data_size = get_dataset_size(config, 'train')
     prepare_solver_file(data_size=data_size)
+ 
+    caffe.set_device(0)
+    caffe.set_mode_gpu()
     solver = caffe.get_solver(config.solver)
+
 
     if not config.test:
         LOSS_LOGGER = Logger("{}_loss".format(config.name))

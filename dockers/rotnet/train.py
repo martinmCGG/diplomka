@@ -101,9 +101,16 @@ def train(config, solver):
         print("ACCURACY", np.mean(accs))
 
 
+def set_num_cats(config):
+    import prepare_nets
+    prepare_nets.set_num_cats(config.train_net[1:-1], config.num_classes, config.num_views)
+    prepare_nets.set_num_cats(config.test_net[1:-1],config.num_classes, config.num_views)
+    prepare_nets.set_batch_size(config.train_net[1:-1], config.batch_size)
+    
 if __name__ == '__main__':
     
     config = get_config()
+    set_num_cats(config)
     
     prepare_data(os.path.join(config.data, 'train.txt'), views=config.num_views, shuffle=True)
     prepare_data(os.path.join(config.data, 'test.txt'), views=config.num_views, shuffle=False)

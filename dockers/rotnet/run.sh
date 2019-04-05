@@ -1,9 +1,9 @@
 ##########################################################################################################
 # Set required variables
 name='rotnet'
-dataset_path="/local/krabec/ModelNet40A/phong"
-out_path="/home/krabec/dockers/rotnet/out/phong"
-GPU=2
+dataset_path="/home/krabec/phong_shapenet"
+out_path="/home/krabec/dockers/rotnet/shapenet"
+GPU=0
 docker_hidden=d
 
 ##########################################################################################################

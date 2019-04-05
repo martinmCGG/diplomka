@@ -6,7 +6,7 @@ layers {
   top: "label"
   image_data_param {
     source: "/data/trainrotnet.txt"
-    batch_size: 480
+    batch_size: $BATCHSIZE
     new_height: 256
     new_width: 256
     crop_size: 227
@@ -301,7 +301,7 @@ layers {
   weight_decay: 1
   weight_decay: 0
   inner_product_param {
-    num_output: 492
+    num_output: $INNER
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -318,7 +318,7 @@ layers {
   name: "prob"
   type: MY_SOFTMAX
   my_softmax_param {
-    stride: 41
+    stride: $NUMCATS
   }
 }
 layers {
@@ -328,7 +328,7 @@ layers {
   name: "my_accuracy"
   type: MY_ACCURACY
   my_accuracy_param {
-    stride: 41
+    stride: $NUMCATS
     using_upright: true
   }
 }
@@ -338,7 +338,7 @@ layers {
   name: "loss"
   type: MY_SOFTMAX_LOSS
   my_softmax_loss_param {
-    stride: 41
+    stride: $NUMCATS
     using_upright: true
   }
 }

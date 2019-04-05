@@ -70,7 +70,7 @@ RUN mkdir logs
 COPY caffe_nets ./caffe_nets
 
 # Copy changed code
-COPY *.prototxt ./Training/
+COPY *.prototxt ./
 COPY *.py ./
 RUN mv classifier.py /opt/caffe/caffe-rotationnet2/python/caffe
 COPY *.ini ./
