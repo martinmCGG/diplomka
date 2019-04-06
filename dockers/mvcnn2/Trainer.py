@@ -57,7 +57,6 @@ class ModelNetTrainer(object):
                 self.optimizer.zero_grad()
 
                 out_data = self.model(in_data)
-
                 loss = self.loss_fn(out_data, target)
                 losses.append(loss.item())
                 

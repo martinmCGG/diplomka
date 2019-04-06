@@ -27,7 +27,7 @@ class SVCNN(Model):
         nclasses = config.num_classes
         self.pretraining = pretraining
         self.cnn_name = config.cnn_name
-        self.use_resnet = cnn_name.startswith('resnet')
+        self.use_resnet = self.cnn_name.startswith('resnet')
         self.mean = Variable(torch.FloatTensor([0.485, 0.456, 0.406]), requires_grad=False).cuda()
         self.std = Variable(torch.FloatTensor([0.229, 0.224, 0.225]), requires_grad=False).cuda()
 

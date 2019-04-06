@@ -42,7 +42,7 @@ def train(config):
     print('num_train_files: '+str(len(train_dataset.filepaths)))
     print('num_val_files: '+str(len(val_dataset.filepaths)))
     
-    trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(),config, log_dir, num_views=1)
+    trainer = ModelNetTrainer(cnet, train_loader, val_loader, optimizer, nn.CrossEntropyLoss(), config, log_dir, num_views=1)
     trainer.train(config,config.stage1_batch_size)
     #cnet.load(os.path.join(log_dir, config.snapshot_prefix + str(30)))
     
