@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  3 APR 2019 16:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (MiKTeX 2.9.6930 64-bit) (preloaded format=pdflatex 2019.3.19)  6 APR 2019 17:23
 entering extended mode
 **./thesis.tex
 (thesis.tex
@@ -853,8 +853,12 @@ Package caption Info: hyperref package is loaded.
 \sf@top=\skip61
 \sf@bottom=\skip62
 )
-Package hyperref Info: Option `unicode' set `true' on input line 106.
-Package hyperref Info: Option `breaklinks' set `true' on input line 107.
+("C:\Program Files\MiKTeX 2.9\tex/generic/pgf/frontendlayer/tikz/libraries\tikz
+librarymatrix.code.tex"
+File: tikzlibrarymatrix.code.tex 2019/02/02 v3.1.1 (3.1.1)
+)
+Package hyperref Info: Option `unicode' set `true' on input line 107.
+Package hyperref Info: Option `breaklinks' set `true' on input line 108.
 
 \@input{macros.aux}
 \openout2 = `macros.aux'.
@@ -880,23 +884,23 @@ LaTeX Warning: Label `Table:accs' multiply defined.
 ) (chap06.aux) (bibliography.aux))
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 117.
-LaTeX Font Info:    ... okay on input line 117.
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 117.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 118.
+LaTeX Font Info:    ... okay on input line 118.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 118.
 
 
 ("C:\Program Files\MiKTeX 2.9\tex/latex/lm\ot1lmr.fd"
@@ -930,7 +934,7 @@ G,.JBIG2,.JB2,.eps]
 (grfext)             \AppendGraphicsExtensions on input line 456.
 )
 \AtBeginShipoutBox=\box64
-Package hyperref Info: Link coloring OFF on input line 117.
+Package hyperref Info: Link coloring OFF on input line 118.
 
 ("C:\Program Files\MiKTeX 2.9\tex/latex/hyperref\nameref.sty"
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
@@ -940,9 +944,9 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count161
 )
-LaTeX Info: Redefining \ref on input line 117.
-LaTeX Info: Redefining \pageref on input line 117.
-LaTeX Info: Redefining \nameref on input line 117.
+LaTeX Info: Redefining \ref on input line 118.
+LaTeX Info: Redefining \pageref on input line 118.
+LaTeX Info: Redefining \nameref on input line 118.
 
 (thesis.out) (thesis.out)
 \@outlinefile=\write7
@@ -1037,7 +1041,8 @@ Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
 Missing character: There is no ; in font nullfont!
-) [6] [7] [8] [9]) [10]
+) [6] (img/conv2d.tex) [7] (img/pool2D.tex)
+[8] [9]) [10]
 \openout2 = `chap03.aux'.
 
  (chap03.tex
@@ -1052,14 +1057,18 @@ Overfull \hbox (0.50066pt too wide) in paragraph at lines 2--25
 [][] |
  []
 
-) (img/voxnet.tex) [11
+) (img/voxnet.tex)
+
+LaTeX Warning: Reference `[' on page 11 undefined on input line 20.
+
+[11
 
 
 
 ] [12] (img/voxblock.tex) (img/vrn.tex
 Missing character: There is no ; in font nullfont!
-) [13] [14]
-[15] [16] [17] (tables/shapenet_cats.tex
+) [13] [14] [15] [16] [17]
+(tables/shapenet_cats.tex
 
 LaTeX Warning: No positions in optional float specifier.
                Default added (so using `tbp') on input line 1.
@@ -1089,50 +1098,46 @@ LaTeX Warning: No positions in optional float specifier.
 
 
 ]) [22] [23]
-<./img/myplane_2.png, id=579, 478.4274pt x 479.1501pt>
+<./img/myplane_2.png, id=584, 478.4274pt x 479.1501pt>
 File: ./img/myplane_2.png Graphic file (type png)
 <use ./img/myplane_2.png>
 Package pdftex.def Info: ./img/myplane_2.png  used on input line 37.
 (pdftex.def)             Requested size: 181.52959pt x 181.8011pt.
-<./img/vrnesn_plane_2.png, id=581, 483.4863pt x 482.7636pt>
+<./img/vrnesn_plane_2.png, id=586, 483.4863pt x 482.7636pt>
 File: ./img/vrnesn_plane_2.png Graphic file (type png)
 <use ./img/vrnesn_plane_2.png>
 Package pdftex.def Info: ./img/vrnesn_plane_2.png  used on input line 39.
 (pdftex.def)             Requested size: 181.52959pt x 181.25688pt.
-<./img/airplane_rotnet.png, id=588, 224.84pt x 224.84pt>
+<./img/airplane_rotnet.png, id=596, 224.84pt x 224.84pt>
 File: ./img/airplane_rotnet.png Graphic file (type png)
 <use ./img/airplane_rotnet.png>
 Package pdftex.def Info: ./img/airplane_rotnet.png  used on input line 49.
 (pdftex.def)             Requested size: 181.52959pt x 181.53616pt.
-<./img/airplane_pbrt.png, id=589, 224.84pt x 224.84pt>
+<./img/airplane_pbrt.png, id=597, 224.84pt x 224.84pt>
 File: ./img/airplane_pbrt.png Graphic file (type png)
 <use ./img/airplane_pbrt.png>
 Package pdftex.def Info: ./img/airplane_pbrt.png  used on input line 51.
 (pdftex.def)             Requested size: 181.52959pt x 181.53616pt.
-<./img/airplane_depth.png, id=590, 224.84pt x 224.84pt>
+<./img/airplane_depth.png, id=598, 224.84pt x 224.84pt>
 File: ./img/airplane_depth.png Graphic file (type png)
 <use ./img/airplane_depth.png>
 Package pdftex.def Info: ./img/airplane_depth.png  used on input line 54.
 (pdftex.def)             Requested size: 181.52959pt x 181.53616pt.
-<./img/airplane_shaded.png, id=591, 224.84pt x 224.84pt>
+<./img/airplane_shaded.png, id=599, 224.84pt x 224.84pt>
 File: ./img/airplane_shaded.png Graphic file (type png)
 <use ./img/airplane_shaded.png>
 Package pdftex.def Info: ./img/airplane_shaded.png  used on input line 56.
 (pdftex.def)             Requested size: 181.52959pt x 181.53616pt.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[24 <./img/myplane_2.png> <./img/vrnesn_plane_2.png>]
-<./img/myplane_1.png, id=605, 868.6854pt x 579.6054pt>
+ [24 <./img/myplane_2.png> <./img/vrnesn_plane_2.png>]
+<./img/myplane_1.png, id=614, 868.6854pt x 579.6054pt>
 File: ./img/myplane_1.png Graphic file (type png)
 <use ./img/myplane_1.png>
-Package pdftex.def Info: ./img/myplane_1.png  used on input line 65.
+Package pdftex.def Info: ./img/myplane_1.png  used on input line 66.
 (pdftex.def)             Requested size: 181.52959pt x 121.11932pt.
-<./img/pnet_plane_1.png, id=606, 868.6854pt x 579.6054pt>
+<./img/pnet_plane_1.png, id=615, 868.6854pt x 579.6054pt>
 File: ./img/pnet_plane_1.png Graphic file (type png)
 <use ./img/pnet_plane_1.png>
-Package pdftex.def Info: ./img/pnet_plane_1.png  used on input line 67.
+Package pdftex.def Info: ./img/pnet_plane_1.png  used on input line 68.
 (pdftex.def)             Requested size: 181.52959pt x 121.11932pt.
 
 
@@ -1203,41 +1208,41 @@ LaTeX Font Info:    Try loading font information for OT1+lmtt on input line 13.
 ("C:\Program Files\MiKTeX 2.9\tex/latex/lm\ot1lmtt.fd"
 File: ot1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-Underfull \hbox (badness 1005) in paragraph at lines 54--58
+Underfull \hbox (badness 1005) in paragraph at lines 60--64
 []\OT1/lmr/m/n/12 Sungjoon Choi, Qian-Yi Zhou, Stephen Miller, and Vladlen Kolt
 un.  A
- []
-
-
-Underfull \hbox (badness 2762) in paragraph at lines 104--109
-[]\OT1/lmr/m/n/12 Geoffrey Hin-ton, Ni-tish Sri-vas-tava, and Kevin Swer-sky.  
-Neu-ral Net-
  []
 
 [32
 
 
 
-] [33]
-Underfull \hbox (badness 10000) in paragraph at lines 205--208
+]
+Underfull \hbox (badness 2762) in paragraph at lines 110--115
+[]\OT1/lmr/m/n/12 Geoffrey Hin-ton, Ni-tish Sri-vas-tava, and Kevin Swer-sky.  
+Neu-ral Net-
+ []
+
+[33]
+Underfull \hbox (badness 10000) in paragraph at lines 211--214
 []\OT1/lmr/m/n/12 machrisaa.  tensorflow-vgg.  URL []$\OT1/lmtt/m/n/12 https : 
 / / github . com / machrisaa /
  []
 
 
-Underfull \hbox (badness 1028) in paragraph at lines 284--290
+Underfull \hbox (badness 1028) in paragraph at lines 290--296
 []\OT1/lmr/m/n/12 Charles R. Qi, Hao Su, Kaichun Mo, and Leonidas J. Guibas.  P
 oint-
  []
 
-
-Underfull \hbox (badness 2582) in paragraph at lines 301--306
+[34]
+Underfull \hbox (badness 2582) in paragraph at lines 307--312
 \OT1/lmr/m/it/12 [cs]\OT1/lmr/m/n/12 , April 2016.  URL []$\OT1/lmtt/m/n/12 htt
 p : / / arxiv . org / abs / 1604 . 03351$[]\OT1/lmr/m/n/12 .  arXiv:
  []
 
-[34]
-Underfull \hbox (badness 3058) in paragraph at lines 344--350
+
+Underfull \hbox (badness 3058) in paragraph at lines 350--356
 \OT1/lmr/m/n/12 Multi-view Con-vo-lu-tional Neu-ral Net-works for 3d Shape Reco
 g-ni-tion.
  []
@@ -1262,28 +1267,31 @@ Appendix A.
 [40
 
 ]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 165.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 165.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 166.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 166.
  (thesis.aux (title.aux) (chap01.aux) (chap02.aux) (chap03.aux) (chap04.aux) (c
 hap05.aux) (chap06.aux) (bibliography.aux))
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 165.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 165.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 166.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 166.
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: D0720D0BF738C4689B68E37A0CC91778;7350.
+(rerunfilecheck)             Checksum: B762D4F10115A619D58AFDCF8CB1546C;7350.
+
+
+LaTeX Warning: There were undefined references.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 165.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 166.
  ) 
 Here is how much of TeX's memory you used:
- 29302 strings out of 492946
- 532883 string characters out of 3135527
- 640667 words of memory out of 3000000
- 32432 multiletter control sequences out of 15000+200000
+ 30146 strings out of 492946
+ 550237 string characters out of 3135527
+ 647942 words of memory out of 3000000
+ 33264 multiletter control sequences out of 15000+200000
  58092 words of font info for 51 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,10n,71p,1175b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 55i,16n,71p,1175b,2327s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-rmtt.enc}{C:/Program Files
 /MiKTeX 2.9/fonts/enc/dvips/lm/lm-rm.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc
 /dvips/lm/lm-mathit.enc}{C:/Program Files/MiKTeX 2.9/fonts/enc/dvips/lm/lm-math
@@ -1298,9 +1306,9 @@ ype1/public/lm/lmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmr
 Files/MiKTeX 2.9/fonts/type1/public/lm/lmri12.pfb><C:/Program Files/MiKTeX 2.9/
 fonts/type1/public/lm/lmsy10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/publi
 c/lm/lmsy8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/lm/lmtt12.pfb>
-Output written on thesis.pdf (44 pages, 1381899 bytes).
+Output written on thesis.pdf (44 pages, 1387913 bytes).
 PDF statistics:
- 863 PDF objects out of 1000 (max. 8388607)
- 166 named destinations out of 1000 (max. 500000)
+ 876 PDF objects out of 1000 (max. 8388607)
+ 169 named destinations out of 1000 (max. 500000)
  446 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -7,12 +7,12 @@ In this section we introduce datasets of 3D models which we used or considered t
 
 \subsection{ModelNet40}
 ModelNet \cite{wu_3d_2014} is one of the most well-known and commonly used dataset containing annotated 3D models in a mesh format. It was developed by a team at Princeton University. Its subset, called ModelNet40, in particular is used as a baseline for testing different approaches. We therefore decided to use this dataset as a starting point for our evaluations. ModelNet40 contains forty different categories and 12 311 individual models. The dataset has an official split to training and testing subsets, which we adhere to in all cases. The test set contains 2648 models and is never used for training. \par
-The models in original ModelNet40 are not aligned and have widely different scales. Therefore when preprocessing the data for neural networks we rescale all models to fit a  unit sphere and we use manually aligned version of the dataset \cite{sedaghat_orientation-boosted_2016}. Also the categories are not equally populated for example there are over 700 airplane models and only over 100 wardrobe models. The exact numbers of models in particular categories can be found in \hyperref[Table:modelnetcats]{Table 4.1}. ModelNet40 contains files in .off format so our scripts have to be able to read this particular format. The dataset is available to download for academic purposes.
+The models in original ModelNet40 are not aligned and have widely different scales. Therefore when preprocessing the data for neural networks we rescale all models to fit a  unit sphere and we use manually aligned version of the dataset \cite{sedaghat_orientation-boosted_2016}. Also the categories are not equally populated for example there are over 700 airplane models and only over 100 wardrobe models. The exact numbers of models in particular categories can be found in \autoref{Table:modelnetcats}. ModelNet40 contains files in .off format so our scripts have to be able to read this particular format. The dataset is available to download for academic purposes.
 
 \input{./tables/modelnet_cats.tex}
 
 \subsection{ShapeNetCore}
-ShapeNet \cite{chang_shapenet:_2015} is an ongoing effort to establish a richly-annotated, large-scale dataset of 3D shapes. ShapeNet is a collaborative effort between researchers at Princeton, Stanford and Toyota Technological Institute at Chicago. We used its subset called ShapeNetCore which contains 51 209 individual models in 55 categories. There is also an official split to training, test and validation sets. However, this split does not contain all models and is not divided uniformly. We therefore decided to construct our own split -- 80\% of models in each category is assigned to training set and the rest to test sest. By doing this we obtained a training set with 40 939 models and test set with 10 270 models. \par \hyperref[Table:shapenetcats]{Table 4.2} lists the exact numbers of models in particular categories. During our exploration of the dataset we noticed that some models are assigned to more than one category so we were forced to choose one of them somewhat arbitrarily. You can find our final split into sets and categories in csv file [priloha x].  \par
+ShapeNet \cite{chang_shapenet:_2015} is an ongoing effort to establish a richly-annotated, large-scale dataset of 3D shapes. ShapeNet is a collaborative effort between researchers at Princeton, Stanford and Toyota Technological Institute at Chicago. We used its subset called ShapeNetCore which contains 51 209 individual models in 55 categories. There is also an official split to training, test and validation sets. However, this split does not contain all models and is not divided uniformly. We therefore decided to construct our own split -- 80\% of models in each category is assigned to training set and the rest to test sest. By doing this we obtained a training set with 40 939 models and test set with 10 270 models. \par \autoref{Table:shapenetcats} lists the exact numbers of models in particular categories. During our exploration of the dataset we noticed that some models are assigned to more than one category so we were forced to choose one of them somewhat arbitrarily. You can find our final split into sets and categories in csv file [priloha x].  \par
 All models in ShapeNetCore are already aligned and rescaled to fit a unit sphere. The categories are not distributed equally at all as you can see from the table. The dataset is also freely available to download for academic purposes.
 
 
@@ -22,7 +22,7 @@ All models in ShapeNetCore are already aligned and rescaled to fit a unit sphere
 In this section we mention several publicly available datasets containing 3D models which can be used for further research. \par
 Both ModelNet and ShapeNet contain much more models than the standardized subsets we used for our evaluation. Therefore there is an option to download the whole datasets or to construct custom subsets. \par
 A Large Dataset of Object Scans \cite{choi_large_2016} is a dataset concentrating on video scan to 3D model reconstruction but we suppose it can be used for learning classification as well. 
-ObjectNet3D \cite{xiang_objectnet3d:_2016} focuses on image to 3D model reconstruction and therefore contains a large number of 3D models that can be used for classification training.
+ObjectNet3D \cite{xiang_objectnet3d:_2016} focuses on image to 3D model reconstruction and contains a large number of 3D models that can be used for classification training.
 SUNCG dataset \cite{song_semantic_2017} contains entire indoor scenes but is annotated on the level of single objects and therefore can be parsed and used for classification. 
 SceneNN \cite{hua_scenenn:_2016} dataset contains a large number of scenes which are richly annotated and can be split into single objects similarly to the previous dataset.
 
@@ -30,7 +30,7 @@ SceneNN \cite{hua_scenenn:_2016} dataset contains a large number of scenes which
 As mentioned in previous chapters,  mesh files, in which most existing 3D models are saved, are not suitable for direct processing by neural networks. Therefore we have to be able to convert meshes to voxels, images or point clouds.
 
 \subsection{Mesh to Voxels}
-In order to use voxel based systems we need to convert mesh files to voxel occupancy grids. For this purpose we have chosen the OpenVDB library, which is free, open-source and offers python scripting \cite{museth_openvdb:_2013}. OpenVDB offers voxelization as one of its core functions, implemented in C++. We supply python scripts for voxelization of ModelNet40 and ShapeNetCore datasets using python multiprocessing to parallelize the computation. (ref the the user guide that describes how to use the scripts?) Still it can take several hours to process the whole dataset as we need to voxelize multiple rotations for each model. 
+In order to use voxel based systems we need to convert mesh files to voxel occupancy grids. For this purpose we have chosen the OpenVDB library, which is free, open-source and offers python scripting \cite{museth_openvdb:_2013}. OpenVDB offers voxelization as one of its core functions, implemented in C++. We supply python scripts for voxelization of ModelNet40 and ShapeNetCore datasets using python multiprocessing to parallelize the computation. Still it can take several hours to process the whole dataset as we need to voxelize multiple rotations for each model. 
 
 \begin{figure}[!h]
 	\centering
@@ -41,20 +41,21 @@ In order to use voxel based systems we need to convert mesh files to voxel occup
 \end{figure}
 
 \subsection{Mesh to Images}
-For multi-view based neural network we have to be able to render images taken from arbitrary viewpoints of a 3D mesh. Firstly we tried to replicate results used by the authors of MVCNN \cite{su_multi-view_2015} and we used pbrt \cite{pharr_physically_2010}, which is physically based rendering software with publicly available code. This turned out to be a plausible approach. 
-Later in our research we found blender scripts from the authors of MVCNN2 \cite{su_deeper_2018}. These work faster and achieve better accuracy than both ours and original MVCNN images. In our framework we provide both approaches implemented with python scripts and multiprocessing support. 
+For multi-view based neural network we have to be able to render images taken from arbitrary viewpoints of a 3D mesh. Firstly we tried to replicate results used by the authors of MVCNN \cite{su_multi-view_2015} and we used pbrt \cite{pharr_physically_2010}, which is physically based rendering software with publicly available code. This turned out to be a plausible approach. We also used the original blender scripts using phong shading \cite{bishop_fast_1986} in blender to render the images.
+Later in our research we found blender scripts from the authors of MVCNN2 \cite{su_deeper_2018}. They provide two different rendering options -- shaded images and depth images. These work faster and achieve better accuracy than both ours and phong shaded images. In our framework we provide both approaches implemented with python scripts and multiprocessing support. \autoref{renderimages} shows one of the airplane models rendered by the four different scripts.
 
 \begin{figure}[!h]
 	\centering
-	\subfloat[Original rendering provided by authors of Rotation Net]{\includegraphics[width=0.44\columnwidth]{./img/airplane_rotnet}}
+	\subfloat[Phong shading in blender]{\includegraphics[width=0.44\columnwidth]{./img/airplane_rotnet}}
 	\qquad
 	\subfloat[Our pbrt rendering]{\includegraphics[width=0.44\columnwidth]{./img/airplane_pbrt}}
 
 	\centering
-	\subfloat[Depth image provided by authors of MVCNN2]{\includegraphics[width=0.44\columnwidth]{./img/airplane_depth}}
+	\subfloat[Depth image in blender]{\includegraphics[width=0.44\columnwidth]{./img/airplane_depth}}
 	\qquad
-	\subfloat[Shaded image provided by authors of MVCNN2]{\includegraphics[width=0.44\columnwidth]{./img/airplane_shaded}}
+	\subfloat[Shaded image in blender]{\includegraphics[width=0.44\columnwidth]{./img/airplane_shaded}}
 	\caption{Illustration of different image representations}
+	\label{renderimages}
 \end{figure}
 
 \subsection{Mesh to Point Cloud}

@@ -1,4 +1,4 @@
-\begin{thebibliography}{48}
+\begin{thebibliography}{49}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -21,6 +21,12 @@ Jon~Louis Bentley.
 \newblock ISSN 00010782.
 \newblock \doi{10.1145/361002.361007}.
 \newblock URL \url{http://portal.acm.org/citation.cfm?doid=361002.361007}.
+
+\bibitem[Bishop and Weimer(1986)]{bishop_fast_1986}
+Bishop and Weimer.
+\newblock Fast {Phong} {Shading}.
+\newblock \emph{Computer Graphics (20) 4 pp. 103-106}, 20, 1986.
+\newblock \doi{10.1145/15886.15897}.
 
 \bibitem[Brock et~al.(2016)Brock, Lim, Ritchie, and
   Weston]{brock_generative_2016}

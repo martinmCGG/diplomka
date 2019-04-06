@@ -7,20 +7,20 @@
 
 \tikzstyle{layer}=[rounded rectangle,align=center,minimum width=300,minimum height=30,inner sep=3pt, draw=black];
 
-\node[layer] at (0,0) (layer1) {Voxel Grid Input \\ $32\times32\times32$};
-\node[layer, below = of layer1] (layer2) {3D Convolution $3\times3\times3$ size filter \\ $32\times32\times32$, 32 filters};
-\node[layer, below = of layer2] (layer3) {3x Voxception Residual Block \\$32\times32\times32$, 32 filters};
-\node[layer, below = of layer3] (layer4) {Downsampling Block \\ $16\times16\times16$, 64 filters};
-\node[layer, below = of layer4] (layer5) {3x Voxception Residual Block \\$16\times16\times16$, 64 filters};
-\node[layer, below = of layer5] (layer6) {Downsampling Block \\ $8\times8\times8$, 128 filters};
-\node[layer, below = of layer6] (layer7) {3x Voxception Residual Block \\$8\times8\times8$, 128 filters};
-\node[layer, below = of layer7] (layer8) {Downsampling Block \\ $4\times4\times4$, 256 filters};
-\node[layer, below = of layer8] (layer9) {3x Voxception Residual Block \\$4\times4\times4$, 256 filters};
-\node[layer, below = of layer9] (layer10) {Downsampling Block \\ $2\times2\times2$, 512 filters};
-\node[layer, below = of layer10] (layer11) {3D Convolution $3\times3\times3$ size filter \\ $2\times2\times2$, 512 filters};
-\node[layer, below = of layer11] (layer12) {Global Pooling (Flatten)};
-\node[layer, below = of layer12] (layer13) {Dense \\ 512};
-\node[layer, below = of layer13] (layer14) {Dense \\ Number of categories};
+\node[layer] at (0,0) (layer1) {Operation: Voxel Grid Input \\ $32\times32\times32$};
+\node[layer, below = of layer1] (layer2) {Operation: 3D Convolution $3\times3\times3$ filter \\ Data size: $32\times32\times32$, 32 filters};
+\node[layer, below = of layer2] (layer3) {Operation: 3x Voxception Residual Block \\ Data size: $32\times32\times32$, 32 filters};
+\node[layer, below = of layer3] (layer4) {Operation: Downsampling Block \\ Data size: $16\times16\times16$, 64 filters};
+\node[layer, below = of layer4] (layer5) {Operation: 3x Voxception Residual Block \\ Data size: $16\times16\times16$, 64 filters};
+\node[layer, below = of layer5] (layer6) {Operation: Downsampling Block \\Data size: $8\times8\times8$, 128 filters};
+\node[layer, below = of layer6] (layer7) {Operation: 3x Voxception Residual Block \\Data size: $8\times8\times8$, 128 filters};
+\node[layer, below = of layer7] (layer8) {Operation: Downsampling Block \\Data size: $4\times4\times4$, 256 filters};
+\node[layer, below = of layer8] (layer9) {Operation: 3x Voxception Residual Block \\Data size: $4\times4\times4$, 256 filters};
+\node[layer, below = of layer9] (layer10) {Operation: Downsampling Block \\Data size: $2\times2\times2$, 512 filters};
+\node[layer, below = of layer10] (layer11) {Operation: 3D Convolution $3\times3\times3$ size filter \\Data size: $2\times2\times2$, 512 filters};
+\node[layer, below = of layer11] (layer12) {Operation: Global Pooling (Flatten)\\Data size: 512};
+\node[layer, below = of layer12] (layer13) {Operation: Dense \\Data size: 512};
+\node[layer, below = of layer13] (layer14) {Operation: Dense \\Data size: Number of categories};
 
 
 \path[line width=1.4pt]
