@@ -1,11 +1,22 @@
 from __future__ import print_function
 import os
-
+import traceback
 import numpy as np
 import h5py as h5
 
 
+def log(file, log_string):
+    with open(file, 'a') as f:
+        print(log_string)
+        print(log_string, file=f)
+
+
 def prepare(config):
+
+    with open(config.log_file, 'w') as f:
+        print("STARTING CONVERSION", file = f)
+        print("STARTING CONVERSION")
+    
     path2data = config.data
     path2save = config.output
     train_nFaces = np.zeros((1,), dtype=np.int32)
@@ -23,7 +34,7 @@ def prepare(config):
     
     label = 0
     for i, cl in enumerate(classes):
-        
+        log(config.log_file, 'Starting with class {}'.format(cl))
         if not os.path.exists(path2data + '/' + cl + '/train/'):
             continue
         class2label[cl] = np.int8(label)
@@ -35,7 +46,6 @@ def prepare(config):
         cl_test_filenames= [x for x in cl_test_filenames if x.split('.')[-1] == 'off']
         
         for j, shapefile in enumerate(cl_train_filenames):
-            print(shapefile)
             with open(path2data + '/' + cl + '/train/' + shapefile, 'rb') as fobj:
                 for k, line in enumerate(fobj):
                     try:
@@ -94,8 +104,9 @@ def prepare(config):
             test_vertices = np.vstack((test_vertices, vrtcs))
         test_labels = np.hstack((test_labels, class2label[cl]*np.ones(len(cl_test_filenames), dtype=np.int8)))
         
-        print('{} - processed'.format(cl))
-
+        log(config.log_file, '{} - processed'.format(cl))
+        
+    log(config.log_file, "Saving h5 file")
     with h5.File(path2save + '/data.h5', 'w') as hf:
         hf.create_dataset('train_nFaces', data=train_nFaces)
         hf.create_dataset('train_faces', data=train_faces)
@@ -106,6 +117,5 @@ def prepare(config):
         hf.create_dataset('test_vertices', data=test_vertices)
         hf.create_dataset('test_labels', data=test_labels)
 
-    print('\nData is processed and saved to ' + path2save + '/data.h5')
-    
+    log(config.log_file, 'FINISHED')  
     

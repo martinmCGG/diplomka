@@ -84,11 +84,10 @@ def files_to_images(files, config, categories, split):
             dataset = split[file_id]
             render_model(file, config, cat, dataset, cat_name)
         except:
-            e = sys.exc_info()
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), config.log_file)
-            log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno), config.log_file)   
+            err_string = traceback.format_exc()
+            log(config.log_file, "Exception occured while rendering file {}".format(file))
+            log(config.log_file, err_string)   
+            sys.exit(1)
     
 def run_multithread(files, config, categories, split, size_thread):
     pool = []
@@ -101,21 +100,19 @@ def run_multithread(files, config, categories, split, size_thread):
     
 def save_for_mvcnn(config, all_files, categories, split):
 
-    log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
+    log(config.log_file,"Starting {} threads on {} files.".format(config.num_threads, len(all_files)))
     size_thread = 100
     size  = size_thread * config.num_threads
-    log(str(size), config.log_file)
     if len(all_files) > size_thread:
         for j in range(len(all_files)//size):
             files = all_files[j*size:(j+1)*size]
             run_multithread(files, config, categories, split, size_thread)
-            log("Finished {} %".format(j*size/len(all_files)), config.log_file) 
+            log(config.log_file, "Finished {} %".format(j*size/len(all_files))) 
         files = all_files[len(all_files)//size*size:]
         run_multithread(files, config, categories, split, size_thread)
-           
     else:
-        files_to_images(files, 0, config, categories,split)
-    log("Finished conversion", config.log_file)
+        files_to_images(all_files, config, categories,split)
+    log(config.log_file, "Finished conversion")
 
 def collect_files(files, split, cats, config):
     print("COLLECTING")
@@ -129,9 +126,10 @@ def collect_files(files, split, cats, config):
                     print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat], dataset , file_id), cat), file = f)
 
 
-def log(message, log):
-    with open(log, 'a') as f:
-        print(message, file = f)
+def log(file, log_string):
+    with open(file, 'a') as f:
+        print(log_string)
+        print(log_string, file=f)    
 
 
 def compute_dodecahedron_vertices():
@@ -154,6 +152,7 @@ if __name__ == '__main__':
     config = get_config()
     with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
+        print("STARTING CONVERSION")
     try:
         if config.dataset_type == "shapenet":
             from Shapenet import *
@@ -169,6 +168,7 @@ if __name__ == '__main__':
         elif config.dataset_type == "modelnet":
             files = find_files(config.data, 'off')
             pool = Pool(processes=config.num_threads)
+            log(config.log_file, "Converting off files to obj. May take a while.")
             pool.map(off2obj, files)
             pool.close()
             pool.join()
@@ -176,15 +176,14 @@ if __name__ == '__main__':
             config = add_to_config(config,'fov', 70)
         config = add_to_config(config,'cat_names', cat_names)
     except: 
-        e = sys.exc_info()
-        with open(config.log_file, 'a') as f:
-            print("Exception occured while reading files.", file=f)
-            print("Exception {}".format(e), file=f)
+        err_string = traceback.format_exc()
+        log(config.log_file, "Exception occured while reading files.")
+        log(config.log_file, err_string)   
         sys.exit(1)
     
     save_for_mvcnn(config, files, categories, split)
     collect_files(files, split, categories, config)
     if config.dataset_type == 'modelnet' and config.remove_obj:
         os.system('find {} -name *.obj -delete'.format(config.data))
-    
+    log(config.log_file, 'FINISHED') 
     

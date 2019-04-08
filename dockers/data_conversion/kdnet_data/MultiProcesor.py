@@ -2,6 +2,7 @@ from __future__ import print_function
 from multiprocessing import Process, Lock
 import sys, os
 from config import dict_to_tuple
+import traceback
 
 class MultiProcesor:
     def __init__(self, files, n_threads, log_file, categories, split, dataset, proccess_function, write_function):
@@ -48,13 +49,16 @@ class MultiProcesor:
             filename = files[i]
             if i>0 and i%logging_frequency == 0:
                 self.log("Thread {} is {}% done.".format(id,float(i)/len(files)*100))
-
-            file_id = self.id(filename)
-            split_index = self.split[file_id]
-            buffer[split_index].append(self.proccess_function(filename, self.dataset, args))  
-            splitss[split_index]+=1
-            buffer_cats[split_index].append(self.categories[file_id])   
-       
+            try:
+                file_id = self.id(filename)
+                split_index = self.split[file_id]
+                buffer[split_index].append(self.proccess_function(filename, self.dataset, args))  
+                splitss[split_index]+=1
+                buffer_cats[split_index].append(self.categories[file_id])   
+            except:
+                err_string = traceback.format_exc()
+                self.log("Exception occured in thread {}. Failed to proccess file {}".format(id, filename))
+                self.log(err_string)        
                     
         for j in range(len(datasets)):
             if len(buffer_cats[j])  > 0:
@@ -66,6 +70,7 @@ class MultiProcesor:
     def log(self, message):
         self.lock.acquire()
         with open(self.log_file, 'a') as f:
+            print(message)
             print(message, file = f)
         self.lock.release()
 

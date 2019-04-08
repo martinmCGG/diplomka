@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 import sys
-
+import traceback
 sys.path.append("/blender_scripts")
 from multiprocessing import Process, Pool
 
@@ -37,11 +37,17 @@ def files_to_images(files, config, categories, split):
     views = config.num_views
     output_dir = config.output
     for i in range(len(files)):
-        file = files[i]
-        file_id = get_file_id(file)
-        cat = categories[file_id]
-        cat_name = config.cat_names[cat]
-        render_model(file, file_id, views, output_dir, cat, coding[split[file_id]], cat_name)
+        try:
+            file = files[i]
+            file_id = get_file_id(file)
+            cat = categories[file_id]
+            cat_name = config.cat_names[cat]
+            render_model(file, file_id, views, output_dir, cat, coding[split[file_id]], cat_name)
+        except:
+            err_string = traceback.format_exc()
+            log(config.log_file, "Exception occured while rendering file {}".format(file))
+            log(config.log_file, err_string)   
+            sys.exit(1)
 
     
 def run_multithread(files, config, categories, split, size_thread):
@@ -55,32 +61,25 @@ def run_multithread(files, config, categories, split, size_thread):
 
     
 def save_for_mvcnn(config, all_files, categories, split):
-    
-
-    #for cat in config.cat_names:
-    #    os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
-    #    for dataset in coding.values():
-    #        os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
             
-    log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
+    log(config.log_file,"Starting {} threads on {} files.".format(config.num_threads, len(all_files)))
     size_thread = 100
     size  = size_thread * config.num_threads
-    log(str(size), config.log_file)
     if len(all_files) > size_thread:
         for j in range(len(all_files)//size):
             files = all_files[j*size:(j+1)*size]
             run_multithread(files, config, categories, split, size_thread)
-            log("Finished {} %".format(j*size/len(all_files)), config.log_file) 
+            log(config.log_file, "Finished {} %".format(j*size/len(all_files))) 
         files = all_files[len(all_files)//size*size:]
         run_multithread(files, config, categories, split, size_thread)
     else:
         files_to_images(all_files, config, categories,split)
-    log("Finished conversion", config.log_file)
+    log(config.log_file, "Finished conversion")
 
 
                             
 def collect_files(files, split, cats, config):
-    print("COLLECTING")
+    log(config.log_file, "COLLECTING")
     datasets = ['train', 'test']
     for dataset in datasets:
         with open ('{}/{}.txt'.format(config.output, dataset), 'w') as f:
@@ -91,10 +90,10 @@ def collect_files(files, split, cats, config):
                     print("{} {}".format(get_name_of_txt_file(config.output, config.cat_names[cat] , dataset , file_id), cat), file = f)                           
 
 
-
-def log(message, log):
-    with open(log, 'a') as f:
-        print(message, file = f)          
+def log(file, log_string):
+    with open(file, 'a') as f:
+        print(log_string)
+        print(log_string, file=f)        
                
 if __name__ == '__main__':
 
@@ -102,6 +101,7 @@ if __name__ == '__main__':
 
     with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
+        print("STARTING CONVERSION")
     try:
         if config.dataset_type == "shapenet":
             from Shapenet import *
@@ -116,17 +116,18 @@ if __name__ == '__main__':
         elif config.dataset_type == "modelnet":
             files = find_files(config.data, 'off')
             pool = Pool(processes=config.num_threads)
+            log(config.log_file, "Converting off files to obj. May take a while.")
             pool.map(off2obj, files)
             pool.close()
             pool.join()
             files = find_files(config.data, 'obj')
         config = add_to_config(config,'cat_names', cat_names)
-    except: 
-        e = sys.exc_info()
-        with open(config.log_file, 'a') as f:
-            print("Exception occured while reading files.", file=f)
-            print("Exception {}".format(e), file=f)
+    except:
+        err_string = traceback.format_exc()
+        log(config.log_file, "Exception occured while reading files.")
+        log(config.log_file, err_string)   
         sys.exit(1)
+    
     
     def exists(file):
         id = get_file_id(file)
@@ -141,15 +142,17 @@ if __name__ == '__main__':
                 return False
         return True
     
+    #Do not convert already existing files
     all_files = files
     files = [x for x in files if not exists(x)]
-    print(len(files))
     
     save_for_mvcnn(config, files, categories, split)
     collect_files(all_files, split,categories, config)
-    log("Ending and cleaning", config.log_file)
+    log(config.log_file, "Ending and cleaning")
     if config.dataset_type == 'modelnet' and config.remove_obj:
+        log(config.log_file, "Removing .obj files.")
         os.system('find {} -name *.obj -delete'.format(config.data))
+    log(config.log_file, "ENDING")
     
         
     

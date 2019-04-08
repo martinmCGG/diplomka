@@ -2,13 +2,14 @@ from __future__ import print_function
 import numpy as np
 import os
 import sys
+import traceback
 import math
 from mesh_to_volume import mesh_to_voxel_array
 
 from MultiProcesor import MultiProcesor
 from npz_join import join_npz
 from config import get_config, add_to_config
-from tty import IFLAG
+
 
 def write_for_vrnens(buffer, buffer_cats, dataset, id, config):
     features = np.array(buffer)
@@ -37,11 +38,14 @@ def create_ROT_MATRIX(rotation):
 
 def collect_files(config):
     datasets = ['val', 'train', 'test']
-    with open(config.log_file, 'a') as f:
-        print("Collecting - joining npz files.", file=f)
+    log(config.log_file, "Collecting - merging npz files.")
     for dataset in datasets:
         join_npz(config.output, "{}.*\.npz".format(dataset), os.path.join(config.output, "{}.npz".format(dataset)))
         
+def log(file, log_string):
+    with open(file, 'a') as f:
+        print(log_string)
+        print(log_string, file=f)
 
 if __name__ == '__main__':
     config = get_config()
@@ -50,7 +54,7 @@ if __name__ == '__main__':
     try:
         ROT_MATRIX = create_ROT_MATRIX(config.num_rotations)
         config = add_to_config(config,'matrix', ROT_MATRIX)
-        
+ 
         if config.dataset_type == "shapenet":
             from Shapenet import *
         elif config.dataset_type == "modelnet":
@@ -61,17 +65,15 @@ if __name__ == '__main__':
         write_cat_names(config.data, config.output)
         
     except:
-        e = sys.exc_info()
-        with open(config.log_file, 'a') as f:
-            print("Exception occured while reading files.", file=f)
-            print("Exception {}".format(e), file=f)
+        err_string = traceback.format_exc()
+        log(config.log_file, "Exception occured while reading files.")
+        log(config.log_file, err_string)   
         sys.exit(1)
     
-
     save_for_VRNENS(config, categories, split, files)
     collect_files(config)
+    log(config.log_file, 'FINISHED') 
     
-    with open(config.log_file, 'a') as f:
-        print("Ended", file=f)
+    
 
 
