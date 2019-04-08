@@ -1,13 +1,13 @@
 ##########################################################################################################
 # Set required variables
 
-name="phong_shapenet"
-dataset_path="/local/krabec/ShapeNet"
+name="shaded_modelnet"
+dataset_path="/local/krabec/ModelNet40A"
 output_dir="/home/krabec"
-docker_hidden=d
+docker_hidden=t
 
 #This must be one of phong, shaded or depth
-render=phong
+render=shaded
 
 ##########################################################################################################
 

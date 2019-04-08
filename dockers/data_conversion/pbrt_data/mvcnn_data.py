@@ -28,13 +28,13 @@ def render_one_image(geometry, unformated_scene, angle, camera_angle, output_dir
         formated_scene = unformated_scene.format(output_file, geometry, camera_angle, dodecahedron, fov, dodecahedron)
     else:
         formated_scene = unformated_scene.format(output_file, geometry, angle, "1.6 0.8 0", fov, "0 1 0")
-        
-    with open("formated_scene{}.pbrt".format(id), 'w') as f:
+       
+    formated_file = "formated_scene{}.pbrt".format(file_id)
+    with open(formated_file , 'w') as f:
         print(formated_scene, file=f)
-    cmd = "./pbrt formated_scene{}.pbrt > /dev/null".format(id)
-    #cmd = "echo \"{}\" | ./pbrt".format(formated_scene)
+    cmd = "./pbrt {} > /dev/null".format(formated_file)
     os.system(cmd)
-
+    os.system("rm {}".format(formated_file))
     
 def render_model(obj_file, config, cat, dataset, cat_name):
     fov = config.fov
@@ -43,9 +43,10 @@ def render_model(obj_file, config, cat, dataset, cat_name):
     whole_path = os.path.join(config.output, cat_name, coding[dataset], file_id)
     
     os.system("mkdir -m 777 \"{}\"".format(whole_path))
-  
     cmd = "./obj2pbrt {} {}".format(obj_file, geometry)
+    print(cmd)
     os.system(cmd) 
+
     with open("scene.pbrt", 'r') as f:
         unformated_scene = f.read() 
 
@@ -73,9 +74,7 @@ def render_model(obj_file, config, cat, dataset, cat_name):
 
 def files_to_images(files, config, categories, split):
     views = config.num_views
-    
     camera_rotations = config.camera_rotations
-
     for i in range(len(files)):
         file = files[i]
         try:
@@ -91,8 +90,16 @@ def files_to_images(files, config, categories, split):
             log("Exception occured in thread {}. Failed to proccess file {}".format(id, file), config.log_file)
             log("Exception: Type: {} File: {} Line: {}".format(exc_type, fname, exc_tb.tb_lineno), config.log_file)   
     
+def run_multithread(files, config, categories, split, size_thread):
+    pool = []
+    for i in range(config.num_threads):
+        p = Process(target=files_to_images, args=(files[i* size_thread:(i+1)* size_thread], config, categories, split))
+        p.start()
+        pool.append(p)
+    for p in pool:
+        p.join()
     
-def save_for_mvcnn(config, files, categories, split):
+def save_for_mvcnn(config, all_files, categories, split):
     
     for cat in config.cat_names:
         os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
@@ -167,7 +174,7 @@ if __name__ == '__main__':
         elif config.dataset_type == "modelnet":
             files = find_files(config.data, 'off')
             pool = Pool(processes=config.num_threads)
-            #pool.map(off2obj, files)
+            pool.map(off2obj, files)
             pool.close()
             pool.join()
             files = find_files(config.data, 'obj')

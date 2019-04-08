@@ -45,6 +45,8 @@ The first and simplest multi-view approach \cite{su_multi-view_2015} uses shared
 \par
 The revisited but similar approach is used by \cite{su_deeper_2018}, which divides the training phase in two stages. In the first stage the network is trained only using one view and later during the second phase pooling across the views is employed. Authors also explore different pre-trained image network architectures and different image rendering techniques improving accuracy of this method significantly. It uses a pre-trained VGG-11 convolutional network as its base. It offers a publicly available implementation in Pytorch which we have chosen to test as its promises some of the best accuracies achieved on ModelNet40 so far.
 
+\input{./img/mvcnn.tex}
+
 \subsection{RotationNet}
 RotationNet \cite{kanezaki_rotationnet:_2016} reports the highest achieved accuracy on ModelNet40 dataset so it is of particular interest to us. It combines the multi-view classification with an unsupervised pose estimation task. Unlike other multi-view networks we do not provide information about the position of the viewpoints, i.e. they can be rotated arbitrarily hence the name of the network. 
 To achieve this, a new category is added to the set of original classification categories. The meaning of this category is “this is not the correct viewpoint”. All the possible rotations of the viewpoints are tried and the most probable according to predicted categories is chosen. Authors offer two implementations, one in Caffe the second one in PyTorch. We have chosen to test this network as it reports very high accuracy on ModelNet40 and inherently contains pose estimation, which can be useful for future work.

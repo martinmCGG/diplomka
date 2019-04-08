@@ -99,9 +99,6 @@ def log(message, log):
 if __name__ == '__main__':
 
     config = get_config()
-    
-    with open(os.path.join(config.output,'tt.txt'), 'w') as f:
-        print("STARTING CONVERSION", file = f)
 
     with open(config.log_file, 'w') as f:
         print("STARTING CONVERSION", file = f)
@@ -137,6 +134,8 @@ if __name__ == '__main__':
         cat_name = cat_names[cat]
         dataset = coding[split[id]]
         whole_path = os.path.join(config.output, cat_name, dataset, id)
+        if not os.path.exists(os.path.join(whole_path, id + '.txt')):
+            return False
         for view in range(config.num_views):
             if not os.path.exists(get_name_of_image_file(whole_path, id, view)):
                 return False
