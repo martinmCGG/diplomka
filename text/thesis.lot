@@ -2,16 +2,16 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {3.1}{\ignorespaces List of examined neural networks. There is a citation of an original paper, a framework of the publicly available code and if we included the network in our testing.\relax }}{12}{table.caption.6}% 
-\contentsline {table}{\numberline {3.2}{\ignorespaces List of ShapeNetCore categories and their counts.\relax }}{19}{table.caption.10}% 
-\contentsline {table}{\numberline {3.3}{\ignorespaces List of ModelNet40 categories and their counts.\relax }}{20}{table.caption.11}% 
+\contentsline {table}{\numberline {3.2}{\ignorespaces List of ShapeNetCore categories and their counts.\relax }}{20}{table.caption.11}% 
+\contentsline {table}{\numberline {3.3}{\ignorespaces List of ModelNet40 categories and their counts.\relax }}{21}{table.caption.12}% 
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces List of ModelNet40 categories and their counts.\relax }}{22}{table.caption.12}% 
-\contentsline {table}{\numberline {4.2}{\ignorespaces List of ShapeNetCore categories and their counts.\relax }}{23}{table.caption.13}% 
+\contentsline {table}{\numberline {4.1}{\ignorespaces List of ModelNet40 categories and their counts.\relax }}{23}{table.caption.13}% 
+\contentsline {table}{\numberline {4.2}{\ignorespaces List of ShapeNetCore categories and their counts.\relax }}{24}{table.caption.14}% 
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces List of ModelNet40 accuracies.\relax }}{28}{table.caption.17}% 
-\contentsline {table}{\numberline {5.2}{\ignorespaces Comparison of multi-view methods.\relax }}{28}{table.caption.18}% 
-\contentsline {table}{\numberline {5.3}{\ignorespaces Table of approximate training times on ModelNet40.\relax }}{29}{table.caption.19}% 
-\contentsline {table}{\numberline {5.4}{\ignorespaces Approximate sizes of saved models, which roughly corresponds to number of trainable parameters of the model.\relax }}{29}{table.caption.20}% 
-\contentsline {table}{\numberline {5.5}{\ignorespaces Averege accuracies per category of ModelNet40, sorted from worst to best.\relax }}{30}{table.caption.21}% 
+\contentsline {table}{\numberline {5.1}{\ignorespaces List of ModelNet40 accuracies.\relax }}{29}{table.caption.18}% 
+\contentsline {table}{\numberline {5.2}{\ignorespaces Comparison of multi-view methods.\relax }}{29}{table.caption.19}% 
+\contentsline {table}{\numberline {5.3}{\ignorespaces Table of approximate training times on ModelNet40.\relax }}{30}{table.caption.20}% 
+\contentsline {table}{\numberline {5.4}{\ignorespaces Approximate sizes of saved models, which roughly corresponds to number of trainable parameters of the model.\relax }}{30}{table.caption.21}% 
+\contentsline {table}{\numberline {5.5}{\ignorespaces Averege accuracies per category of ModelNet40, sorted from worst to best.\relax }}{31}{table.caption.22}% 
 \addvspace {10\p@ }
 \addvspace {10\p@ }

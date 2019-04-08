@@ -1,0 +1,45 @@
+\begin{figure}
+\def\layersep{0.5cm}
+\centering
+\begin{tikzpicture}[shorten >=1pt,->,draw=black, node distance=\layersep]
+
+\tikzstyle{layer}=[rounded rectangle,align=center,minimum width=240,minimum height=30,inner sep=3pt, draw=black];
+
+\node[layer] at (0,0) (layer1) {Operation: Point Cloud Input \\Data size: $n\times3$};
+\node[layer, below = of layer1] (t1) {Operation: Input Transform\\ Data size: $n\times3$};
+\node[layer, below = of t1] (layer2) {Operation: Dense (for each point) \\ Data size: $n\times64$};
+\node[layer, below = of layer2] (layer3) {Operation: Dense (for each point) \\ Data size: $n\times64$};
+\node[layer, below = of layer3] (t2) {Operation: Feature Transform \\ Data size: $n\times64$};
+\node[layer, below = of t2] (layer4) {Operation: Dense (for each point) \\ Data size: $n\times64$};
+\node[layer, below = of layer4] (layer5) {Operation: Dense (for each point) \\ Data size: $n\times128$};
+\node[layer, below = of layer5] (layer6) {Operation: Dense (for each point) \\ Data size: $n\times1024$};
+\node[layer, below = of layer6] (layer7) {Operation: Max pooling across points \\Data size: $1024$};
+\node[layer, below = of layer7] (layer8) {Operation: Dense\\ Data size: $512$};
+\node[layer, below = of layer8] (layer9) {Operation: Dense\\ Data size: $256$};
+\node[layer, below = of layer9] (layer10) {Operation: Dense \\Data size: Number of categories};
+
+
+\tikzstyle{transform}=[rectangle,align=center,minimum width=160,minimum height=100,inner sep=3pt, draw=black];
+\node[transform, right = of t1] (t11) {Input Transform \\Dense layers 64,128,1024\\(for each point)\\ Max pooling across points\\Dense 9 $\rightarrow3\times3$ matrix \\Matrix applied on points};
+\node[transform, right = of t2] (t22) {Feature Transform\\Dense layers 64,128,1024\\(for each point)\\ Max pooling across points\\Dense 4096 $\rightarrow64\times64$ matrix \\Matrix applied on points};
+
+
+\path[line width=1.4pt]
+(layer1) edge          		node {} (t1) 
+	(t1) edge          		node {} (layer2) 
+(layer2) edge          		node {} (layer3)    
+(layer3) edge          		node {} (t2) 
+	(t2) edge          		node {} (layer4) 
+(layer4) edge          		node {} (layer5)    
+(layer5) edge          		node {} (layer6)    
+(layer6) edge          		node {} (layer7)       
+(layer7) edge          		node {} (layer8) 
+(layer8) edge          		node {} (layer9)
+(layer9) edge          		node {} (layer10)
+(t22) edge          		node {} (t2)
+(t11) edge          		node {} (t1);
+
+\end{tikzpicture}
+\caption{PointNet architecture. Layers labeled "for each point" are applied for each point separatly with same weights. $n$ is number of input points.}
+\label{pointnet}
+\end{figure}

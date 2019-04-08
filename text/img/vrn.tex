@@ -7,7 +7,7 @@
 
 \tikzstyle{layer}=[rounded rectangle,align=center,minimum width=300,minimum height=30,inner sep=3pt, draw=black];
 
-\node[layer] at (0,0) (layer1) {Operation: Voxel Grid Input \\ $32\times32\times32$};
+\node[layer] at (0,0) (layer1) {Operation: Voxel Grid Input \\Data size: $32\times32\times32$};
 \node[layer, below = of layer1] (layer2) {Operation: 3D Convolution $3\times3\times3$ filter \\ Data size: $32\times32\times32$, 32 filters};
 \node[layer, below = of layer2] (layer3) {Operation: 3x Voxception Residual Block \\ Data size: $32\times32\times32$, 32 filters};
 \node[layer, below = of layer3] (layer4) {Operation: Downsampling Block \\ Data size: $16\times16\times16$, 64 filters};
