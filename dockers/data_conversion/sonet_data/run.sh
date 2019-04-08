@@ -2,10 +2,10 @@
 # Set required variables
 
 name="sonet5000"
-dataset_path="/local/krabec/ModelNet40A/ModelNet40A"
-output_dir="/local/krabec/ModelNet40A/"
-GPU=2
-docker_hidden=d
+dataset_path="/media/user/TMP/ModelNet40"
+output_dir="/media/user/TMP/ModelNet40/converted_sonet"
+GPU=0
+docker_hidden=i
 
 ##########################################################################################################
 

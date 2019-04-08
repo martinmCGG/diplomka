@@ -2,9 +2,9 @@
 # Set required variables
 
 name="vrnens"
-dataset_path="/local/krabec/ShapeNet/ShapeNet"
-output_dir="/local/krabec/ShapeNet"
-docker_hidden=d
+dataset_path="/media/user/TMP/ModelNet40"
+output_dir="/media/user/TMP/ModelNet40/converted_vrnens"
+docker_hidden=t
 
 ##########################################################################################################
 

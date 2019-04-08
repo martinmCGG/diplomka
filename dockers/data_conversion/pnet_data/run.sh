@@ -2,8 +2,8 @@
 # Set required variables
 
 name="pnet"
-dataset_path="/local/krabec/ShapeNet/ShapeNet"
-output_dir="/local/krabec/ShapeNet"
+dataset_path="/media/user/TMP/ModelNet40"
+output_dir="/media/user/TMP/ModelNet40/converted_pnet"
 docker_hidden=t
 
 ##########################################################################################################

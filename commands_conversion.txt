@@ -1,0 +1,341 @@
+# System info
+
+cat /etc/os-release | grep VERSION=
+# > VERSION="18.04.2 LTS (Bionic Beaver)"
+
+nvidia-smi
+# +-----------------------------------------------------------------------------+
+# | NVIDIA-SMI 410.78       Driver Version: 410.78       CUDA Version: 10.0     |
+# |-------------------------------+----------------------+----------------------+
+# | GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+# | Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+# |===============================+======================+======================|
+# |   0  GeForce RTX 2070    Off  | 00000000:05:00.0 Off |                  N/A |
+# |  0%   35C    P8    11W / 175W |      0MiB /  7952MiB |      0%      Default |
+# +-------------------------------+----------------------+----------------------+
+# ...
+
+
+
+# Tests
+
+git clone https://github.com/alobal123/diplomka MK-diplomka-test
+cd MK-diplomka-test
+
+git describe --all --long
+# > heads/master-0-gabfe8bc
+
+## Data conversion
+### Rendered images
+{
+
+cd dockers/data_conversion/pbrt_data/
+
+# change run.sh:
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_pbrt"
+	docker_hidden=t
+
+# change config.ini:
+	dataset_type= modelnet
+
+./run.sh
+
+# Warnings:
+...
+mkdir: cannot create directory '/data/xbox': File exists
+mkdir: cannot create directory '/data/xbox/train': File exists
+mkdir: cannot create directory '/data/xbox/test': File exists
+mkdir: cannot create directory '/data/xbox/val': File exists
+# -> using "mkdir -p /path/to/new/folder" should help
+
+
+# Error 1:
+Scanning for files...
+Found 12311 files
+Traceback (most recent call last):
+  File "mvcnn_data.py", line 183, in <module>
+    save_for_mvcnn(config, files, categories, split)
+  File "mvcnn_data.py", line 102, in save_for_mvcnn
+    log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
+NameError: name 'all_files' is not defined
+
+# renamed the "files" parameter of save_for_mvcnn to "all_files" in mvcnn_data.py
+
+# Error 2:
+Scanning for files...
+Found 12311 files
+Traceback (most recent call last):
+  File "mvcnn_data.py", line 183, in <module>
+    save_for_mvcnn(config, files, categories, split)
+  File "mvcnn_data.py", line 109, in save_for_mvcnn
+    run_multithread(files, config, categories, split, size_thread)
+NameError: name 'run_multithread' is not defined
+
+# not fixed
+
+}
+
+
+
+{
+
+cd dockers/data_conversion/blender_data/
+
+# change run.sh:
+	name="blender_phong"
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_blender"
+	docker_hidden=t
+
+# change config.ini:
+	dataset_type= modelnet
+
+./run.sh
+
+# Error:
+Successfully built a51b2c6d51bb
+Successfully tagged blender2:latest
+Error response from daemon: Cannot kill container: blender2: No such container: blender2
+Error: No such container: blender2
+2285b9f9595e1de90a1b7c177d803826f473fda5ca878c7cedc3b676130556ee
+docker: Error response from daemon: error while creating mount source path '/media/user/TMP/ModelNet40/converted_blender/blender_phong': chown /media/user/TMP/ModelNet40/converted_blender/blender_phong: operation not permitted.
+Error: No such container: blender2
+
+# ^ re-running the run.sh script worked (possible cause: the TMP partition is an ExFAT, which does not support permissions/ownership)
+
+# Possible error in output:
+.../blender_phong/airplane/test/airplane_0627/airplane_0627_1.png is rendered upside down (all other models I looked at too; maybe an issue in .off -> .obj conversion or Blender's input settings?)
+
+# The conversion finished correctly (last 2 lines: COLLECTING; Blender quit) with exit code 0, generating 2.5 GB of renders
+
+}
+
+
+
+### Voxels
+{
+
+cd dockers/data_conversion/vrnens_data/
+
+# change run.sh:
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_vrnens"
+	docker_hidden=t
+
+# change config.ini:
+	dataset_type = modelnet
+
+./run.sh
+
+# Error:
+Successfully built e82c6fc743c6
+Successfully tagged openvdb:latest
+Error response from daemon: Cannot kill container: openvdb: No such container: openvdb
+Error: No such container: openvdb
+1fdfad9a17af18828f0ae87865f0da7e5e4fbce277908fa1e88c01888a1f9966
+docker: Error response from daemon: error while creating mount source path '/media/user/TMP/ModelNet40/converted_vrnens/vrnens': chown /media/user/TMP/ModelNet40/converted_vrnens/vrnens: operation not permitted.
+Error: No such container: openvdb
+
+# ^ again, re-running the run.sh script worked
+
+# result: exit code 0, resulting folder looks ok, 9.1 GB
+
+}
+
+### Point cloud
+{
+
+cd dockers/data_conversion/pnet_data/
+
+# change run.sh:
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_pnet"
+
+./run.sh
+
+# Error:
+Successfully built 83b33f13f404
+Successfully tagged pointcloud:latest
+Error response from daemon: Cannot kill container: pointcloud: No such container: pointcloud
+Error: No such container: pointcloud
+6486eca8edf83f938d503b6b0495fe25cdef54d6be592baec5da5b6c98e76437
+docker: Error response from daemon: error while creating mount source path '/media/user/TMP/ModelNet40/converted_pnet/pnet': chown /media/user/TMP/ModelNet40/converted_pnet/pnet: operation not permitted.
+Error: No such container: pointcloud
+
+# ^ again, re-running the run.sh script worked
+
+# the resulting data seems ok, 578 MB
+
+}
+
+{
+
+cd dockers/data_conversion/sonet_data/
+
+# change run.sh:
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_sonet"
+	GPU=0
+	docker_hidden=i
+
+./run.sh
+
+# Error:
+Successfully built 04e5a4f56c95
+Successfully tagged sonet:latest
+Error response from daemon: Cannot kill container: sonet: No such container: sonet
+Error: No such container: sonet
+952e8561693579922164c18f14135f8915857ea3095d0417e73b280d9ee026a6
+docker: Error response from daemon: error while creating mount source path '/media/user/TMP/ModelNet40/converted_sonet/sonet5000': chown /media/user/TMP/ModelNet40/converted_sonet/sonet5000: operation not permitted.
+Error: No such container: sonet
+
+# ^ again, re-running the run.sh script worked
+
+# the resulting data seems ok, 2.8 GB
+
+}
+
+### Other
+{
+
+cd dockers/data_conversion/octree_data/
+
+# (non-adaptive octree)
+
+# change run.sh:
+	name="octree"
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_octree"
+	docker_hidden=i
+
+
+# change config.ini:
+	dataset_type = modelnet
+	adaptive = False
+
+
+# Error 1:
+Successfully built 2291fce3e20d
+Successfully tagged octree:latest
+Error response from daemon: Cannot kill container: octree: No such container: octree
+Error: No such container: octree
+e15141e221d161b6eba4af01a5cadd9b7d71ce6964acdf6b637c2a4c79c5fd4d
+docker: Error response from daemon: error while creating mount source path '/media/user/TMP/ModelNet40/converted_octree/octree': chown /media/user/TMP/ModelNet40/converted_octree/octree: operation not permitted.
+Error: No such container: octree
+
+# ^ again, re-running the run.sh script worked
+
+
+# Error 2:
+Successfully tagged octree:latest
+Error response from daemon: Cannot kill container: octree: No such container: octree
+Error: No such container: octree
+995342f0db4a2e4e63bd5e74c9902dd86730ae6bdc07f2414a759704a996f424
+Traceback (most recent call last):
+  File "octree_data.py", line 104, in <module>
+    Modelnet.write_cat_names(config.data, config.output)
+NameError: name 'Modelnet' is not defined
+
+# removed "Modelnet." from the problematic line
+
+# result:
+I0405 22:50:25.633473   554 convert_octree_data.cpp:83] A total of 468 octree files.
+I0405 22:50:25.633497   554 convert_octree_data.cpp:86] Writing data to DB
+I0405 22:50:25.664624   554 db_lmdb.cpp:40] Opened lmdb /data/train_lmdb
+I0405 22:50:40.000685   554 convert_octree_data.cpp:117] Processed 468 files.
+# exit code 0, resulting data folder seems to be ok (734,5 MB)
+
+}
+
+{
+
+cd dockers/data_conversion/octree_data/
+# (adaptive octree)
+
+# change run.sh:
+	name="octree_adaptive"
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_octree_adaptive"
+	docker_hidden=i
+
+
+# change config.ini:
+	dataset_type = modelnet
+	adaptive = True
+
+./run.sh
+
+# Error:
+Successfully built ca353a32c77c
+Successfully tagged octree:latest
+octree
+Error response from daemon: removal of container octree is already in progress
+docker: Error response from daemon: Conflict. The container name "/octree" is already in use by container "74c8b4a7b8ee928d2050f228b3daeb510bc3034fb82f827979903f49a37a812c". You have to remove (or rename) that container to be able to reuse that name.
+See 'docker run --help'.
+Error: No such container: octree
+
+# ^ fixed itself when running run.sh for the third time (?strange?)
+
+# finished with error code 0, output folder seems OK, 492 MB
+
+}
+
+{
+
+cd dockers/data_conversion/kdnet_data/
+
+# change run.sh:
+	dataset_path="/media/user/TMP/ModelNet40"
+	output_dir="/media/user/TMP/ModelNet40/converted_kdnet"
+	docker_hidden=i
+	
+
+# change config.ini:
+	dataset_type= modelnet
+
+./run.sh
+
+
+# Error 1:
+078e91401a3e0b1075525dc48cdb1a84d5f519b1562263cb16075c9623b3a83c
+docker: Error response from daemon: error while creating mount source path '/media/user/TMP/ModelNet40/converted_kdnet/kdnetsmall': chown /media/user/TMP/ModelNet40/converted_kdnet/kdnetsmall: operation not permitted.
+Error: No such container: kdnet_data
+
+# ^ again, re-running the run.sh script worked
+
+
+# Error 2:
+667f741b0c40007fc90b83c7a01b333854b3d5df030f0e24e6aae91c9bb299ef
+{'data': '/dataset', 'output': '/data', 'log_file': '/data/log.txt', 'num_threads': 8, 'dataset_type': 'modelnet'}
+airplane_0001.off
+Traceback (most recent call last):
+  File "kdnet_data.py", line 14, in <module>
+    prepare(config)
+  File "/kdnets/lib/processors/modelnet40.py", line 52, in prepare
+    vrtcs[k] = map(np.float32, line.split())
+TypeError: float() argument must be a string or a number, not 'map'
+
+# changed map() to list(map()) because Python 3 map returns an iterator, not a list
+
+# result:
+xbox_0121.off
+xbox_0122.off
+xbox_0123.off
+xbox - processed
+Data is processed and saved to /data/data.h5
+# exit code: 0, resulting data folder seems OK (single .h5 file, 5.2 GB)
+
+}
+
+exit
+
+# Additional notes (not necessarily things that need to be fixed):
+ - the Manual folder contains duplicate content (*.md), may be removed?
+ - run.sh scripts write e.g. "Error: No such container: pbrt" before starting the container even when everything works fine (just the container is not running so it cannot be killed). This may be supressed by >/dev/null or 2>/dev/null.
+ - there is no obvious indication that the conversion process runs - when a container is detached (in run.sh). Adding something like this would help: "the container/process is running in the background. Check its status via 'docker ps' (?) or watch logs with 'tail -f /path/to/some.log'". If the detaching is not necessary, I would avoid it by running the process inside the container interactively (which would also solve the issue of automatic container stopping/destruction on end).
+ - generally it should be documented (and consistent) where the logs are created (during data conversion)
+ - some docker containers write to the source dataset folder, which might cause "collisions" when converting the dataset into multiple formats simultaneously. I would prefer if the log (and maybe other temporary files when needed) were written to the OUTPUT directory (/data instead of /dataset). (e.g. data_conversion/ocrtee_data/run.sh: docker exec -i -"$docker_hidden" "$image_name" sh -c "python octree_data.py > /dataset/log.txt")
+ - run.sh does not fail on real errors. Adding "#! /bin/sh -e" as a first line or running "set -e" at the beginning would stop on errors. But all fail-able commands (e.g. stopping a not-running container, which may return non-zero exit code) would need to be suffixed with '| true' to allow it to fail without consequences.
+ - pbrt_data and blender_data break the <network_name>_data naming convention. I would prefer the names e.g. mvcnn_data_pbrt and mvcnn_data_blender instead
+

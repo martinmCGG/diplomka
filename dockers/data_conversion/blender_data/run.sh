@@ -1,10 +1,10 @@
 ##########################################################################################################
 # Set required variables
 
-name="phong_shapenet"
-dataset_path="/local/krabec/ShapeNet"
-output_dir="/home/krabec"
-docker_hidden=d
+name="blender_phong"
+dataset_path="/media/user/TMP/ModelNet40"
+output_dir="/media/user/TMP/ModelNet40/converted_blender"
+docker_hidden=t
 
 #This must be one of phong, shaded or depth
 render=phong
