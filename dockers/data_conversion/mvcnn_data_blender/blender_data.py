@@ -20,7 +20,7 @@ def get_name_of_txt_file(output_dir, cat_name, dataset, file_id):
 def render_model(obj_file, file_id, views, output_dir, cat, dataset, cat_name):
     
     whole_path = os.path.join(output_dir, cat_name, dataset, file_id)
-    os.system("mkdir -m 777 \"{}\"".format(whole_path))
+    os.system("mkdir -p -m 777 \"{}\"".format(whole_path))
     if config.blender_script == 'phong':
         render_phong(obj_file, file_id, whole_path, nviews=views)
     else:
@@ -57,10 +57,10 @@ def run_multithread(files, config, categories, split, size_thread):
 def save_for_mvcnn(config, all_files, categories, split):
     
 
-    for cat in config.cat_names:
-        os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
-        for dataset in coding.values():
-            os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
+    #for cat in config.cat_names:
+    #    os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
+    #    for dataset in coding.values():
+    #        os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
             
     log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
     size_thread = 100

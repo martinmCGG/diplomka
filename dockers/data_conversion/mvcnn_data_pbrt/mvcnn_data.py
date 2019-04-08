@@ -42,7 +42,7 @@ def render_model(obj_file, config, cat, dataset, cat_name):
     geometry = os.path.join(os.path.split(obj_file)[0] , Path(obj_file).stem + ".pbrt")
     whole_path = os.path.join(config.output, cat_name, coding[dataset], file_id)
     
-    os.system("mkdir -m 777 \"{}\"".format(whole_path))
+    os.system("mkdir -p -m 777 \"{}\"".format(whole_path))
     cmd = "./obj2pbrt {} {}".format(obj_file, geometry)
     print(cmd)
     os.system(cmd) 
@@ -100,12 +100,7 @@ def run_multithread(files, config, categories, split, size_thread):
         p.join()
     
 def save_for_mvcnn(config, all_files, categories, split):
-    
-    for cat in config.cat_names:
-        os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat)))
-        for dataset in coding.values():
-            os.system("mkdir -m 777 \"{}\"".format(os.path.join(config.output,cat,dataset)))
-            
+
     log("Starting {} threads on {} files.".format(config.num_threads, len(all_files)), config.log_file)
     size_thread = 100
     size  = size_thread * config.num_threads
