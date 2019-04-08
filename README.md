@@ -59,7 +59,7 @@ Parameters for data conversion in config.ini file:
 
 *   data - path to the dataset inside the container. Does not have to be changed.
 *   output - path to the directory inside the container where converted dataset will be saved. Does not have to be changed.
-*   log_file - path and name of the file where progress of the data conversion will be written.
+*   log_file - path and name of the file where progress of the data conversion will be written. By default its located in the output directory and called log.txt.
 *   num_threads - maximum number of threads to use.
 *   dataset_type -  which dataset is converting. Must be one of modelnet or shapenet currently.
 
