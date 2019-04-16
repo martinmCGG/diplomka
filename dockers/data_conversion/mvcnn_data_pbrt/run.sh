@@ -2,8 +2,8 @@
 # Set required variables
 set -e
 name="pbrt"
-dataset_path="/local/krabec/ModelNet40A"
-output_dir="/local/krabec/"
+dataset_path="/media/user/TMP/ModelNet40"
+output_dir="/media/user/TMP/ModelNet40/converted_mvcnn_pbrt"
 docker_hidden=t
 
 ##########################################################################################################

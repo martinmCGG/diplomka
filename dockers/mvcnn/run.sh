@@ -1,10 +1,10 @@
 	##########################################################################################################
 # Set required variables
 name='mvcnn'
-dataset_path="/local/krabec/ShapeNet/shaded"
-out_path="/home/krabec/dockers/mvcnn/shapenet"
-GPU=1
-docker_hidden=d
+dataset_path="/media/user/TMP/ModelNet40/converted_mvcnn_pbrt/pbrt/"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/mvcnn"
+GPU=0
+docker_hidden=t
 ##########################################################################################################
 mkdir "$out_path"
 docker build -t "$name" .

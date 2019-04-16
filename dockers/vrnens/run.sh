@@ -3,9 +3,9 @@
 
 name='vrnens'
 dataset_path="/local/krabec/ShapeNet/vrnens"
-out_path="/home/krabec/dockers/vrnens2/shapenet/"
-GPU=3
-docker_hidden=d
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/vrnens"
+GPU=0
+docker_hidden=t
 
 ##########################################################################################################
 

@@ -2,9 +2,9 @@
 # Set required variables
 name='rotnet'
 dataset_path="/home/krabec/phong_shapenet"
-out_path="/home/krabec/dockers/rotnet/shapenet"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/rotnet"
 GPU=0
-docker_hidden=d
+docker_hidden=t
 
 ##########################################################################################################
 

@@ -3,9 +3,9 @@
 
 name='pnet2'
 dataset_path="/local/krabec/ShapeNet/pnet"
-out_path="/home/krabec/dockers/pointnet2/shapenet/"
-GPU=3
-docker_hidden=d
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/pointnet2"
+GPU=0
+docker_hidden=t
 
 ##########################################################################################################
 

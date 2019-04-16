@@ -3,9 +3,9 @@
 
 name='seq2seq'
 dataset_path="/local/krabec/ModelNet40A/shaded"
-out_path="/home/krabec/dockers/seq2seq/out/shaded2"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/seq2seq"
 GPU=0
-docker_hidden=d
+docker_hidden=t
 
 ##########################################################################################################
 

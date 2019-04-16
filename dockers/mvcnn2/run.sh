@@ -2,10 +2,10 @@
 # Set required variables
 
 name='mvcnn2'
-dataset_path="/home/krabec/shaded"
-out_path="/home/krabec/dockers/mvcnn2/shapenet"
+dataset_path="/media/user/TMP/ModelNet40/converted_mvcnn_pbrt/pbrt/"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/mvcnn2"
 GPU=0
-docker_hidden=d
+docker_hidden=t
 
 ##########################################################################################################
 

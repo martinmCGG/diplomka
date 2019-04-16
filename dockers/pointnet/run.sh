@@ -3,8 +3,8 @@
 
 name='pnet'
 dataset_path="/local/krabec/ModelNet40A/pnet"
-out_path="/home/krabec/dockers/pointnet/out2/"
-GPU=2
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/pointnet"
+GPU=0
 docker_hidden=t
 
 ##########################################################################################################

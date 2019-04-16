@@ -2,8 +2,8 @@
 # Set required variables
 
 name='octree'
-dataset_path="/local/krabec/ModelNet40A/octree"
-out_path="/home/krabec/dockers/octree/out2/"
+dataset_path="/media/user/TMP/ModelNet40/converted_octree/octree/"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/octree"
 GPU=0
 docker_hidden=t
 

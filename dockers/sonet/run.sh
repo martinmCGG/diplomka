@@ -3,9 +3,9 @@
 
 name='sonet'
 dataset_path="/local/krabec/ModelNet40A/sonet5000"
-out_path="/home/krabec/dockers/sonet/out5000/"
-GPU=1
-docker_hidden=d
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/sonet"
+GPU=0
+docker_hidden=t
 
 ##########################################################################################################
 

@@ -1,5 +1,6 @@
 # Start with cudnn base image
-FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
+#FROM nvidia/cuda:8.0-cudnn6-devel-ubuntu16.04
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu16.04
 
 # Install basic utilities, python, and python libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -70,14 +71,14 @@ WORKDIR $CAFFE_ROOT
 ARG CAFFE_COMMIT=6bfc5ca8f7c2a4b7de09dfe7a01cf9d3470d22b3
 RUN git clone https://github.com/BVLC/caffe.git . && git reset --hard $CAFFE_COMMIT && \
     rsync -a $OCNN_ROOT/caffe/ ./ && ex -sc '83i|set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")' -cx CMakeLists.txt && \
-    cd python && for req in $(cat requirements.txt) pydot; do pip install $req; done && cd .. && \
-    mkdir build && cd build && \
+    cd python && for req in $(cat requirements.txt) pydot; do pip install $req; done && cd ..
+RUN mkdir build && cd build && \
     cmake -DUSE_CUDNN=1 -DUSE_NCCL=1 .. && \
     make -j"$(nproc)" && \
     mkdir $CAFFE_ROOT/include/caffe/proto && \
     cp $CAFFE_ROOT/build/include/caffe/proto/caffe.pb.h $CAFFE_ROOT/include/caffe/proto/caffe.pb.h
 
-# Prepare newtrok for use 
+# Prepare netwrok for use 
 WORKDIR $OCNN_ROOT
 RUN cd ocnn/octree && pip install . && cd ../caffe && pip install .
 

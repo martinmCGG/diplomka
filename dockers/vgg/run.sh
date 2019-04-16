@@ -3,7 +3,7 @@
 
 name='vgg'
 dataset_path="/local/krabec/ModelNet40A/shaded"
-out_path="/home/krabec/dockers/vgg/shaded/"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/vgg"
 GPU=0
 docker_hidden=t
 

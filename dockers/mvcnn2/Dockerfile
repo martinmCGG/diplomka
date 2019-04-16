@@ -1,5 +1,5 @@
 # Start with pytorch base image
-FROM pytorch/pytorch
+FROM pytorch/pytorch:0.4.1-cuda9-cudnn7-runtime
 
 # Install some basic utils
 RUN apt-get update -yq && apt-get install -yq \
@@ -18,6 +18,8 @@ RUN mv mvcnn_pytorch mvcnn2
 
 WORKDIR /mvcnn2
 RUN mkdir logs	
+
+#RUN pip install torchvision
 
 # Copy changed code
 COPY *.py ./

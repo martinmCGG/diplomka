@@ -1,5 +1,5 @@
 # Start with tensorflow base image
-FROM  tensorflow/tensorflow:1.12.0-gpu
+FROM  tensorflow/tensorflow:1.13.1-gpu
 WORKDIR /
 
 # Install some basic utils
@@ -23,6 +23,9 @@ RUN echo y | apt-get install libfontconfig1 libxrender1
 
 # Prepare pretrained 2D convolutional network
 RUN ./prepare_pretrained_alexnet.sh
+
+RUN pip install matplotlib
+RUN pip install pandas
 
 # Copy changed code
 COPY *.py ./

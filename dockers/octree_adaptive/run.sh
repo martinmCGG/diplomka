@@ -3,9 +3,9 @@
 
 name='octree_adaptive'
 dataset_path="/home/krabec/octree_adaptive"
-out_path="/home/krabec/dockers/octree_adaptive/shapenet/"
+out_path="/media/user/TMP/repo/MK-diplomka-test/out/octree_adaptive"
 GPU=0
-docker_hidden=d
+docker_hidden=t
 
 ##########################################################################################################
 
